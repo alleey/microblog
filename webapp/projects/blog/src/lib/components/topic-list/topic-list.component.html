@@ -1,0 +1,41 @@
+<div *ngIf="loading; else contents">
+    <utils-loader></utils-loader>
+</div>
+
+<ng-template #contents>
+    <utils-alert *ngIf="errorDesc;else topics" [dismissable]="false" [minimal]="true">
+        <p>An error occurred fetching the topics list: {{ errorDesc }}</p>
+    </utils-alert>
+</ng-template>
+
+<ng-template #topics>
+
+    <ng-container
+        [ngTemplateOutlet]="headerTemplate || defaultHeaderTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+
+    <utils-search-box (onApplyFilter)="onApplyFilter($event)" *ngIf="enableSearch">
+    </utils-search-box>
+    <blog-topic-list-view 
+        [topics]="topicList" 
+        [itemTemplate]="itemTemplate"
+        [noContentsTemplate]="noContentsTemplate"
+        (onSelectItem)="handleListViewEvent($event)">
+    </blog-topic-list-view>
+    <utils-pager [page]="page" (onSelectPage)="gotoPage($event)">
+    </utils-pager>
+
+    <ng-container
+        [ngTemplateOutlet]="footerTemplate || defaultFooterTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+
+</ng-template>
+
+<ng-template #defaultHeaderTemplate>
+</ng-template>
+  
+<ng-template #defaultFooterTemplate>
+</ng-template>
+  

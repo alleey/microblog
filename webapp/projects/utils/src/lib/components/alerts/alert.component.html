@@ -1,0 +1,15 @@
+
+<ng-container 
+    [ngTemplateOutlet]="controlTemplate || defaultTemplate"
+    [ngTemplateOutletContext]="{ $implicit: this }">
+</ng-container>
+
+<ng-template #defaultTemplate let-item>
+    <div [ngClass]="['alert', 'alert-' + item.kind]" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="item.fireOnClose()" *ngIf="item.dismissable">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="alert-heading" *ngIf="!item.minimal">{{item.title}}</h4>
+        <ng-content></ng-content>
+    </div>
+</ng-template>

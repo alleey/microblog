@@ -1,0 +1,59 @@
+<div *ngIf="post" class="bg-light p-4">
+
+  <ng-container 
+    [ngTemplateOutlet]="headerTemplate || defaultHeaderTemplate"
+    [ngTemplateOutletContext]="{ $implicit: post, list: this }">
+  </ng-container>
+
+  <ng-container 
+    [ngTemplateOutlet]="contentTemplate || defaultContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: post, list: this }">
+  </ng-container>
+
+  <ng-container 
+    [ngTemplateOutlet]="footerTemplate || defaultFooterTemplate"
+    [ngTemplateOutletContext]="{ $implicit: post, list: this }">
+  </ng-container>
+
+</div>
+
+<ng-template #defaultContentTemplate let-item let-parent="list">
+  <p class="posttext ">
+    {{item.text}}
+  </p>
+  <h5>Posted under Topics:</h5>
+  <blog-topic-list-view [topics]="topics"></blog-topic-list-view>
+  <hr class="my-4">
+  <ng-container *ngIf="parent.enableComments">
+    <h5>Comments:</h5>
+    <div class="mb-3 col-sm-12">
+      <blog-comment-list [postId]="postId"></blog-comment-list>
+    </div>
+    <hr class="my-4">
+    <comment-editor *authRequireLogin="true"></comment-editor>
+  </ng-container>
+</ng-template>
+
+<ng-template #defaultHeaderTemplate let-item let-parent="list">
+  <div class="d-flex justify-content-between">
+    <div>
+      <h2 class="blog-post-list-post-title">{{item.title}}</h2>
+      <div class="created"> {{item.owner}} created the post on {{item.createdOn | prettyDate }}.</div>
+    </div>
+    <div class="d-flex justify-content-between">
+      <div class="ml-1" *authRequireOwner="item.owner">
+        <a class="btn btn-success" role="button" (click)="parent.selectItem(item, 'edit')">Edit</a>
+      </div>
+      <div class="ml-1" *authRequireOwner="item.owner">
+        <a class="btn btn-success" role="button" (click)="parent.selectItem(item, 'delete')">Delete</a>
+      </div>
+    </div>
+  </div>
+  <hr class="my-4">
+</ng-template>
+
+<ng-template #defaultFooterTemplate let-item>
+  <div class="d-flex">
+  </div>
+  <hr class="my-4">
+</ng-template>

@@ -1,0 +1,56 @@
+server:
+  port: ${USER_PROFILE_SERVICE_PORT:9082}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: env,health,metrics
+
+spring:
+  datasource:
+    platform: "postgres"
+    driver-class-name: "org.postgresql.Driver"
+    url: "jdbc:postgresql://database:5432/userprofiles_local"
+    username: "postgres"
+    password: "{cipher}23764ab05adf12c10e97ea9321690d67e7b8259a46b7baab75d802b7a506c4eb"
+    test-while-idle: "true"
+    validation-query: "SELECT 1"
+  jpa:
+    database: "POSTGRESQL"
+    generate-ddl: true
+    show-sql: "true"
+    properties:
+      hibernate:
+        dialect: "org.hibernate.dialect.PostgreSQLDialect"
+        ddl-auto: create
+    hibernate:
+      ddl-auto: create
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+      client:
+        provider:
+          keycloak:
+            token-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/token"
+            authorization-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/auth"
+            userinfo-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/userinfo"
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: zabardast-service-client
+            client-secret: "c2ac53d1-1179-4fca-bd6e-c421d1a37e59"
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/zabardast-service-client"
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:9001/eureka}

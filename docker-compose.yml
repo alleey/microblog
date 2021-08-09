@@ -1,0 +1,143 @@
+version: "3.7"
+services:
+  # Infrastructure
+  database:
+    image: postgres:9.5
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "eagle_eye_local"
+
+  eurekaserver:
+    image: alpha/eureka-service
+    build:
+      context: ./eureka-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9001:9001"
+    environment:
+      SERVER_PORT: 9001
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+
+  keycloak:
+    image: alpha/keycloak
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "8080:8080"
+
+  # App services
+  configserver:
+    image: alpha/config-service
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9003:9003"
+    environment:
+      SERVER_PORT: 9003
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
+  gateway:
+    image: alpha/gateway
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9000:9000"
+    depends_on:
+      - configserver
+      - eurekaserver
+      - keycloak
+    environment:
+      SERVER_PORT: 9000
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      CONFIG_URI: "http://configserver:9003/config"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
+  blogserver:
+    image: alpha/blog-service
+    build:
+      context: ./blog-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9081:9081"
+    restart: on-failure
+    depends_on:
+      - database
+      - configserver
+      - eurekaserver
+      - keycloak
+      - gateway
+    environment:
+      SERVER_PORT: 9081
+      DATABASESERVER_PORT: "5432"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      CONFIG_URI: "http://configserver:9003/config"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
+  bookmarkserver:
+    image: alpha/bookmark-service
+    build:
+      context: ./bookmark-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9080:9080"
+    restart: on-failure
+    depends_on:
+      - database
+      - configserver
+      - eurekaserver
+      - keycloak
+      - gateway
+    environment:
+      SERVER_PORT: 9080
+      DATABASESERVER_PORT: "5432"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      CONFIG_URI: "http://configserver:9003/config"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
+  webapp:
+    image: alpha/webapp
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "4200:80"
+    restart: on-failure
+    depends_on:
+      - keycloak
+      - bookmarkserver
+      - blogserver
+
+  logspout:
+    image: gliderlabs/logspout
+    command: syslog://logs3.papertrailapp.com:48292
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

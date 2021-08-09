@@ -1,0 +1,31 @@
+<ng-container *ngIf="posts">
+    <div *ngFor="let x of posts" class="bg-light">
+        <ng-container 
+            [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
+            [ngTemplateOutletContext]="{ $implicit: x, list: this }">
+        </ng-container>
+    </div>
+</ng-container>
+<ng-container *ngIf="!posts">
+    <ng-container 
+        [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+</ng-container>
+
+<ng-template #defaultItemTemplate let-item let-parent="list">
+    <h4 (click)="selectItem(item, 'select')" class="blog-post-list-post-title">{{item.title}}</h4>
+    <div class="created"> {{item.owner}} created the post on {{item.createdOn | prettyDate }}.</div>
+    <p class="posttext ">
+      {{item.text}} 
+    </p>
+    <p>
+        <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
+    </p>
+    <button class="btn btn-success" (click)="selectItem(item, 'select')">Read More...</button>
+    <hr class="my-4">
+</ng-template>
+
+<ng-template #defaultNoContentsTemplate let-item>
+    No blog posts found! Why not create one?
+</ng-template>

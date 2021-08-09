@@ -1,0 +1,23 @@
+#logging:
+#  level:
+#    root: debug
+
+server:
+  port: ${BOOKMARK_SERVICE_PORT:9080}
+spring:
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:bookmarks;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS bookmark"
+    username: sa
+    password: sa
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+eureka:
+  client:
+    enabled: false

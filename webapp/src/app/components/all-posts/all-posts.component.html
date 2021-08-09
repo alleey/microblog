@@ -1,0 +1,16 @@
+<blog-post-list 
+    [headerTemplate]="header">
+</blog-post-list>
+
+<ng-template #header>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h5>RECENT POSTS</h5>
+        </div>
+        <div>
+            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']">New Post</a>
+            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']" *authRequireRole="'admin'">New Topic</a>
+        </div>
+    </div>
+    <hr class="my-4">
+</ng-template>

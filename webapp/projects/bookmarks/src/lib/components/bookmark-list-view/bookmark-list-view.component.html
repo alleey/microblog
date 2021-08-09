@@ -1,0 +1,27 @@
+<ng-container *ngIf="bookmarks">
+    <ul class="list-group checked-list-box">
+        <li class="list-group-item" *ngFor="let x of bookmarks; index as i">
+            <ng-container 
+                [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
+                [ngTemplateOutletContext]="{ $implicit: x, index: i, list: this }">
+            </ng-container>
+        </li>
+    </ul>
+</ng-container>
+<ng-container *ngIf="!bookmarks">
+    <ng-container 
+        [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+</ng-container>
+
+<ng-template #defaultItemTemplate let-item let-parent="list">
+    <i class="fa fa-times"
+        (click)="parent.selectItem(item, 'delete')"></i>
+    <a class="ml-2" class="ml-1 bookmark-list-bookmark-title" 
+        (click)="parent.selectItem(item, 'select')">{{item.caption}}</a>
+</ng-template>
+
+<ng-template #defaultNoContentsTemplate let-item>
+    No bookmark found!
+</ng-template>

@@ -1,0 +1,17 @@
+logging:
+  level:
+    ROOT: INFO
+
+server:
+  port: ${EUREKA_SERVICE_PORT:9001}
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:9001}/eureka
+  server:
+    wait-time-in-ms-when-sync-empty: 5
+    health-check-url-path: /actuator/health
+    status-page-url-path: /actuator/info

@@ -1,0 +1,28 @@
+
+server:
+  port: ${PORT:8888}
+
+encrypt:
+  key: "345345fsdfsf5345"
+
+spring:
+  application:
+    name: config-service
+  profiles:
+    active: native
+  boot:
+    admin:
+      context-path: /admin
+  cloud:
+    config:
+      server:
+        encrypt:
+          enabled: true
+        prefix: /config
+        native:
+          search-locations: 
+          - 'classpath:/config'
+          - 'classpath:/config/{application}'
+          - 'classpath:/config/{application}/{profile}'
+
+# "[classpath:/, classpath:/config, classpath:/config/{application}, classpath:/config/{application}/{profile}]"

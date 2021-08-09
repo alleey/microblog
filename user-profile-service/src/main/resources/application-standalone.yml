@@ -1,0 +1,33 @@
+server:
+  port: ${USER_PROFILE_SERVICE_PORT:9082}
+spring:
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:userprofiles;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS userprofiles"
+    username: sa
+    password: sa
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+      client:
+        provider:
+          keycloak:
+            token-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/token"
+            authorization-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/auth"
+            userinfo-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/userinfo"
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: zabardast-service-client
+            client-secret: "c2ac53d1-1179-4fca-bd6e-c421d1a37e59"
+            authorization-grant-type: client_credentials
+            redirect-uri: "{baseUrl}/login/oauth2/code/zabardast-service-client"
+eureka:
+  client:
+    enabled: false

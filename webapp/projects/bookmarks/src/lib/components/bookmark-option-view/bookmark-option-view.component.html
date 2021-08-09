@@ -1,0 +1,9 @@
+<div *ngIf="!isBookmarked">
+  <a type="button" class="btn btn-outline-primary" (click)="fireAddBoomark()">Bookmark</a>
+</div>
+
+<div *ngIf="isBookmarked">
+  <a type="button" class="btn btn-primary" (click)="fireRemoveBoomark()">
+    Bookmarked <span class="badge badge-light"><i class="fa fa-star"></i></span>
+  </a>
+</div>
