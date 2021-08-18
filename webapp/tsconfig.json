@@ -16,6 +16,14 @@
         "dist/bookmarks/bookmarks",
         "dist/bookmarks"
       ],
+      "followers": [
+        "dist/followers/followers",
+        "dist/followers"
+      ],
+      "stats": [
+        "dist/stats/stats",
+        "dist/stats"
+      ],
       "userprofile": [
         "dist/userprofile/userprofile",
         "dist/userprofile"

@@ -30,7 +30,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.bookmarks.MockBookmarkData;
-import org.zabardast.bookmarks.dto.BookmarkRepresentation;
+import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
+import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
 import org.zabardast.bookmarks.model.Bookmark;
 import org.zabardast.bookmarks.services.BookmarkService;
 import org.zabardast.bookmarks.services.exceptions.BookmarkAlreadyExistsException;
@@ -149,14 +150,14 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCanCreateBookmark() throws Exception {
 
-		Bookmark newBookmark = MockBookmarkData.createBookmark(100, "Test", "Test", MockBookmarkData.UserIdGuest);
-		BookmarkRepresentation bookmarkRepresentation = modelMapper.map(newBookmark, BookmarkRepresentation.class);
+		BookmarkResponseRepresentation newBookmark = MockBookmarkData.createBookmarkResponse(100, "Test", "Test", MockBookmarkData.UserIdGuest);
+		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(newBookmark, BookmarkRequestRepresentation.class);
 
-		Mockito.when(bookmarkService.newBookmark(MockBookmarkData.UserIdGuest, bookmarkRepresentation)).then(r -> newBookmark);
+		Mockito.when(bookmarkService.newBookmark(MockBookmarkData.UserIdGuest, bookmarkRequestRepresentation)).then(r -> newBookmark);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/bookmarks")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRepresentation));
+				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_CREATED));
@@ -166,15 +167,15 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userBookmarkRequiresUniqueSlug() throws Exception {
 
-		Bookmark newBookmark = blogData.AllBookmarks.get(1);
-		BookmarkRepresentation bookmarkRepresentation = modelMapper.map(newBookmark, BookmarkRepresentation.class);
+		BookmarkResponseRepresentation newBookmark = blogData.AllBookmarks.get(1);
+		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(newBookmark, BookmarkRequestRepresentation.class);
 
-		Mockito.when(bookmarkService.newBookmark(MockBookmarkData.UserIdGuest, bookmarkRepresentation))
+		Mockito.when(bookmarkService.newBookmark(MockBookmarkData.UserIdGuest, bookmarkRequestRepresentation))
 				.thenThrow(new BookmarkAlreadyExistsException(blogData.AllBookmarks.get(1)));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/bookmarks")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRepresentation));
+				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_CONFLICT));
@@ -184,16 +185,16 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCanUpdateOwnedBookmark() throws Exception {
 
-		Bookmark bookmark = blogData.AlLUserBookmarks.get(0);
-		BookmarkRepresentation bookmarkRepresentation = modelMapper.map(bookmark, BookmarkRepresentation.class);
+		BookmarkResponseRepresentation bookmark = blogData.AlLUserBookmarks.get(0);
+		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(bookmark, BookmarkRequestRepresentation.class);
 
 		Mockito.when(bookmarkService.getBookmark(bookmark.getId())).then(r -> bookmark);
-		Mockito.when(bookmarkService.updateBookmark(bookmark.getId(), bookmarkRepresentation)).then(r -> bookmark);
+		Mockito.when(bookmarkService.updateBookmark(bookmark.getId(), bookmarkRequestRepresentation)).then(r -> bookmark);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(
 					String.format("/api/v1/bookmarks/%d", bookmark.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRepresentation));
+				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_OK));
@@ -203,15 +204,15 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCannotUpdateNonExistingBookmark() throws Exception {
 
-		Bookmark bookmark = blogData.AlLUserBookmarks.get(0);
-		BookmarkRepresentation bookmarkRepresentation = modelMapper.map(bookmark, BookmarkRepresentation.class);
+		BookmarkResponseRepresentation bookmark = blogData.AlLUserBookmarks.get(0);
+		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(bookmark, BookmarkRequestRepresentation.class);
 
-		Mockito.when(bookmarkService.updateBookmark(1000L, bookmarkRepresentation))
+		Mockito.when(bookmarkService.updateBookmark(1000L, bookmarkRequestRepresentation))
 				.thenThrow(new BookmarkNotFoundException(bookmark.getId()));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/bookmarks/1000")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRepresentation));
+				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
@@ -221,15 +222,15 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCannotUpdateOthersBookmark() throws Exception {
 
-		Bookmark bookmark = blogData.AllAdminBookmarks.get(0);
-		BookmarkRepresentation bookmarkRepresentation = modelMapper.map(bookmark, BookmarkRepresentation.class);
+		BookmarkResponseRepresentation bookmark = blogData.AllAdminBookmarks.get(0);
+		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(bookmark, BookmarkRequestRepresentation.class);
 
 		Mockito.when(bookmarkService.getBookmark(bookmark.getId())).then(r -> bookmark);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(
 					String.format("/api/v1/bookmarks/%d", bookmark.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRepresentation));
+				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
@@ -239,7 +240,8 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCanDeleteOwnedBookmark() throws Exception {
 
-		Bookmark bookmark = blogData.AlLUserBookmarks.get(0);
+		BookmarkResponseRepresentation bookmark = blogData.AlLUserBookmarks.get(0);
+
 		Mockito.when(bookmarkService.getBookmark(bookmark.getId())).then(r -> bookmark);
 		Mockito.doNothing().when(bookmarkService).deleteBookmark(bookmark.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(
@@ -256,11 +258,12 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCannotDeleteNonExistingBookmark() throws Exception {
 
-		Bookmark bookmark = blogData.AlLUserBookmarks.get(0);
+		BookmarkResponseRepresentation bookmark = blogData.AlLUserBookmarks.get(0);
 
 		Mockito.when(bookmarkService.getBookmark(1000L))
 				.thenThrow(new BookmarkNotFoundException(bookmark.getId()));
 		Mockito.doNothing().when(bookmarkService).deleteBookmark(bookmark.getId());
+
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(
 					"/api/v1/bookmarks/1000")
 				.accept(MediaType.APPLICATION_JSON)
@@ -274,7 +277,7 @@ class BookmarksController_UserTests {
 	@WithMockUser(username = MockBookmarkData.UserIdGuest, roles = "USER")
 	void userCannotDeleteOthersBookmark() throws Exception {
 
-		Bookmark bookmark = blogData.AllAdminBookmarks.get(0);
+		BookmarkResponseRepresentation bookmark = blogData.AllAdminBookmarks.get(0);
 		
 		Mockito.when(bookmarkService.getBookmark(bookmark.getId())).then(r -> bookmark);
 		Mockito.doNothing().when(bookmarkService).deleteBookmark(bookmark.getId());

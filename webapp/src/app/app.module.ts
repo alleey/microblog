@@ -10,25 +10,32 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { environment } from '../environments/environment';
 
-import { AppComponent } from './app.component';
 import { MarkdownModule } from 'ngx-markdown';
 import { BlogModule } from 'blog';
 import { BookmarksModule } from 'bookmarks';
+import { FollowersModule } from 'followers';
+import { StatsModule } from 'stats';
 import { UserProfileModule } from 'userprofile';
-import { AllPostsComponent } from './components/all-posts/all-posts.component';
+
+import { AppComponent } from './app.component';
+import { AppPostsListComponent } from './components/app-posts-list/app-posts-list.component';
+import { AppPostComponent } from './components/app-post/app-post.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AllPostsComponent,
+    AppPostsListComponent,
+    AppPostComponent,
   ],
   imports: [
     AppRoutingModule,
     BrowserModule,
     HttpClientModule,
     BlogModule.forRoot(environment.services),
-    BookmarksModule.forRoot(environment.services.bookmarks),
-    UserProfileModule.forRoot(environment.services.userProfiles),
+    BookmarksModule.forRoot(environment.services),
+    FollowersModule.forRoot(environment.services),
+    StatsModule.forRoot(environment.services),
+    UserProfileModule.forRoot(environment.services),
     UtilsModule,
     MarkdownModule.forRoot(),
     OidcAuthModule.forRoot(environment.oidc),

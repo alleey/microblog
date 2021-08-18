@@ -27,9 +27,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.zabardast.bookmarks.dto.BookmarkRepresentation;
+import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
+import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
+import org.zabardast.bookmarks.dto.assemblers.BookmarkResponseRepresentationAssembler;
 import org.zabardast.bookmarks.model.Bookmark;
-import org.zabardast.bookmarks.model.assemblers.BookmarkModelAssembler;
 import org.zabardast.bookmarks.services.BookmarkService;
 import org.zabardast.common.filtering.Filter;
 
@@ -44,22 +45,22 @@ public class BookmarksController {
 	BookmarkService bookmarkService;
 
 	@Autowired
-	PagedResourcesAssembler<Bookmark> pagedAssembler;
+	PagedResourcesAssembler<BookmarkResponseRepresentation> pagedAssembler;
 
 	@Autowired
-    BookmarkModelAssembler assembler;
+	BookmarkResponseRepresentationAssembler assembler;
 
 	@GetMapping()
-	public ResponseEntity<PagedModel<EntityModel<Bookmark>>> getAll(final Pageable page, @NotNull Authentication authentication) {
-		PagedModel<EntityModel<Bookmark>> entities = pagedAssembler.toModel(
-				bookmarkService.getAllBookmarks(authentication.getName(), page),
-				assembler
+	public ResponseEntity<?> getAll(final Pageable page, @NotNull Authentication authentication) {
+		PagedModel<?> entities = pagedAssembler.toModel(
+			bookmarkService.getAllBookmarks(authentication.getName(), page),
+			assembler
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<PagedModel<EntityModel<Bookmark>>> getAllMatching(@NotNull @RequestParam("q")  final String criteria,
+	public ResponseEntity<?> getAllMatching(@NotNull @RequestParam("q")  final String criteria,
 																			final Pageable page,
 																			@NotNull Authentication authentication)
 	{
@@ -69,10 +70,10 @@ public class BookmarksController {
 			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
 			Filter filter = mapper.readValue(criteria, Filter.class);
 
-			PagedModel<EntityModel<Bookmark>> entities = pagedAssembler.toModel(
-					bookmarkService.getAllFiltered(authentication.getName(), filter, page),
-					assembler
-				);
+			PagedModel<?> entities = pagedAssembler.toModel(
+				bookmarkService.getAllFiltered(authentication.getName(), filter, page),
+				assembler
+			);
 			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 		}
 		catch (JsonProcessingException e)
@@ -83,7 +84,7 @@ public class BookmarksController {
 	}
 
 	@GetMapping(value = "{bookmarkId}")
-	public ResponseEntity<EntityModel<Bookmark>> getBookmarkById(@PathVariable("bookmarkId") Long bookmarkId,
+	public ResponseEntity<?> getBookmarkById(@PathVariable("bookmarkId") Long bookmarkId,
 																 @NotNull Authentication authentication) {
 		return ResponseEntity
 				.ok()
@@ -92,8 +93,8 @@ public class BookmarksController {
 	}
 
 	@PostMapping()
-	public ResponseEntity<?> newBookmark(@NotNull @RequestBody BookmarkRepresentation bookmark, @NotNull Authentication authentication) {
-		EntityModel<Bookmark> entity = assembler.toModel(
+	public ResponseEntity<?> newBookmark(@NotNull @RequestBody BookmarkRequestRepresentation bookmark, @NotNull Authentication authentication) {
+		EntityModel<?> entity = assembler.toModel(
 			bookmarkService.newBookmark(authentication.getName(), bookmark)
 		);
 		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
@@ -102,10 +103,11 @@ public class BookmarksController {
 	@PutMapping(value = "{bookmarkId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
 	public ResponseEntity<?> updateBookmark(@PathVariable Long bookmarkId,
-											@NotNull @RequestBody BookmarkRepresentation bookmark,
-											@NotNull Authentication authentication) {
-		EntityModel<Bookmark> entity = assembler.toModel(
-				bookmarkService.updateBookmark(bookmarkId, bookmark)
+											@NotNull @RequestBody BookmarkRequestRepresentation bookmark,
+											@NotNull Authentication authentication)
+	{
+		EntityModel<?> entity = assembler.toModel(
+			bookmarkService.updateBookmark(bookmarkId, bookmark)
 		);
 		return ResponseEntity.ok().build();
 	}

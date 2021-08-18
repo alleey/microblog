@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UserProfileServiceConfig, UserProfileServiceConfigToken } from '../config/service-config';
+import { UserProfileServiceConfig, UserProfileServiceConfigToken } from '../config/config';
 import { UserProfileResponseModel } from '../models/user-profile';
 
 @Injectable({
@@ -26,4 +26,5 @@ export class UserProfileService {
                   return data as UserProfileResponseModel;
                 })
               );
-  }}
+  }
+}

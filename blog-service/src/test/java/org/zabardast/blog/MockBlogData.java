@@ -1,12 +1,14 @@
 package org.zabardast.blog;
 
-import org.zabardast.blog.model.Comment;
-import org.zabardast.blog.model.Post;
-import org.zabardast.blog.model.Topic;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.CommentResponseRepresentation;
+import org.zabardast.blog.dto.PostRequestRepresentation;
+import org.zabardast.blog.dto.PostResponseRepresentation;
+import org.zabardast.blog.dto.TopicRequestRepresentation;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.slugify.Slugify;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -27,57 +29,85 @@ public final class MockBlogData {
         "Defense", "Foreign Affairs", "War Studies"
     };
 
-    public final List<Topic> AllTopics;
-    public final Topic TopicGeneral;
+    public final List<TopicResponseRepresentation> AllTopics;
+    public final TopicResponseRepresentation TopicGeneral;
 
-    public final List<Post> AllPosts;
-    public final List<Post> AlLUserPosts;
-    public final List<Post> AllAdminPosts;
+    public final List<PostResponseRepresentation> AllPosts;
+    public final List<PostResponseRepresentation> AlLUserPosts;
+    public final List<PostResponseRepresentation> AllAdminPosts;
+
+    public final List<CommentResponseRepresentation> AllUserPostComments;
+    public final List<CommentResponseRepresentation> AllAdminPostComments;
 
     public MockBlogData() {
 
         AllTopics = IntStream.range(0, TopicNames.length)
-                .mapToObj(t -> createBlogTopic(t, TopicNames[t]))
+                .mapToObj(t -> createBlogTopicResponse(t, TopicNames[t]))
                 .collect(Collectors.toList());
         TopicGeneral = AllTopics.get(0);
 
         AlLUserPosts = IntStream.range(0, 15)
-                .mapToObj(i -> createBlogPost(i, String.format("Post %s",i), String.format("Text %s",i), UserIdGuest, TopicGeneral))
+                .mapToObj(i -> createBlogPostResponse(i, String.format("Post %s",i), String.format("Text %s",i), UserIdGuest, TopicGeneral))
                 .collect(Collectors.toList());
         AllAdminPosts = IntStream.range(0, 10)
-                .mapToObj(i -> createBlogPost(i+15, String.format("Post %s",i), String.format("Text %s",i), UserIdAdmin, TopicGeneral))
+                .mapToObj(i -> createBlogPostResponse(i+15, String.format("Post %s",i), String.format("Text %s",i), UserIdAdmin, TopicGeneral))
                 .collect(Collectors.toList());
         AllPosts = Stream.concat(AlLUserPosts.stream(), AllAdminPosts.stream())
                 .collect(Collectors.toList());
+
+        AllUserPostComments = IntStream.range(0, 15)
+                .mapToObj(i -> createBlogCommentResponse(i, String.format("Comment %s",i), UserIdGuest, AlLUserPosts.get(0).getId()))
+                .collect(Collectors.toList());
+        AllAdminPostComments = IntStream.range(0, 15)
+                .mapToObj(i -> createBlogCommentResponse(i, String.format("Comment %s",i), UserIdAdmin, AllAdminPosts.get(0).getId()))
+                .collect(Collectors.toList());
     }
 
-    public static Comment createBlogComment(long id, String text, String userId) {
-        return Comment.builder()
-                .id(id)
+    public static CommentRequestRepresentation createBlogCommentRequest(String text) {
+        return CommentRequestRepresentation.builder()
                 .text(text)
-                .owner(userId)
                 .build();
     }
 
-    public static Post createBlogPost(long id, String title, String text, String userId, Topic topic) {
+    public static CommentResponseRepresentation createBlogCommentResponse(long id, String text, String userId, Long postId) {
+        return CommentResponseRepresentation.builder()
+                .id(id)
+                .text(text)
+                .owner(userId)
+                .postId(postId)
+                .build();
+    }
+
+    public static PostRequestRepresentation createBlogPostRequest(String title, String text) {
         Slugify slg = new Slugify();
-        return Post.builder()
+        return PostRequestRepresentation.builder()
+                .title(title)
+                .slug(slg.slugify(title))
+                .text(text)
+                .build();
+    }
+
+    public static PostResponseRepresentation createBlogPostResponse(long id, String title, String text, String userId, TopicResponseRepresentation topic) {
+        Slugify slg = new Slugify();
+        return PostResponseRepresentation.builder()
                 .id(id)
                 .title(title)
                 .slug(slg.slugify(title))
                 .text(text)
                 .owner(userId)
-                .comments(Arrays.asList(
-                    createBlogComment(1,"I like it", UserIdGuest),
-                    createBlogComment(2,"I like it, too!", UserIdAdmin)
-                ))
                 .topics(Collections.singleton(topic))
                 .createdOn(new Date())
                 .build();
     }
 
-    public static Topic createBlogTopic(long id, String caption) {
-        return Topic.builder()
+    public static TopicRequestRepresentation createBlogTopicRequest(String caption) {
+        return TopicRequestRepresentation.builder()
+                .caption(caption)
+                .build();
+    }
+
+    public static TopicResponseRepresentation createBlogTopicResponse(long id, String caption) {
+        return TopicResponseRepresentation.builder()
                 .id(id)
                 .caption(caption)
                 .build();

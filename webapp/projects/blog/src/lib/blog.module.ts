@@ -14,7 +14,7 @@ import {
   TopicListComponent, 
   TopicListViewComponent 
 } from './components/public-api';
-import { BlogServiceConfig, BlogServiceConfigToken } from './config/service-config';
+import { BlogModuleConfig, CommentsServiceConfigToken, PostsServiceConfigToken, TopicsServiceConfigToken } from './config/config';
 import { PostsService } from './services/posts.service';
 import { TopicsService } from './services/topics.service';
 import { TopicSelectorComponent } from './components/topic-selector/topic-selector.component';
@@ -59,15 +59,23 @@ import { CommentEditorComponent } from './components/comment-editor/comment-edit
 })
 export class BlogModule {
 
-  static forRoot(config: BlogServiceConfig): ModuleWithProviders<BlogModule> {
+  static forRoot(config: BlogModuleConfig): ModuleWithProviders<BlogModule> {
     return {
       ngModule: BlogModule,
       providers: [
         PostsService,
         TopicsService,
         {
-          provide: BlogServiceConfigToken,
-          useValue: config
+          provide: PostsServiceConfigToken,
+          useValue: config.posts
+        },
+        {
+          provide: CommentsServiceConfigToken,
+          useValue: config.comments
+        },
+        {
+          provide: TopicsServiceConfigToken,
+          useValue: config.topics
         }
       ]
     }

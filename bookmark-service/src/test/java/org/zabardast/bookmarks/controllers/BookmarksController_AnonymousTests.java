@@ -1,39 +1,29 @@
 package org.zabardast.bookmarks.controllers;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.bookmarks.MockBookmarkData;
-import org.zabardast.bookmarks.dto.BookmarkRepresentation;
+import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
+import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
 import org.zabardast.bookmarks.model.Bookmark;
 import org.zabardast.bookmarks.services.BookmarkService;
-import org.zabardast.bookmarks.services.exceptions.BookmarkNotFoundException;
 
 @SpringBootTest()
 @ExtendWith(SpringExtension.class)
@@ -44,7 +34,7 @@ class BookmarksController_AnonymousTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	@Mock
+	@MockBean
 	private BookmarkService bookmarkService;
 
 	@Autowired
@@ -77,12 +67,14 @@ class BookmarksController_AnonymousTests {
 	@Test
 	void createNewBookmarkRequiresLogin() throws Exception {
 
-		Bookmark newBookmark = MockBookmarkData.createBookmark(100, "Test", "Test", MockBookmarkData.UserIdGuest);
-		BookmarkRepresentation bookmarkRepresentation = modelMapper.map(newBookmark, BookmarkRepresentation.class);
+		BookmarkResponseRepresentation newBookmark = MockBookmarkData
+				.createBookmarkResponse(100, "Test", "Test", MockBookmarkData.UserIdGuest);
+		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(newBookmark, BookmarkRequestRepresentation.class);
+
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/bookmarks")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRepresentation));
+				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));

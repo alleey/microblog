@@ -26,9 +26,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.zabardast.blog.dto.TopicRepresentation;
+import org.zabardast.blog.dto.TopicRequestRepresentation;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
 import org.zabardast.blog.model.Topic;
-import org.zabardast.blog.model.assemblers.TopicModelAssembler;
+import org.zabardast.blog.dto.assemblers.TopicResponseRepresentationAssembler;
 import org.zabardast.blog.services.TopicService;
 import org.zabardast.common.filtering.Filter;
 
@@ -43,14 +44,14 @@ public class TopicsController {
     TopicService topicService;
 
 	@Autowired
-	private PagedResourcesAssembler<Topic> pagedAssembler;
+	private PagedResourcesAssembler<TopicResponseRepresentation> pagedAssembler;
 
 	@Autowired
-	TopicModelAssembler assembler;
+	TopicResponseRepresentationAssembler assembler;
 
 	@GetMapping()
-	public ResponseEntity<PagedModel<EntityModel<Topic>>> getAll (@NotNull final Pageable page) {
-		PagedModel<EntityModel<Topic>> entities = pagedAssembler.toModel(
+	public ResponseEntity<?> getAll (@NotNull final Pageable page) {
+		PagedModel<?> entities = pagedAssembler.toModel(
 			topicService.getAllTopics(page),
 			assembler
 		);
@@ -58,7 +59,7 @@ public class TopicsController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<PagedModel<EntityModel<Topic>>> getAllMatching(@NotNull @RequestParam("q")  final String criteria,
+	public ResponseEntity<?> getAllMatching(@NotNull @RequestParam("q")  final String criteria,
 																			final Pageable page)
 	{
 		try
@@ -67,9 +68,9 @@ public class TopicsController {
 			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
 			Filter filter = mapper.readValue(criteria, Filter.class);
 
-			PagedModel<EntityModel<Topic>> entities = pagedAssembler.toModel(
-					topicService.getAllFiltered(filter, page),
-					assembler
+			PagedModel<?> entities = pagedAssembler.toModel(
+				topicService.getAllFiltered(filter, page),
+				assembler
 			);
 			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 		}
@@ -81,7 +82,7 @@ public class TopicsController {
 	}
 
 	@GetMapping(value = "{topicId}")
-	public ResponseEntity<EntityModel<Topic>> getTopicById(@PathVariable("topicId") Long topicId) {
+	public ResponseEntity<?> getTopicById(@PathVariable("topicId") Long topicId) {
 		return ResponseEntity
 				.ok()
 				.contentType(MediaTypes.HAL_JSON)
@@ -90,8 +91,8 @@ public class TopicsController {
 
 	@PostMapping()
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE')")
-	public ResponseEntity<?> newTopic(@RequestBody TopicRepresentation blogTopic) {
-		EntityModel<Topic> entity = assembler.toModel(
+	public ResponseEntity<?> newTopic(@RequestBody TopicRequestRepresentation blogTopic) {
+		EntityModel<?> entity = assembler.toModel(
 			topicService.newTopic(blogTopic)
 		);
 		return ResponseEntity
@@ -101,8 +102,8 @@ public class TopicsController {
 
 	@PutMapping(value = "{topicId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE')")
-	public ResponseEntity<?> updateTopic(@PathVariable Long topicId, @RequestBody TopicRepresentation blogTopic) {
-		EntityModel<Topic> entity = assembler.toModel(
+	public ResponseEntity<?> updateTopic(@PathVariable Long topicId, @RequestBody TopicRequestRepresentation blogTopic) {
+		EntityModel<?> entity = assembler.toModel(
 			topicService.updateTopic(topicId, blogTopic)
 		);
 		return ResponseEntity.ok().build();

@@ -30,7 +30,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   response : BookmarksResponseModel|null;
   errorDesc: any = "";
   loading: boolean = false;
-  subscription!: Subscription;
+  subscription: Subscription = new Subscription();
 
   constructor(
       private bookmarksService: BookmarksService, 
@@ -50,11 +50,9 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
       this.fetchPage(pageNum);
     });
     // Requery when the backend data changes
-    this.subscription = this.bookmarksService.onChange.subscribe({
-      next: () => {
-        this.fetchPage(this.pageable.page);
-      }
-    });
+    this.subscription.add(
+      this.bookmarksService.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
+    );
   }
 
   ngOnDestroy(): void {

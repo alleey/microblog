@@ -25,9 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.zabardast.common.filtering.Filter;
-import org.zabardast.userprofile.dto.UserProfileRepresentation;
+import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
+import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
 import org.zabardast.userprofile.model.UserProfile;
-import org.zabardast.userprofile.model.assemblers.UserProfileModelAssembler;
+import org.zabardast.userprofile.dto.assemblers.UserProfileResponseRepresentationAssembler;
 import org.zabardast.userprofile.services.UserProfileService;
 
 @Slf4j
@@ -41,24 +42,24 @@ public class UserProfilesController {
 	UserProfileService userProfileService;
 
 	@Autowired
-	PagedResourcesAssembler<UserProfile> pagedAssembler;
+	PagedResourcesAssembler<UserProfileResponseRepresentation> pagedAssembler;
 
 	@Autowired
-	UserProfileModelAssembler assembler;
+	UserProfileResponseRepresentationAssembler assembler;
 
 	@GetMapping()
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<PagedModel<EntityModel<UserProfile>>> getAll(final Pageable page) {
-		PagedModel<EntityModel<UserProfile>> entities = pagedAssembler.toModel(
-				userProfileService.getAllUserProfiles(page),
-				assembler
+	//@PreAuthorize("isAuthenticated")
+	public ResponseEntity<?> getAll(final Pageable page) {
+		PagedModel<?> entities = pagedAssembler.toModel(
+			userProfileService.getAllUserProfiles(page),
+			assembler
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 	}
 
 	@GetMapping("search")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<PagedModel<EntityModel<UserProfile>>> getAllMatching(
+	//@PreAuthorize("isAuthenticated")
+	public ResponseEntity<?> getAllMatching(
 			@NotNull @RequestParam("q")  final String criteria,
 			final Pageable page)
 	{
@@ -68,10 +69,10 @@ public class UserProfilesController {
 			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
 			Filter filter = mapper.readValue(criteria, Filter.class);
 
-			PagedModel<EntityModel<UserProfile>> entities = pagedAssembler.toModel(
-					userProfileService.getAllFiltered(filter, page),
-					assembler
-				);
+			PagedModel<?> entities = pagedAssembler.toModel(
+				userProfileService.getAllFiltered(filter, page),
+				assembler
+			);
 			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 		}
 		catch (JsonProcessingException e)
@@ -81,8 +82,8 @@ public class UserProfilesController {
 	}
 
 	@GetMapping(value = "{userProfileId}")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<EntityModel<UserProfile>> getUserProfileById(@PathVariable("userProfileId") String userProfileId)
+	//@PreAuthorize("isAuthenticated")
+	public ResponseEntity<?> getUserProfileById(@PathVariable("userProfileId") String userProfileId)
 	{
 		return ResponseEntity
 				.ok()
@@ -93,8 +94,8 @@ public class UserProfilesController {
 	@PutMapping(value = "{userProfileId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @userProfileOwnership.require(#userProfileId, authentication)")
 	public ResponseEntity<?> updateUserProfile(@PathVariable String userProfileId,
-											@NotNull @RequestBody UserProfileRepresentation userProfile) {
-		EntityModel<UserProfile> entity = assembler.toModel(
+											@NotNull @RequestBody UserProfileRequestRepresentation userProfile) {
+		EntityModel<?> entity = assembler.toModel(
 			userProfileService.updateUserProfile(userProfileId, userProfile, false)
 		);
 		return ResponseEntity.ok().build();

@@ -1,7 +1,7 @@
 import { PageModel } from "utils";
 
 export interface UserProfileModel {
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
     username: string;

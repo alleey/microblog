@@ -20,10 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.userprofile.MockUserProfileData;
-import org.zabardast.userprofile.dto.UserProfileRepresentation;
+import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
+import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
 import org.zabardast.userprofile.model.UserProfile;
 import org.zabardast.userprofile.services.UserProfileService;
-import org.zabardast.userprofile.services.exceptions.UserProfileAlreadyExistsException;
 import org.zabardast.userprofile.services.exceptions.UserProfileNotFoundException;
 
 @SpringBootTest()
@@ -47,14 +47,14 @@ class UserProfilesController_AdminTests {
 	@WithMockUser(username = MockUserProfileData.UserIdAdmin, roles = "ADMIN")
 	void adminCanUpdateAnyUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AllUserProfiles.get(0);
-		UserProfileRepresentation userProfileRepresentation = modelMapper.map(userProfile, UserProfileRepresentation.class);
+		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
+		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
-		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRepresentation, false)).then(r -> userProfile);
+		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false)).then(r -> userProfile);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/users/%s", userProfile.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockUserProfileData.objectToJson(userProfileRepresentation));
+				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_OK));
@@ -64,15 +64,15 @@ class UserProfilesController_AdminTests {
 	@WithMockUser(username = MockUserProfileData.UserIdAdmin, roles = "ADMIN")
 	void adminCannotUpdateNonExistingUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AllUserProfiles.get(0);
-		UserProfileRepresentation userProfileRepresentation = modelMapper.map(userProfile, UserProfileRepresentation.class);
+		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
+		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
-		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRepresentation, false))
+		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false))
 				.thenThrow(new UserProfileNotFoundException(userProfile.getId()));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/users/%s", userProfile.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockUserProfileData.objectToJson(userProfileRepresentation));
+				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
@@ -82,7 +82,7 @@ class UserProfilesController_AdminTests {
 	@WithMockUser(username = MockUserProfileData.UserIdAdmin, roles = "ADMIN")
 	void adminCanDeleteAnyUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AllUserProfiles.get(0);
+		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
 		Mockito.doNothing().when(userProfileService).deleteUserProfile(userProfile.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(String.format("/api/v1/users/%s", userProfile.getId()))
 				.accept(MediaType.APPLICATION_JSON)

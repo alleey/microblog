@@ -1,0 +1,34 @@
+<blog-post-list [headerTemplate]="header" [itemTemplate]="thisItemTemplate">
+</blog-post-list>
+
+<ng-template #thisItemTemplate let-item let-parent="list">
+    <div class="p-1">
+        <a (click)="parent.selectItem(item, 'select')" class="posttitle">{{item.title}}</a>
+        <div class="created">
+            <user-profile-badge [userId]="item.owner"></user-profile-badge> posted 
+            {{item.createdOn | prettyDate}}.
+        </div>
+        <p class="posttext ">
+            {{item.text}}
+        </p>
+        <p>
+            <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
+        </p>
+        <button class="btn btn-success" (click)="parent.selectItem(item, 'select')">Read More...</button>
+        <hr class="my-4">
+    </div>
+</ng-template>
+
+<ng-template #header>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h5>RECENT POSTS</h5>
+        </div>
+        <div>
+            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']">New Post</a>
+            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']"
+                *authRequireRole="'admin'">New Topic</a>
+        </div>
+    </div>
+    <hr class="my-4">
+</ng-template>

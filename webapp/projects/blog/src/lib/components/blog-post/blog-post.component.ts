@@ -47,8 +47,7 @@ export class BlogPostComponent implements OnInit {
       .subscribe(
       {
         next: (result: BlogPostResponseModel) => {
-          this.response = result;
-          this.response.permalink = window.location.origin + this.router.url;
+          this.postItem = result;
           this.loading = false;
         },
         error: (err: any) => {
@@ -60,7 +59,14 @@ export class BlogPostComponent implements OnInit {
     );
   }
 
-  get postItem(): BlogPostModel {
+  set postItem(item: BlogPostResponseModel) {
+    this.response = item;
+    this.response.permalink = window.location.origin + this.router.url;
+    this.postId = this.response.id;
+    this.postSlug = this.response.slug;
+  }
+
+  get postItem(): BlogPostResponseModel {
     return this.response!;
   }
 

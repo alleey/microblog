@@ -16,7 +16,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.blog.dto.PostRepresentation;
+import org.zabardast.blog.dto.PostRequestRepresentation;
+import org.zabardast.blog.dto.PostResponseRepresentation;
 import org.zabardast.blog.events.PostCreatedEvent;
 import org.zabardast.blog.events.PostDeletedEvent;
 import org.zabardast.blog.events.PostUpdatedEvent;
@@ -53,34 +54,34 @@ public class PostService
     ModelMapper modelMapper;
 
     @Transactional
-    public Post getPost(Long postId) {
+    public PostResponseRepresentation getPost(Long postId) {
         return postRepository
                 .findById(postId)
+                .map(i -> modelMapper.map(i, PostResponseRepresentation.class))
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
-    public void test() {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Post> query = builder.createQuery(Post.class);
-        Root<Post> root = query.from(Post.class);
-
+    @Transactional
+    public Page<PostResponseRepresentation> getOwnerPosts(@NotNull String ownerId, @NotNull Pageable page) {
+        return postRepository
+                .findByOwner(ownerId, page)
+                .map(i -> modelMapper.map(i, PostResponseRepresentation.class));
     }
 
     @Transactional
-    public Page<Post> getOwnerPosts(@NotNull String ownerId, @NotNull Pageable page) {
-        return postRepository.findByOwner(ownerId, page);
+    public Page<PostResponseRepresentation> getAllPosts(@NotNull Pageable page) {
+        return postRepository
+                .findAll(page)
+                .map(i -> modelMapper.map(i, PostResponseRepresentation.class));
     }
 
     @Transactional
-    public Page<Post> getAllPosts(@NotNull Pageable page) {
-        return postRepository.findAll(page);
-    }
-
-    @Transactional
-    public Page<Post> getTopicPosts(Long topicId, Pageable page) {
+    public Page<PostResponseRepresentation> getTopicPosts(Long topicId, Pageable page) {
         return topicRepository.findById(topicId)
                 .map(entity -> {
-                    return postRepository.findAllByTopics(entity, page);
+                    return postRepository
+                            .findAllByTopics(entity, page)
+                            .map(i -> modelMapper.map(i, PostResponseRepresentation.class));
                 })
                 .orElseThrow(() -> {
                     throw new TopicNotFoundException(topicId);
@@ -88,7 +89,7 @@ public class PostService
     }
 
     @Transactional
-    public Page<Post> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
+    public Page<PostResponseRepresentation> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<Post> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
                 Post.class,
@@ -101,37 +102,37 @@ public class PostService
         query.setMaxResults(pageable.getPageSize());
 
         Page<Post> result = new PageImpl<>(query.getResultList(), pageable, totalRows);
-        return result;
+        return result.map(i -> modelMapper.map(i, PostResponseRepresentation.class));
     }
 
     @Transactional
-    public Post newPost(@NotNull String ownerId, @NotNull PostRepresentation postRepresentation) {
+    public PostResponseRepresentation newPost(@NotNull String ownerId, @NotNull PostRequestRepresentation postRequestRepresentation) {
 
-        postRepository.findBySlug(postRepresentation.getSlug())
+        postRepository.findBySlug(postRequestRepresentation.getSlug())
                 .ifPresent(post -> {
                     throw new PostAlreadyExistsException(post);
                 });
-        Post post = modelMapper.map(postRepresentation, Post.class);
+        Post post = modelMapper.map(postRequestRepresentation, Post.class);
         post.setOwner(ownerId);
         post.setCreatedOn(new Date());
         Post saved = postRepository.save(post);
 
         eventPublisher.publishEvent(new PostCreatedEvent(this, saved));
-        return saved;
+        return modelMapper.map(saved, PostResponseRepresentation.class);
     }
 
     @Transactional
-    public Post updatePost(@NotNull Long postId, @NotNull PostRepresentation postRepresentation) {
+    public PostResponseRepresentation updatePost(@NotNull Long postId, @NotNull PostRequestRepresentation postRequestRepresentation) {
         return postRepository.findById(postId)
             .map(found -> {
                 found.setUpdatedOn(new Date());
-                found.setSlug(postRepresentation.getSlug());
-                found.setTitle(postRepresentation.getTitle());
-                found.setText(postRepresentation.getText());
+                found.setSlug(postRequestRepresentation.getSlug());
+                found.setTitle(postRequestRepresentation.getTitle());
+                found.setText(postRequestRepresentation.getText());
                 Post saved = postRepository.save(found);
 
                 eventPublisher.publishEvent(new PostUpdatedEvent(this, saved));
-                return saved;
+                return modelMapper.map(saved, PostResponseRepresentation.class);
             })
             .orElseThrow(() -> {
                 throw new PostNotFoundException(postId);
@@ -142,36 +143,5 @@ public class PostService
     public void deletePost(@NotNull Long postId) {
         postRepository.deleteById(postId);
         eventPublisher.publishEvent(new PostDeletedEvent(this, postId));
-    }
-
-    @Transactional
-    public void resetTopics(@NotNull Long postId, @NotNull List<Topic> topics) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> {
-                    throw new PostNotFoundException(postId);
-                });
-        post.setTopics(new HashSet<Topic>(topics));
-        postRepository.save(post);
-    }
-
-    @Transactional
-    public Topic assignTopic(@NotNull Long postId, @NotNull Topic topic) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> {
-                    throw new PostNotFoundException(postId);
-                });
-        post.getTopics().add(topic);
-        postRepository.save(post);
-        return topic;
-    }
-
-    @Transactional
-    public void unassignTopic(@NotNull Long postId, @NotNull Topic topic) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> {
-                    throw new PostNotFoundException(postId);
-                });
-        post.getTopics().remove(topic);
-        postRepository.save(post);
     }
 }

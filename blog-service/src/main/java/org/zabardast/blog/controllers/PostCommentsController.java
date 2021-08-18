@@ -23,9 +23,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.zabardast.blog.dto.CommentRepresentation;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.CommentResponseRepresentation;
 import org.zabardast.blog.model.Comment;
-import org.zabardast.blog.model.assemblers.CommentModelAssembler;
+import org.zabardast.blog.dto.assemblers.CommentResponseRepresentationAssembler;
 import org.zabardast.blog.services.CommentService;
 
 @Slf4j
@@ -39,15 +40,15 @@ public class PostCommentsController {
 	CommentService commentService;
 
 	@Autowired
-	private PagedResourcesAssembler<Comment> pagedAssembler;
+	private PagedResourcesAssembler<CommentResponseRepresentation> pagedAssembler;
 
 	@Autowired
-    CommentModelAssembler assembler;
+	CommentResponseRepresentationAssembler assembler;
 
 	@GetMapping()
-	public ResponseEntity<PagedModel<EntityModel<Comment>>> getAll (@PathVariable("postId") Long postId, @NotNull final Pageable page) {
+	public ResponseEntity<?> getAll (@PathVariable("postId") Long postId, @NotNull final Pageable page) {
 
-		PagedModel<EntityModel<Comment>> entities = pagedAssembler.toModel(
+		PagedModel<?> entities = pagedAssembler.toModel(
 			commentService.getPostComments(postId, page),
 			assembler
 		);
@@ -55,7 +56,7 @@ public class PostCommentsController {
 	}
 
 	@GetMapping(value = "{commentId}")
-	public ResponseEntity<EntityModel<Comment>> getCommentById(@PathVariable Long postId,
+	public ResponseEntity<?> getCommentById(@PathVariable Long postId,
 															   @PathVariable Long commentId) {
 		return ResponseEntity
 				.ok()
@@ -65,9 +66,9 @@ public class PostCommentsController {
 
 	@PostMapping()
 	public ResponseEntity<?> newComment(@PathVariable("postId") Long postId,
-										@RequestBody CommentRepresentation blogComment,
+										@RequestBody CommentRequestRepresentation blogComment,
 										@NotNull Authentication authentication) {
-		EntityModel<Comment> entity = assembler.toModel(
+		EntityModel<?> entity = assembler.toModel(
 			commentService.newComment(postId, authentication.getName(), blogComment)
 		);
 		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
@@ -77,8 +78,8 @@ public class PostCommentsController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
 	public ResponseEntity<?> updateComment(@PathVariable("postId") Long postId,
 										   @PathVariable Long commentId,
-										   @RequestBody CommentRepresentation blogComment) {
-		EntityModel<Comment> entity = assembler.toModel(
+										   @RequestBody CommentRequestRepresentation blogComment) {
+		EntityModel<?> entity = assembler.toModel(
 			commentService.updateComment(postId, commentId, blogComment)
 		);
 		return ResponseEntity.ok().build();

@@ -9,10 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.zabardast.blog.MockBlogData;
-import org.zabardast.blog.model.Topic;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
 import org.zabardast.blog.services.TopicService;
 import org.zabardast.blog.services.exceptions.TopicNotFoundException;
 import java.util.Arrays;
@@ -21,11 +20,9 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.config.client.ConfigClientAutoConfiguration;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -139,7 +136,7 @@ class TopicsController_AnonymousTests {
 	@Test
 	void createNewTopicRequiresLogin() throws Exception {
 
-		Topic newTopic = MockBlogData.createBlogTopic(100L, "Test");
+		TopicResponseRepresentation newTopic = MockBlogData.createBlogTopicResponse(100L, "Test");
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/topics")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)

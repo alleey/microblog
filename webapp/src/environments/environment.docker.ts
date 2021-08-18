@@ -15,29 +15,41 @@ export const environment = {
 
   services: {
     posts: {
-      serviceBaseUrl: "http://localhost:9081",
+      serviceBaseUrl: "http://localhost:9000/api/v1",
       defaultEndpoint: "posts",
       pageSize: 10,
+      maxTitleLength: 256,
+      maxContentLength: 4096,
     },
     comments: {
-      serviceBaseUrl: "http://localhost:9081/api/v1",
+      serviceBaseUrl: "http://localhost:9000/api/v1",
       defaultEndpoint: "posts",
       pageSize: 25,
+      maxContentLength: 1024,
     },
     topics: {
-      serviceBaseUrl: "http://localhost:9081",
+      serviceBaseUrl: "http://localhost:9000/api/v1",
       defaultEndpoint: "topics",
       pageSize: 25,
     },
     bookmarks: {
-      serviceBaseUrl: "http://localhost:9080",
+      serviceBaseUrl: "http://localhost:9000/api/v1",
       defaultEndpoint: "bookmarks",
       pageSize: 25,
     },
     userProfiles: {
-      serviceBaseUrl: "http://localhost:9082",
+      serviceBaseUrl: "http://localhost:9000/api/v1",
       defaultEndpoint: "users",
       pageSize: 10,
+    },
+    followers: {
+      serviceBaseUrl: "http://localhost:9000/api/v1",
+      defaultEndpoint: "followers",
+      pageSize: 10,
+    },
+    counters: {
+      serviceBaseUrl: "http://localhost:9000/api/v1",
+      defaultEndpoint: "stats/counters"
     },
   }
 };

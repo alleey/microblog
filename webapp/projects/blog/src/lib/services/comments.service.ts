@@ -4,7 +4,7 @@ import { Pageable } from 'utils';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, map, tap } from "rxjs/operators";
 import { CommentResponseModel, CommentsResponseModel } from '../models/comment';
-import { BlogServiceConfig, BlogServiceConfigToken } from '../config/service-config';
+import { CommentsServiceConfig, CommentsServiceConfigToken } from '../config/config';
 
 @Injectable({
   providedIn: 'root'
@@ -13,25 +13,21 @@ export class CommentsService {
 
   public onChange: Subject<any> = new Subject<any>();
 
-  constructor(
-    @Inject(BlogServiceConfigToken) 
-    private config: BlogServiceConfig,
-    private httpClient: HttpClient) { 
-  }
+  constructor(@Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig, private httpClient: HttpClient) 
+  { }
 
   public all(endpoint: string, postId: number, pageable?: Pageable): Observable<CommentsResponseModel> {
 
     const page: number = pageable ? pageable.page : 0;
-    const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.comments.pageSize;
-    const apiEndpoint = endpoint ? endpoint : this.config.comments.defaultEndpoint;
+    const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.pageSize;
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
 
     return this.httpClient
-              .get<CommentsResponseModel>(`${this.config.comments.serviceBaseUrl}/${apiEndpoint}/${postId}/comments`, {
+              .get<CommentsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments`, {
                 params: {
                   "page": page.toString(),
                   "size": pageSize.toString(),
-                  "sort": "createdOn",
-                  "sort.dir": "desc"
+                  "sort": "createdOn,desc"
                 }
               })
               .pipe(
@@ -42,9 +38,9 @@ export class CommentsService {
   }
 
   public one(endpoint: string, postId: number, id: number): Observable<CommentResponseModel> {
-    const apiEndpoint = endpoint ? endpoint : this.config.comments.defaultEndpoint;
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-              .get<CommentResponseModel>(`${this.config.comments.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
+              .get<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
               .pipe(
                 map(data => {
                   return data as CommentResponseModel;
@@ -53,12 +49,12 @@ export class CommentsService {
   }
 
   public create(endpoint: string, postId: number, text: string): Observable<CommentResponseModel> {
-    const apiEndpoint = endpoint ? endpoint : this.config.comments.defaultEndpoint;
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     let commentRepr = {
       "text": text
     };
     return this.httpClient
-            .post<CommentResponseModel>(`${this.config.comments.serviceBaseUrl}/${apiEndpoint}/${postId}/comments`, commentRepr)
+            .post<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments`, commentRepr)
             .pipe(
               map(data => {
                 return data as CommentResponseModel;
@@ -70,12 +66,12 @@ export class CommentsService {
   }
 
   public update(endpoint: string, postId: number, id: number, text: string): Observable<CommentResponseModel> {
-    const apiEndpoint = endpoint ? endpoint : this.config.comments.defaultEndpoint;
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     let commentRepr = {
       "text": text
     };
     return this.httpClient
-            .put<CommentResponseModel>(`${this.config.comments.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`, commentRepr)
+            .put<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`, commentRepr)
             .pipe(
               map(data => {
                 return data as CommentResponseModel;
@@ -87,9 +83,9 @@ export class CommentsService {
   }
 
   public delete(endpoint: string, postId: number, id: number): Observable<void> {
-    const apiEndpoint = endpoint ? endpoint : this.config.comments.defaultEndpoint;
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-            .delete<void>(`${this.config.comments.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
+            .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
             .pipe(
               catchError((error: any) => {
                 return throwError(new Error(error.status));

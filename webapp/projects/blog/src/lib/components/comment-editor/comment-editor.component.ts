@@ -1,7 +1,8 @@
 import { Location } from '@angular/common';
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, Inject, Input, OnInit, TemplateRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommentsServiceConfig, CommentsServiceConfigToken } from '../../config/config';
 import { CommentModel, CommentResponseModel } from '../../models/comment';
 import { CommentsService } from '../../services/comments.service';
 
@@ -13,8 +14,11 @@ import { CommentsService } from '../../services/comments.service';
 export class CommentEditorComponent implements OnInit {
 
   @Input() headerTemplate: TemplateRef<any> | undefined;
-  @Input() postId?: number;
+  @Input("postId") paramPostId?: number;
+  @Input("commentId") paramCommentId?: string;
+  @Input() updateMode: boolean = true;
 
+  postId?: number;
   commentId?: number;
   comment : CommentModel|null = null;
 
@@ -25,8 +29,8 @@ export class CommentEditorComponent implements OnInit {
   form!: FormGroup;
 
   constructor(
+    @Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig,
     private commentsService: CommentsService, 
-    private router: Router, 
     private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
@@ -34,22 +38,29 @@ export class CommentEditorComponent implements OnInit {
 
     this.form = new FormGroup(
     {
-      "text": new FormControl("", Validators.required),
+      "text": new FormControl("", [
+          Validators.required,
+          Validators.maxLength(this.config.maxContentLength)
+      ]),
     });
 
     this.activatedRoute.params.subscribe(params => {
-      this.postId = params.postId;
+      this.postId = params.postId ?? this.paramPostId;
+      this.commentId = params.commentId ?? this.paramCommentId;
       if(this.isUpdateMode)
         this.fetchComment(this.commentId!);
     });
   }
 
-  get isUpdateMode(): boolean { return this.commentId !== undefined; }
+  get isUpdateMode(): boolean { 
+    return this.updateMode && this.commentId !== undefined; 
+  }
+
   get text() { return this.form.get('text'); }
 
   set blogComment(item: CommentModel) {
-    this.comment = item;
-    this.commentId = this.comment?.id;
+    this.comment = this.updateMode ? item : null;
+    this.commentId = this.updateMode ? this.comment?.id : undefined;
     console.info("Got comment id: " + this.commentId!);
   }
 

@@ -16,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.common.events.EventPublisher;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
-import org.zabardast.userprofile.dto.UserProfileRepresentation;
+import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
+import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
 import org.zabardast.userprofile.events.UserProfileCreatedEvent;
 import org.zabardast.userprofile.events.UserProfileDeletedEvent;
 import org.zabardast.userprofile.events.UserProfileUpdatedEvent;
@@ -43,16 +44,18 @@ public class UserProfileService
     ModelMapper modelMapper;
 
     @Transactional
-    public UserProfile getUserProfile(@NotNull String userProfileId) {
+    public UserProfileResponseRepresentation getUserProfile(@NotNull String userProfileId) {
         UserProfile bookmark = userProfileRepository
                 .findById(userProfileId)
                 .orElseThrow(() -> new UserProfileNotFoundException(userProfileId));
-        return bookmark;
+        return modelMapper.map(bookmark, UserProfileResponseRepresentation.class);
     }
 
     @Transactional
-    public Page<UserProfile> getAllUserProfiles(@NotNull Pageable pageable) {
-        return userProfileRepository.findAll(pageable);
+    public Page<UserProfileResponseRepresentation> getAllUserProfiles(@NotNull Pageable pageable) {
+        return userProfileRepository
+                .findAll(pageable)
+                .map(i -> modelMapper.map(i, UserProfileResponseRepresentation.class));
     }
 
     @Transactional
@@ -61,7 +64,7 @@ public class UserProfileService
     }
 
     @Transactional
-    public Page<UserProfile> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
+    public Page<UserProfileResponseRepresentation> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<UserProfile> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
                 UserProfile.class,
@@ -74,23 +77,23 @@ public class UserProfileService
         query.setMaxResults(pageable.getPageSize());
 
         Page<UserProfile> result = new PageImpl<>(query.getResultList(), pageable, totalRows);
-        return result;
+        return result.map(i -> modelMapper.map(i, UserProfileResponseRepresentation.class));
     }
 
     @Transactional
-    public UserProfile newUserProfile(@NotNull UserProfileRepresentation userProfileRepresentation) {
-        UserProfile userProfile = modelMapper.map(userProfileRepresentation, UserProfile.class);
+    public UserProfileResponseRepresentation newUserProfile(@NotNull UserProfileRequestRepresentation userProfileRequestRepresentation) {
+        UserProfile userProfile = modelMapper.map(userProfileRequestRepresentation, UserProfile.class);
         userProfile.setCreatedOn(new Date());
         userProfile.setSyncedOn(userProfile.getCreatedOn());
 
         UserProfile saved = userProfileRepository.save(userProfile);
         eventPublisher.publishEvent(new UserProfileCreatedEvent(this, saved));
-        return saved;
+        return modelMapper.map(saved, UserProfileResponseRepresentation.class);
     }
 
     @Transactional
-    public UserProfile updateUserProfile(@NotNull String userProfileId,
-                                         @NotNull UserProfileRepresentation userProfile,
+    public UserProfileResponseRepresentation updateUserProfile(@NotNull String userProfileId,
+                                         @NotNull UserProfileRequestRepresentation userProfile,
                                          boolean setSync) {
         return userProfileRepository.findById(userProfileId)
             .map(found -> {
@@ -103,7 +106,7 @@ public class UserProfileService
 
                 UserProfile saved =  userProfileRepository.save(found);
                 eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, saved));
-                return saved;
+                return modelMapper.map(saved, UserProfileResponseRepresentation.class);
             })
             .orElseThrow(() -> {
                 throw new UserProfileNotFoundException(userProfileId);

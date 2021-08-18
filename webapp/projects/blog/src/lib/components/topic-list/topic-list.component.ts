@@ -31,7 +31,9 @@ export class TopicListComponent implements OnInit, OnDestroy {
   loading: boolean = false;
 
   filter: string = "";
-  subscription!: Subscription;
+
+  subscription: Subscription = new Subscription();
+
 
   constructor(
     private topicsService: TopicsService, 
@@ -50,11 +52,9 @@ export class TopicListComponent implements OnInit, OnDestroy {
       this.fetchPage(pageNum);
     }); 
     // Requery when the backend data changes
-    this.subscription = this.topicsService.onChange.subscribe({
-      next: () => {
-        this.fetchPage(this.pageable.page);
-      }
-    });
+    this.subscription.add(
+      this.topicsService.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
+    );
   }
 
   ngOnDestroy(): void {

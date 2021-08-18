@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build-all": "ng build utils && ng build auth-oidc && ng build blog && ng build bookmarks && ng build userprofile && ng build"
+    "build-all": "ng build utils && ng build auth-oidc && ng build blog && ng build bookmarks && ng build userprofile && ng build followers  && ng build stats && ng build"
   },
   "private": true,
   "dependencies": {

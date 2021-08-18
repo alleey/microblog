@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.zabardast.blog.MockBlogData;
-import org.zabardast.blog.model.Post;
+import org.zabardast.blog.dto.PostResponseRepresentation;
 import org.zabardast.blog.services.PostService;
 import org.zabardast.blog.services.exceptions.PostNotFoundException;
 import java.util.Arrays;
@@ -22,11 +22,9 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.cloud.config.client.ConfigClientAutoConfiguration;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -77,6 +75,7 @@ class PostsController_AnynoymousTests {
 
 		Pageable pageable = PageRequest.of(0, 1);
 		PageImpl page = new PageImpl(Arrays.asList(blogData.AllPosts.get(0)), pageable, blogData.AllPosts.size());
+
 		Mockito.when(postService.getAllPosts(pageable)).then(r -> page);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/posts?page=0&size=1")
 				.accept(MediaType.APPLICATION_JSON);
@@ -158,7 +157,7 @@ class PostsController_AnynoymousTests {
 	@Test
 	void createNewPostRequiresLogin() throws Exception {
 
-		Post newPost = MockBlogData.createBlogPost(100, "Test", "Test", "admin", blogData.TopicGeneral);
+		PostResponseRepresentation newPost = MockBlogData.createBlogPostResponse(100, "Test", "Test", "admin", blogData.TopicGeneral);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/posts")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)

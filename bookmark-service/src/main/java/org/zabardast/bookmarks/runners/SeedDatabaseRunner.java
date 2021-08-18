@@ -1,9 +1,7 @@
 package org.zabardast.bookmarks.runners;
 
-import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
-import org.zabardast.bookmarks.dto.BookmarkRepresentation;
-import org.zabardast.bookmarks.model.Bookmark;
+import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.services.BookmarkService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +29,9 @@ class SeedDatabaseRunner implements CommandLineRunner {
         service.newBookmark(UserIdGuest, createBookmark("Oracle", "http://www.oracle.com"));
     }
 
-    private BookmarkRepresentation createBookmark(String caption, String url) {
+    private BookmarkRequestRepresentation createBookmark(String caption, String url) {
         log.debug("Create bookmark: " + caption);
-        return BookmarkRepresentation.builder()
+        return BookmarkRequestRepresentation.builder()
                 .caption(caption)
                 .url(url)
                 .build();

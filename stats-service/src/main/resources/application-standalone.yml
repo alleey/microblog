@@ -1,0 +1,19 @@
+server:
+  port: ${STATS_SERVICE_PORT:9084}
+spring:
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:stats;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS stats"
+    username: sa
+    password: sa
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+eureka:
+  client:
+    enabled: false

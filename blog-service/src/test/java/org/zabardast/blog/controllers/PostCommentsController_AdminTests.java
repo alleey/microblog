@@ -19,12 +19,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.blog.MockBlogData;
-import org.zabardast.blog.dto.CommentRepresentation;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.CommentResponseRepresentation;
 import org.zabardast.blog.model.Comment;
 import org.zabardast.blog.model.Post;
 import org.zabardast.blog.services.CommentService;
-import org.zabardast.blog.services.exceptions.CommentNotFoundException;
-import org.zabardast.blog.services.exceptions.PostNotFoundException;
 
 @SpringBootTest()
 @ExtendWith(SpringExtension.class)
@@ -38,47 +37,42 @@ class PostCommentsController_AdminTests {
 	@MockBean
 	private CommentService commentService;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	private MockBlogData blogData = new MockBlogData();
 
 	@Test
-	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "ADMIN")
+	@WithMockUser(username = MockBlogData.UserIdAdmin, roles = "ADMIN")
 	void userCanUpdateOthersComment() throws Exception {
 
-		Post post = blogData.AlLUserPosts.get(0);
-		Comment comment = post.getComments().get(0); // User has first comment
-		Comment newComment = MockBlogData.createBlogComment(100, "Test", MockBlogData.UserIdGuest);
-		CommentRepresentation commentRepresentation = modelMapper.map(newComment, CommentRepresentation.class);
+		CommentResponseRepresentation comment = blogData.AllUserPostComments.get(0);
+		CommentResponseRepresentation newComment = MockBlogData
+				.createBlogCommentResponse(comment.getId(), "Test", MockBlogData.UserIdGuest, comment.getPostId());
+		CommentRequestRepresentation commentRequest = MockBlogData.createBlogCommentRequest("Test");
 
-		Mockito.when(commentService.getPostComment(post.getId(), comment.getId())).then(r -> comment);
-		Mockito.when(commentService.updateComment(post.getId(), comment.getId(), commentRepresentation))
-				.then(r -> {
-					newComment.setPost(post);
-					return newComment;
-				});
+		Mockito.when(commentService.getPostComment(comment.getPostId(), comment.getId())).then(r -> newComment);
+		Mockito.when(commentService.updateComment(comment.getPostId(), comment.getId(), commentRequest))
+				.then(r -> newComment);
+
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.put("/api/v1/posts/{post}/comments/{comment}", post.getId(), comment.getId())
+				.put("/api/v1/posts/{post}/comments/{comment}", comment.getPostId(), comment.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(commentRepresentation));
+				.content(MockBlogData.objectToJson(commentRequest));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_OK));
 	}
 
 	@Test
-	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "ADMIN")
+	@WithMockUser(username = MockBlogData.UserIdAdmin, roles = "ADMIN")
 	void userCanDeleteOthersComment() throws Exception {
 
-		Post post = blogData.AlLUserPosts.get(0);
-		Comment comment = post.getComments().get(0); // User has first comment
+		CommentResponseRepresentation comment = blogData.AllUserPostComments.get(0);
 
-		Mockito.when(commentService.getPostComment(post.getId(), comment.getId())).then(r -> comment);
-		Mockito.doNothing().when(commentService).deleteComment(post.getId(), comment.getId());
+		Mockito.when(commentService.getPostComment(comment.getPostId(), comment.getId())).then(r -> comment);
+		Mockito.doNothing().when(commentService).deleteComment(comment.getPostId(), comment.getId());
+
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/posts/{post}/comments/{comment}", post.getId(), comment.getId())
+				.delete("/api/v1/posts/{post}/comments/{comment}", comment.getPostId(), comment.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON);
 

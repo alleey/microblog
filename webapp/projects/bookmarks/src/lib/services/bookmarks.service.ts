@@ -4,7 +4,7 @@ import { Pageable } from 'utils';
 import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, map, tap } from "rxjs/operators";
 import { BookmarkResponseModel, BookmarksResponseModel } from '../models/bookmark';
-import { BookmarksServiceConfig, BookmarksServiceConfigToken } from '../config/service-config';
+import { BookmarksServiceConfig, BookmarksServiceConfigToken } from '../config/config';
 
 @Injectable({
   providedIn: 'root'
@@ -30,8 +30,7 @@ export class BookmarksService {
               params: {
                 "page": page.toString(),
                 "size": pageSize.toString(),
-                "sort": "caption",
-                "sort.dir": "asc"
+                "sort": "caption,asc"
               }
             })
             .pipe(
@@ -63,8 +62,7 @@ export class BookmarksService {
                 "q": JSON.stringify(query),
                 "page": page.toString(),
                 "size": pageSize.toString(),
-                "sort": "caption",
-                "sort.dir": "asc"
+                "sort": "caption,asc"
               }
             })
             .pipe(

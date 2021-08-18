@@ -23,7 +23,6 @@ import org.springframework.hateoas.server.core.Relation;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Relation(collectionRelation = "topics")
 public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +33,5 @@ public class Topic {
     private String caption;
 
     @ManyToMany(mappedBy = "topics")
-    @JsonIgnore()
     List<Post> posts;
 }

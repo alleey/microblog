@@ -35,11 +35,14 @@ export const environment = {
       serviceBaseUrl: "http://localhost:9081/api/v1",
       defaultEndpoint: "posts",
       pageSize: 10,
+      maxTitleLength: 256,
+      maxContentLength: 4096,
     },
     comments: {
       serviceBaseUrl: "http://localhost:9081/api/v1",
       defaultEndpoint: "posts",
       pageSize: 25,
+      maxContentLength: 1024,
     },
     topics: {
       serviceBaseUrl: "http://localhost:9081/api/v1",
@@ -55,6 +58,15 @@ export const environment = {
       serviceBaseUrl: "http://localhost:9082/api/v1",
       defaultEndpoint: "users",
       pageSize: 10,
+    },
+    followers: {
+      serviceBaseUrl: "http://localhost:9083/api/v1",
+      defaultEndpoint: "followers",
+      pageSize: 10,
+    },
+    counters: {
+      serviceBaseUrl: "http://localhost:9084/api/v1",
+      defaultEndpoint: "stats/counters"
     },
   }
 };

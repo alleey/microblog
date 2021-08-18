@@ -38,6 +38,9 @@
                     <utils-alert *ngIf="title?.errors?.required" [dismissable]="false" [minimal]="true">
                         Title is required.
                     </utils-alert>
+                    <utils-alert *ngIf="title?.errors?.maxLength" [dismissable]="false" [minimal]="true">
+                        Title length exceeds limit.
+                    </utils-alert>
                 </div>
 
             </div>
@@ -54,6 +57,9 @@
                 <div *ngIf="slug?.invalid && (slug?.dirty || slug?.touched)">
                     <utils-alert *ngIf="slug?.errors?.required" [dismissable]="false" [minimal]="true">
                         Slug is required.
+                    </utils-alert>
+                    <utils-alert *ngIf="slug?.errors?.maxLength" [dismissable]="false" [minimal]="true">
+                        Slug length exceeds limit.
                     </utils-alert>
                     <utils-alert *ngIf="slug?.errors?.pattern" [dismissable]="false" [minimal]="true">
                         Only clean url like expressions are allowed in slugs e.g. this-is-a-valid-slug
@@ -72,6 +78,9 @@
                 <div *ngIf="text?.invalid && (text?.dirty || text?.touched)">
                     <utils-alert *ngIf="text?.errors?.pattern" [dismissable]="false" [minimal]="true">
                         Sorry, cannot leave this empty!
+                    </utils-alert>
+                    <utils-alert *ngIf="text?.errors?.maxLength" [dismissable]="false" [minimal]="true">
+                        Conent length exceeds limit.
                     </utils-alert>
                 </div>
 

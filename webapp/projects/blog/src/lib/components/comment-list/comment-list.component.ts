@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Pageable, PageModel } from 'utils';
 import { CommentModel, CommentsResponseModel } from '../../models/comment';
 import { CommentsService } from '../../services/comments.service';
@@ -9,7 +10,7 @@ import { CommentsService } from '../../services/comments.service';
   templateUrl: './comment-list.component.html',
   styleUrls: ['./comment-list.component.css']
 })
-export class CommentListComponent implements OnInit {
+export class CommentListComponent implements OnInit, OnDestroy {
 
   @Input() postId!: number;
 
@@ -25,8 +26,10 @@ export class CommentListComponent implements OnInit {
   errorDesc: any = "";
   loading: boolean = false;
 
+  subscription: Subscription = new Subscription();
+
   constructor(
-    private postService: CommentsService, 
+    private commentsService: CommentsService, 
     private router: Router, 
     private activatedRoute: ActivatedRoute) 
   { 
@@ -42,6 +45,14 @@ export class CommentListComponent implements OnInit {
       const pageNum = params.pageNum ?? 0;
       this.fetchPage(pageNum);
     });
+    // Requery when the backend data changes
+    this.subscription.add(
+      this.commentsService.onChange.subscribe({ next: () =>  this.fetchPage(0) })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   fetchPage(pageNum: number): void {
@@ -49,7 +60,7 @@ export class CommentListComponent implements OnInit {
     //this.organizationId = routeParams.get('orgId') as string;  
     this.pageable.page = pageNum;
     this.loading = true;
-    this.postService.all(this.state?.endpoint, this.postId, this.pageable)
+    this.commentsService.all(this.state?.endpoint, this.postId, this.pageable)
       .subscribe(
       {
         next: (result: CommentsResponseModel) => {

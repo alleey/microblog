@@ -1,20 +1,19 @@
 package org.zabardast.blog.runners;
 
-import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
-import org.zabardast.blog.dto.CommentRepresentation;
-import org.zabardast.blog.dto.PostRepresentation;
-import org.zabardast.blog.dto.TopicRepresentation;
-import org.zabardast.blog.model.Comment;
-import org.zabardast.blog.model.Post;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.PostRequestRepresentation;
+import org.zabardast.blog.dto.PostResponseRepresentation;
+import org.zabardast.blog.dto.TopicRequestRepresentation;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
 import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.services.CommentService;
 import org.zabardast.blog.services.PostService;
 
+import org.zabardast.blog.services.PostTopicService;
 import org.zabardast.blog.services.TopicService;
 import com.github.slugify.Slugify;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,31 +43,33 @@ class SeedDatabaseRunner implements CommandLineRunner {
     CommentService commentService;
     @Autowired
     TopicService topicService;
+    @Autowired
+    PostTopicService postTopicService;
 
     @Override
     public void run(String... strings) throws Exception {
 
-        List<Topic> createdTopics = Arrays.stream(TopicNames)
+        List<TopicResponseRepresentation> createdTopics = Arrays.stream(TopicNames)
                 .map(t -> createBlogTopic(t))
                 .collect(Collectors.toList());
 
-        Topic topicGeneral = createdTopics.get(0);
+        TopicResponseRepresentation topicGeneral = createdTopics.get(0);
 
-        createBlogPost("Hello World", "This is a test post", UserIdGuest, topicGeneral);
-        createBlogPost("Hello Again", "This is another test post", UserIdAdmin, topicGeneral);
-        createBlogPost("Post Hattrick", "Third post completes hat-trick!", UserIdGuest, topicGeneral);
+        createBlogPost("Hello World", "This is a test post", UserIdGuest, topicGeneral.getId());
+        createBlogPost("Hello Again", "This is another test post", UserIdAdmin, topicGeneral.getId());
+        createBlogPost("Post Hattrick", "Third post completes hat-trick!", UserIdGuest, topicGeneral.getId());
     }
 
-    private CommentRepresentation createComment(String text) {
-        return CommentRepresentation.builder()
+    private CommentRequestRepresentation createComment(String text) {
+        return CommentRequestRepresentation.builder()
                 .text(text)
                 .build();
     }
 
-    private void createBlogPost(String title, String text, String userId, Topic topic) {
+    private void createBlogPost(String title, String text, String userId, Long topicId) {
         log.debug("Create test blog post: " + title);
         Slugify slg = new Slugify();
-        Post created = postService.newPost(userId, PostRepresentation.builder()
+        PostResponseRepresentation created = postService.newPost(userId, PostRequestRepresentation.builder()
                 .title(title)
                 .slug(slg.slugify(title))
                 .text(text)
@@ -76,12 +77,12 @@ class SeedDatabaseRunner implements CommandLineRunner {
 
         commentService.newComment(created.getId(), UserIdGuest, createComment("I like it"));
         commentService.newComment(created.getId(), UserIdAdmin, createComment("I like it, too!"));
-        postService.assignTopic(created.getId(), topic);
+        postTopicService.assignTopic(created.getId(), topicId);
     }
 
-    private Topic createBlogTopic(String caption) {
+    private TopicResponseRepresentation createBlogTopic(String caption) {
         log.debug("Create test blog topic: " + caption);
-        return topicService.newTopic(TopicRepresentation.builder()
+        return topicService.newTopic(TopicRequestRepresentation.builder()
                 .caption(caption)
                 .build());
     }

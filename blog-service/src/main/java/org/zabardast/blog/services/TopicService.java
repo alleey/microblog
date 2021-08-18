@@ -6,11 +6,11 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
-import org.zabardast.blog.dto.TopicRepresentation;
+import org.zabardast.blog.dto.TopicRequestRepresentation;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
 import org.zabardast.blog.events.TopicCreatedEvent;
 import org.zabardast.blog.events.TopicDeletedEvent;
 import org.zabardast.blog.events.TopicUpdatedEvent;
-import org.zabardast.blog.model.Post;
 import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.repository.TopicRepository;
 import org.zabardast.blog.services.exceptions.TopicAlreadyExistsException;
@@ -42,18 +42,22 @@ public class TopicService
     ModelMapper modelMapper;
 
     @Transactional
-    public Topic findOne(@NotNull Long topicId) {
-        return topicRepository.findById(topicId)
+    public TopicResponseRepresentation findOne(@NotNull Long topicId) {
+        return topicRepository
+                .findById(topicId)
+                .map(i -> modelMapper.map(i, TopicResponseRepresentation.class))
                 .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
     @Transactional
-    public Page<Topic> getAllTopics(@NotNull Pageable page) {
-        return topicRepository.findAll(page);
+    public Page<TopicResponseRepresentation> getAllTopics(@NotNull Pageable page) {
+        return topicRepository
+                .findAll(page)
+                .map(i -> modelMapper.map(i, TopicResponseRepresentation.class));
     }
 
     @Transactional
-    public Page<Topic> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
+    public Page<TopicResponseRepresentation> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<Topic> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
                 Topic.class,
@@ -66,30 +70,30 @@ public class TopicService
         query.setMaxResults(pageable.getPageSize());
 
         Page<Topic> result = new PageImpl<>(query.getResultList(), pageable, totalRows);
-        return result;
+        return result.map(i -> modelMapper.map(i, TopicResponseRepresentation.class));
     }
 
     @Transactional
-    public Topic newTopic(@NotNull TopicRepresentation topicRepresentation) {
-        topicRepository.findByCaption(topicRepresentation.getCaption())
+    public TopicResponseRepresentation newTopic(@NotNull TopicRequestRepresentation topicRequestRepresentation) {
+        topicRepository.findByCaption(topicRequestRepresentation.getCaption())
             .ifPresent(topic -> {
                 throw new TopicAlreadyExistsException(topic);
             });
-        Topic topic = modelMapper.map(topicRepresentation, Topic.class);
+        Topic topic = modelMapper.map(topicRequestRepresentation, Topic.class);
         Topic saved = topicRepository.save(topic);
 
         eventPublisher.publishEvent(new TopicCreatedEvent(this, saved));
-        return saved;
+        return modelMapper.map(saved, TopicResponseRepresentation.class);
     }
 
     @Transactional
-    public Topic updateTopic(@NotNull Long topicId, @NotNull TopicRepresentation blogTopic) {
+    public TopicResponseRepresentation updateTopic(@NotNull Long topicId, @NotNull TopicRequestRepresentation blogTopic) {
         return topicRepository.findById(topicId)
             .map(found -> {
                 found.setCaption(blogTopic.getCaption());
                 Topic saved = topicRepository.save(found);
                 eventPublisher.publishEvent(new TopicUpdatedEvent(this, saved));
-                return saved;
+                return modelMapper.map(saved, TopicResponseRepresentation.class);
             })
             .orElseThrow(() -> {
                 throw new TopicNotFoundException(topicId);

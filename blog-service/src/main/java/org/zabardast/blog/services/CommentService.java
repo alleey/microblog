@@ -2,11 +2,11 @@ package org.zabardast.blog.services;
 
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
-import org.zabardast.blog.dto.CommentRepresentation;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.CommentResponseRepresentation;
 import org.zabardast.blog.events.CommentCreatedEvent;
 import org.zabardast.blog.events.CommentDeletedEvent;
 import org.zabardast.blog.events.CommentUpdatedEvent;
-import org.zabardast.blog.events.PostCreatedEvent;
 import org.zabardast.blog.model.Comment;
 import org.zabardast.blog.model.Post;
 import org.zabardast.blog.repository.CommentRepository;
@@ -37,26 +37,18 @@ public class CommentService
     ModelMapper modelMapper;
 
     @Transactional
-    public Comment getPostComment(Long postId, Long commentId) {
-        return postRepository.findById(postId)
-            .map(post -> {
-                return commentRepository.findByPostAndId(post, commentId)
-                    .map(found -> {
-                        found.setPost(post);
-                        return found;
-                    })
-                    .orElseThrow(() -> new CommentNotFoundException(commentId));
-            })
-            .orElseThrow(() -> {
-                throw new PostNotFoundException(postId);
-            });
+    public CommentResponseRepresentation getPostComment(Long postId, Long commentId) {
+        Comment comment = getPostCommentInternal(postId, commentId);
+        return convert(comment, postId);
     }
 
     @Transactional
-    public Page<Comment> getPostComments(@NotNull Long postId, @NotNull Pageable page) {
+    public Page<CommentResponseRepresentation> getPostComments(@NotNull Long postId, @NotNull Pageable page) {
         return postRepository.findById(postId)
             .map(entity -> {
-                return commentRepository.findAllByPost(entity, page);
+                return commentRepository
+                        .findAllByPost(entity, page)
+                        .map(i -> convert(i, postId));
             })
             .orElseThrow(() -> {
                 throw new PostNotFoundException(postId);
@@ -64,10 +56,10 @@ public class CommentService
     }
 
     @Transactional
-    public Comment newComment(@NotNull Long postId, @NotNull String ownerId, @NotNull CommentRepresentation commentRepresentation) {
+    public CommentResponseRepresentation newComment(@NotNull Long postId, @NotNull String ownerId, @NotNull CommentRequestRepresentation commentRequestRepresentation) {
         return postRepository.findById(postId)
             .map(post -> {
-                Comment comment = modelMapper.map(commentRepresentation, Comment.class);
+                Comment comment = modelMapper.map(commentRequestRepresentation, Comment.class);
                 comment.setUpdatedOn(new Date());
                 comment.setPost(post);
                 comment.setOwner(ownerId);
@@ -76,7 +68,7 @@ public class CommentService
 
                 Comment saved = commentRepository.save(comment);
                 eventPublisher.publishEvent(new CommentCreatedEvent(this, saved));
-                return saved;
+                return convert(saved, postId);
             })
             .orElseThrow(() -> {
                 throw new PostNotFoundException(postId);
@@ -84,14 +76,14 @@ public class CommentService
     }
 
     @Transactional
-    public Comment updateComment(@NotNull Long postId, @NotNull Long commentId, @NotNull CommentRepresentation commentRepresentation) {
-        Comment found = getPostComment(postId, commentId);
+    public CommentResponseRepresentation updateComment(@NotNull Long postId, @NotNull Long commentId, @NotNull CommentRequestRepresentation commentRequestRepresentation) {
+        Comment found = getPostCommentInternal(postId, commentId);
         found.setUpdatedOn(new Date());
-        found.setText(commentRepresentation.getText());
+        found.setText(commentRequestRepresentation.getText());
 
         Comment saved = commentRepository.save(found);
         eventPublisher.publishEvent(new CommentUpdatedEvent(this, saved));
-        return saved;
+        return convert(saved, postId);
     }
 
     @Transactional
@@ -102,5 +94,26 @@ public class CommentService
                 });
         commentRepository.deleteByPostAndId(post, commentId);
         eventPublisher.publishEvent(new CommentDeletedEvent(this, commentId));
+    }
+
+    Comment getPostCommentInternal(Long postId, Long commentId) {
+        return postRepository.findById(postId)
+                .map(post -> {
+                    return commentRepository.findByPostAndId(post, commentId)
+                            .map(found -> {
+                                found.setPost(post);
+                                return found;
+                            })
+                            .orElseThrow(() -> new CommentNotFoundException(commentId));
+                })
+                .orElseThrow(() -> {
+                    throw new PostNotFoundException(postId);
+                });
+    }
+
+    CommentResponseRepresentation convert(Comment c, Long postId) {
+        CommentResponseRepresentation r = modelMapper.map(c, CommentResponseRepresentation.class);
+        r.setPostId(postId);
+        return r;
     }
 }

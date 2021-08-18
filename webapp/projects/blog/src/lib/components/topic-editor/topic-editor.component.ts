@@ -13,6 +13,8 @@ import { TopicsService } from '../../services/topics.service';
 export class TopicEditorComponent implements OnInit {
 
   @Input() headerTemplate: TemplateRef<any> | undefined;
+  @Input("topicId") paramTopicId?: string;
+  @Input() updateMode: boolean = true;
 
   topicId?: number;
   topic : TopicModel|null = null;
@@ -35,18 +37,20 @@ export class TopicEditorComponent implements OnInit {
     });
 
     this.activatedRoute.params.subscribe(params => {
-      this.topicId = params.topicId;
+      this.topicId = params.topicId ?? this.paramTopicId;
       if(this.isUpdateMode)
         this.fetchTopic(this.topicId!);
     });
   }
 
-  get isUpdateMode(): boolean { return this.topicId !== undefined; }
+  get isUpdateMode(): boolean { 
+    return this.updateMode && this.topicId !== undefined; 
+  }
   get caption() { return this.form.get('caption'); }
 
   set theTopic(item: TopicModel) {
-    this.topic = item;
-    this.topicId = this.topic?.id;
+    this.topic = this.updateMode ? item : null;
+    this.topicId = this.updateMode ? this.topic?.id : undefined;
     console.info("Got post id: " + this.topicId!);
   }
 

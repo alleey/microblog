@@ -11,8 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.zabardast.blog.MockBlogData;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.CommentResponseRepresentation;
 import org.zabardast.blog.model.Comment;
-import org.zabardast.blog.model.Post;
 import org.zabardast.blog.services.CommentService;
 import org.zabardast.blog.services.exceptions.CommentNotFoundException;
 import java.util.List;
@@ -51,9 +52,7 @@ class PostCommentsController_AnonymousTests {
 	@Test
 	void getAllPostComments() throws Exception {
 
-		Post post = blogData.AllPosts.get(0);
-		List<Comment> comments = post.getComments();
-		comments.forEach(c -> c.setPost(post));
+		List<CommentResponseRepresentation> comments = blogData.AllUserPostComments;
 
 		Pageable pageable = PageRequest.of(0, 20);
 		PageImpl page = new PageImpl(comments, pageable, comments.size());
@@ -75,9 +74,7 @@ class PostCommentsController_AnonymousTests {
 	@Test
 	void getAllPostCommentsCustomPaging() throws Exception {
 
-		Post post = blogData.AllPosts.get(0);
-		List<Comment> comments = post.getComments();
-		comments.forEach(c -> c.setPost(post));
+		List<CommentResponseRepresentation> comments = blogData.AllUserPostComments;
 
 		Pageable pageable = PageRequest.of(0, 1);
 		PageImpl page = new PageImpl(comments.subList(0,pageable.getPageSize()), pageable, comments.size());
@@ -98,15 +95,13 @@ class PostCommentsController_AnonymousTests {
 	@Test
 	void getCommentById() throws Exception {
 
-		Post post = blogData.AllPosts.get(0);
-		Comment comment = blogData.AllPosts.get(0).getComments().get(0);
+		CommentResponseRepresentation comment = blogData.AllUserPostComments.get(0);
 
-		Mockito.when(commentService.getPostComment(post.getId(), comment.getId())).then(r -> {
-			comment.setPost(post);
+		Mockito.when(commentService.getPostComment(comment.getPostId(), comment.getId())).then(r -> {
 			return comment;
 		});
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
-					String.format("/api/v1/posts/%d/comments/%d", post.getId(), comment.getId()))
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.get("/api/v1/posts/{postId}/comments/{commentId}", comment.getPostId(), comment.getId())
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
@@ -114,7 +109,7 @@ class PostCommentsController_AnonymousTests {
 				.andExpect(jsonPath("$.id", is((int)comment.getId())))
 				.andExpect(jsonPath("$.text", equalTo(comment.getText())))
 				.andExpect(jsonPath("$._links.self.href",
-						endsWith(String.format("/api/v1/posts/%d/comments/%d", post.getId(), comment.getId()))));
+						endsWith(String.format("/api/v1/posts/%d/comments/%d", comment.getPostId(), comment.getId()))));
 	}
 
 	@Test
@@ -131,7 +126,7 @@ class PostCommentsController_AnonymousTests {
 	@Test
 	void createNewCommentRequiresLogin() throws Exception {
 
-		Comment newComment = MockBlogData.createBlogComment(100, "Test", MockBlogData.UserIdGuest);
+		CommentRequestRepresentation newComment = MockBlogData.createBlogCommentRequest("Test");
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/posts/1/comments")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -144,11 +139,11 @@ class PostCommentsController_AnonymousTests {
 	@Test
 	void updateCommentRequiresLogin() throws Exception {
 
-		Comment comment = blogData.AllPosts.get(0).getComments().stream().collect(Collectors.toList()).get(1);
+		CommentRequestRepresentation newComment = MockBlogData.createBlogCommentRequest("Test");
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/posts/1/comments/1")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(comment));
+				.content(MockBlogData.objectToJson(newComment));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));

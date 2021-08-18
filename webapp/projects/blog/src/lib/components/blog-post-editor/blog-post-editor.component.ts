@@ -1,7 +1,8 @@
 import { Location } from '@angular/common';
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Inject, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PostsServiceConfig, PostsServiceConfigToken } from '../../config/config';
 import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
 import { TopicModel } from '../../models/topic';
 import { PostsService } from '../../services/posts.service';
@@ -34,6 +35,8 @@ function slugify(text: string) {
 export class BlogPostEditorComponent implements OnInit {
 
   @Input() headerTemplate: TemplateRef<any> | undefined;
+  @Input("postId") paramPostId?: number;
+  @Input() updateMode: boolean = true;
 
   postId?: number;
   post : BlogPostModel|null = null;
@@ -48,9 +51,8 @@ export class BlogPostEditorComponent implements OnInit {
   topicSelector!: TopicSelectorComponent;
 
   constructor(
+    @Inject(PostsServiceConfigToken) private config: PostsServiceConfig,
     private postService: PostsService, 
-    private topicService: TopicsService,
-    private router: Router, 
     private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
@@ -58,14 +60,21 @@ export class BlogPostEditorComponent implements OnInit {
 
     this.form = new FormGroup(
     {
-      "title": new FormControl("", Validators.required),
+      "title": new FormControl("", [
+          Validators.required,
+          Validators.maxLength(this.config.maxTitleLength),
+        ]),
       "slug": new FormControl("", [
           Validators.required,
+          Validators.maxLength(this.config.maxTitleLength),
           Validators.pattern(/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/)
         ], 
         uniqueSlugValidator(this.postService)
       ),
-      "text": new FormControl("", Validators.required),
+      "text": new FormControl("", [
+          Validators.required, 
+          Validators.maxLength(this.config.maxContentLength)
+        ]),
     });
 
     this.title?.valueChanges.subscribe(val => {
@@ -75,13 +84,15 @@ export class BlogPostEditorComponent implements OnInit {
     });
 
     this.activatedRoute.params.subscribe(params => {
-      this.postId = params.postId;
+      this.postId = params.postId ?? this.paramPostId;
       if(this.isUpdateMode)
         this.fetchPost(this.postId!);
     });
   }
 
-  get isUpdateMode(): boolean { return this.postId !== undefined; }
+  get isUpdateMode(): boolean { 
+    return this.updateMode && this.postId !== undefined; 
+  }
   get title() { return this.form.get('title'); }
   get slug() { return this.form.get('slug'); }
   get text() { return this.form.get('text'); }
@@ -91,8 +102,8 @@ export class BlogPostEditorComponent implements OnInit {
   }
 
   set blogPost(item: BlogPostModel) {
-    this.post = item;
-    this.postId = this.post?.id;
+    this.post = this.updateMode ? item : null;
+    this.postId = this.updateMode ? this.post?.id : undefined;
     console.info("Got post id: " + this.postId!);
   }
 

@@ -1,16 +1,17 @@
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BlogPostModel, BlogPostsResponseModel } from '../../models/blog-post';
 import { PostsService } from '../../services/posts.service';
 import { Pageable, PageModel } from 'utils';
 import { BlogPostListViewEvent } from '../blog-post-list-view/blog-post-list-view.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'blog-post-list',
   templateUrl: './blog-post-list.component.html',
   styleUrls: ['./blog-post-list.component.scss']
 })
-export class BlogPostListComponent implements OnInit {
+export class BlogPostListComponent implements OnInit, OnDestroy {
 
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
   @Input() itemTemplate: TemplateRef<any> | undefined;
@@ -27,6 +28,8 @@ export class BlogPostListComponent implements OnInit {
   response : BlogPostsResponseModel|null;
   errorDesc: any = "";
   loading: boolean = false;
+
+  subscription: Subscription = new Subscription();
 
   constructor(
     private postService: PostsService, 
@@ -45,6 +48,14 @@ export class BlogPostListComponent implements OnInit {
       const pageNum = params.pageNum ?? 0;
       this.fetchPage(pageNum);
     });
+    // Requery when the backend data changes
+    this.subscription.add(
+      this.postService.onChange.subscribe({ next: () => this.fetchPage(0) })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   fetchPage(pageNum: number): void {

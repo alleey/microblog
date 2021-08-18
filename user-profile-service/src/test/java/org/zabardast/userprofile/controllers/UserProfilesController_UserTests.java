@@ -33,7 +33,8 @@ import org.zabardast.common.filtering.Condition;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.Operator;
 import org.zabardast.userprofile.MockUserProfileData;
-import org.zabardast.userprofile.dto.UserProfileRepresentation;
+import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
+import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
 import org.zabardast.userprofile.model.UserProfile;
 import org.zabardast.userprofile.services.UserProfileService;
 import org.zabardast.userprofile.services.exceptions.UserProfileNotFoundException;
@@ -124,7 +125,7 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void getUserProfileById() throws Exception {
 
-		UserProfile userProfile = blogData.AllUserProfiles.get(0);
+		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
 		Mockito.when(userProfileService.getUserProfile(MockUserProfileData.UserIdGuest)).then(r -> userProfile);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
 				.get("/api/v1/users/{id}", MockUserProfileData.UserIdGuest)
@@ -154,16 +155,16 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void userCanUpdateOwnedUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AlLNonAdminProfiles.get(0);
-		UserProfileRepresentation userProfileRepresentation = modelMapper.map(userProfile, UserProfileRepresentation.class);
+		UserProfileResponseRepresentation userProfile = blogData.AlLNonAdminProfiles.get(0);
+		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
-		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRepresentation, false)).then(r -> userProfile);
+		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false)).then(r -> userProfile);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
 				.put("/api/v1/users/{id}", userProfile.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockUserProfileData.objectToJson(userProfileRepresentation));
+				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_OK));
@@ -173,16 +174,16 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void userCannotUpdateNonExistingUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AlLNonAdminProfiles.get(0);
-		UserProfileRepresentation userProfileRepresentation = modelMapper.map(userProfile, UserProfileRepresentation.class);
+		UserProfileResponseRepresentation userProfile = blogData.AlLNonAdminProfiles.get(0);
+		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
-		Mockito.when(userProfileService.updateUserProfile("Absent", userProfileRepresentation, false))
+		Mockito.when(userProfileService.updateUserProfile("Absent", userProfileRequestRepresentation, false))
 				.thenThrow(new UserProfileNotFoundException(userProfile.getId()));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
 				.put("/api/v1/users/Absent")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockUserProfileData.objectToJson(userProfileRepresentation));
+				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
@@ -192,15 +193,15 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void userCannotUpdateOthersUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AllAdminUserProfiles.get(0);
-		UserProfileRepresentation userProfileRepresentation = modelMapper.map(userProfile, UserProfileRepresentation.class);
+		UserProfileResponseRepresentation userProfile = blogData.AllAdminUserProfiles.get(0);
+		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
 				.put("/api/v1/users/{id}", userProfile.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockUserProfileData.objectToJson(userProfileRepresentation));
+				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
@@ -210,7 +211,7 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void userCanDeleteOwnedUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AlLNonAdminProfiles.get(0);
+		UserProfileResponseRepresentation userProfile = blogData.AlLNonAdminProfiles.get(0);
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
 		Mockito.doNothing().when(userProfileService).deleteUserProfile(userProfile.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -227,7 +228,7 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void userCannotDeleteNonExistingUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AlLNonAdminProfiles.get(0);
+		UserProfileResponseRepresentation userProfile = blogData.AlLNonAdminProfiles.get(0);
 
 		Mockito.when(userProfileService.getUserProfile("Absent"))
 				.thenThrow(new UserProfileNotFoundException(userProfile.getId()));
@@ -245,7 +246,7 @@ class UserProfilesController_UserTests {
 	@WithMockUser(username = MockUserProfileData.UserIdGuest, roles = "USER")
 	void userCannotDeleteOthersUserProfile() throws Exception {
 
-		UserProfile userProfile = blogData.AllAdminUserProfiles.get(0);
+		UserProfileResponseRepresentation userProfile = blogData.AllAdminUserProfiles.get(0);
 		
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
 		Mockito.doNothing().when(userProfileService).deleteUserProfile(userProfile.getId());

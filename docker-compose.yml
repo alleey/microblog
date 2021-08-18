@@ -121,6 +121,81 @@ services:
       KEYCLOCK_URL: "http://keycloak:8080"
       KEYCLOCK_REALM: "zabardast"
 
+  userprofileserver:
+    image: alpha/user-profile-service
+    build:
+      context: ./user-profile-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9082:9082"
+    restart: on-failure
+    depends_on:
+      - database
+      - configserver
+      - eurekaserver
+      - keycloak
+      - gateway
+    environment:
+      SERVER_PORT: 9082
+      DATABASESERVER_PORT: "5432"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      CONFIG_URI: "http://configserver:9003/config"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
+  followersserver:
+    image: alpha/followers-service
+    build:
+      context: ./followers-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9083:9083"
+    restart: on-failure
+    depends_on:
+      - database
+      - configserver
+      - eurekaserver
+      - keycloak
+      - gateway
+    environment:
+      SERVER_PORT: 9083
+      DATABASESERVER_PORT: "5432"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      CONFIG_URI: "http://configserver:9003/config"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
+  statsserver:
+    image: alpha/stats-service
+    build:
+      context: ./stats-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9084:9084"
+    restart: on-failure
+    depends_on:
+      - database
+      - configserver
+      - eurekaserver
+      - keycloak
+      - gateway
+    environment:
+      SERVER_PORT: 9084
+      DATABASESERVER_PORT: "5432"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+      CONFIG_URI: "http://configserver:9003/config"
+      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KEYCLOCK_URL: "http://keycloak:8080"
+      KEYCLOCK_REALM: "zabardast"
+
   webapp:
     image: alpha/webapp
     build:

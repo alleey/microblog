@@ -1,0 +1,42 @@
+server:
+  port: ${FOLLOWERS_SERVICE_PORT:9084}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: env,health,metrics
+
+spring:
+  datasource:
+    platform: "postgres"
+    driver-class-name: "org.postgresql.Driver"
+    url: "jdbc:postgresql://database:5432/stats_local"
+    username: "postgres"
+    password: "{cipher}23764ab05adf12c10e97ea9321690d67e7b8259a46b7baab75d802b7a506c4eb"
+    test-while-idle: "true"
+    validation-query: "SELECT 1"
+  jpa:
+    database: "POSTGRESQL"
+    generate-ddl: true
+    show-sql: "true"
+    properties:
+      hibernate:
+        dialect: "org.hibernate.dialect.PostgreSQLDialect"
+        ddl-auto: create
+    hibernate:
+      ddl-auto: create
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:http://localhost:8080}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:9001/eureka}

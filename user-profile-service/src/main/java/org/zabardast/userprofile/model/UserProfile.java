@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.server.core.Relation;
 
 @Entity
 @Table(name = "userprofiles", schema="userprofiles")
@@ -21,7 +20,6 @@ import org.springframework.hateoas.server.core.Relation;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Relation(collectionRelation = "userprofiles")
 public class UserProfile {
     @Id
     @Column(name = "user_id", nullable = false)

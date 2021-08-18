@@ -11,8 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.zabardast.userprofile.dto.KeycloakUserRepresentation;
-import org.zabardast.userprofile.dto.UserProfileRepresentation;
-import org.zabardast.userprofile.model.UserProfile;
+import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
 import org.zabardast.userprofile.services.UserProfileService;
 import org.zabardast.userprofile.services.exceptions.UserProfileNotFoundException;
 
@@ -60,7 +59,7 @@ public class UserAccountSyncTask {
     }
 
     void updateLocalProfile(@NotNull  KeycloakUserRepresentation keycloakUserRepresentation) {
-        UserProfileRepresentation userProfile = modelMapper.map(keycloakUserRepresentation, UserProfileRepresentation.class);
+        UserProfileRequestRepresentation userProfile = modelMapper.map(keycloakUserRepresentation, UserProfileRequestRepresentation.class);
         try {
             userProfileService.updateUserProfile(keycloakUserRepresentation.getId(), userProfile, true);
         } catch (UserProfileNotFoundException e) {

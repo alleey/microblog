@@ -9,8 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.zabardast.blog.MockBlogData;
-import org.zabardast.blog.dto.PostRepresentation;
-import org.zabardast.blog.model.Post;
+import org.zabardast.blog.dto.PostRequestRepresentation;
+import org.zabardast.blog.dto.PostResponseRepresentation;
 import org.zabardast.blog.services.PostService;
 import org.zabardast.blog.services.exceptions.PostAlreadyExistsException;
 import org.zabardast.blog.services.exceptions.PostNotFoundException;
@@ -40,23 +40,22 @@ class PostsController_UserTests {
 	@MockBean
 	private PostService postService;
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	private MockBlogData blogData = new MockBlogData();
 
 	@Test
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCanCreatePost() throws Exception {
 
-		Post newPost = MockBlogData.createBlogPost(100, "Test", "Test", MockBlogData.UserIdGuest, blogData.TopicGeneral);
-		PostRepresentation postRepresentation = modelMapper.map(newPost, PostRepresentation.class);
+		PostResponseRepresentation newPost =
+				MockBlogData.createBlogPostResponse(100, "Test", "Test", MockBlogData.UserIdGuest, blogData.TopicGeneral);
+		PostRequestRepresentation postRequestRepresentation = MockBlogData
+				.createBlogPostRequest("Test", "Test");
 
-		Mockito.when(postService.newPost(MockBlogData.UserIdGuest, postRepresentation)).then(r -> newPost);
+		Mockito.when(postService.newPost(MockBlogData.UserIdGuest, postRequestRepresentation)).then(r -> newPost);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/posts")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(postRepresentation));
+				.content(MockBlogData.objectToJson(postRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_CREATED));
@@ -66,15 +65,16 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userPostRequiresUniqueSlug() throws Exception {
 
-		Post newPost = blogData.AllPosts.get(1);
-		PostRepresentation postRepresentation = modelMapper.map(newPost, PostRepresentation.class);
+		PostResponseRepresentation newPost = blogData.AllPosts.get(1);
+		PostRequestRepresentation postRequestRepresentation = MockBlogData
+				.createBlogPostRequest("Test", "Test");
 
-		Mockito.when(postService.newPost(MockBlogData.UserIdGuest, postRepresentation))
-				.thenThrow(new PostAlreadyExistsException(blogData.AllPosts.get(1)));
+		Mockito.when(postService.newPost(MockBlogData.UserIdGuest, postRequestRepresentation))
+				.thenThrow(new PostAlreadyExistsException(postRequestRepresentation));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/posts")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(postRepresentation));
+				.content(MockBlogData.objectToJson(postRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_CONFLICT));
@@ -84,15 +84,16 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCanUpdateOwnedPost() throws Exception {
 
-		Post post = blogData.AlLUserPosts.get(0);
-		PostRepresentation postRepresentation = modelMapper.map(post, PostRepresentation.class);
+		PostResponseRepresentation post = blogData.AlLUserPosts.get(0);
+		PostRequestRepresentation postRequestRepresentation = MockBlogData
+				.createBlogPostRequest("Test", "Test");
 
 		Mockito.when(postService.getPost(post.getId())).then(r -> post);
-		Mockito.when(postService.updatePost(post.getId(), postRepresentation)).then(r -> post);
+		Mockito.when(postService.updatePost(post.getId(), postRequestRepresentation)).then(r -> post);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/posts/%d", post.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(postRepresentation));
+				.content(MockBlogData.objectToJson(postRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_OK));
@@ -102,7 +103,8 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCannotUpdateNonExistingPost() throws Exception {
 
-		Post post = blogData.AlLUserPosts.get(0);
+		PostResponseRepresentation post = blogData.AlLUserPosts.get(0);
+
 		Mockito.when(postService.getPost(post.getId())).thenThrow(new PostNotFoundException(post.getId()));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/posts/%d", post.getId()))
 				.accept(MediaType.APPLICATION_JSON)
@@ -117,15 +119,16 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCannotUpdateOthersPost() throws Exception {
 
-		Post post = blogData.AllAdminPosts.get(0);
-		PostRepresentation postRepresentation = modelMapper.map(post, PostRepresentation.class);
+		PostResponseRepresentation post = blogData.AllAdminPosts.get(0);
+		PostRequestRepresentation postRequestRepresentation = MockBlogData
+				.createBlogPostRequest("Test", "Test");
 
 		Mockito.when(postService.getPost(post.getId())).then(r -> post);
-		Mockito.when(postService.updatePost(post.getId(), postRepresentation)).then(r -> post);
+		Mockito.when(postService.updatePost(post.getId(), postRequestRepresentation)).then(r -> post);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/posts/%d", post.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(postRepresentation));
+				.content(MockBlogData.objectToJson(postRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
 				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
@@ -135,7 +138,8 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCanDeleteOwnedPost() throws Exception {
 
-		Post post = blogData.AlLUserPosts.get(0);
+		PostResponseRepresentation post = blogData.AlLUserPosts.get(0);
+
 		Mockito.when(postService.getPost(post.getId())).then(r -> post);
 		Mockito.doNothing().when(postService).deletePost(post.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(String.format("/api/v1/posts/%d", post.getId()))
@@ -151,7 +155,8 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCanDeleteNonExistingPost() throws Exception {
 
-		Post post = blogData.AlLUserPosts.get(0);
+		PostResponseRepresentation post = blogData.AlLUserPosts.get(0);
+
 		Mockito.when(postService.getPost(post.getId())).thenThrow(new PostNotFoundException(post.getId()));
 		Mockito.doNothing().when(postService).deletePost(post.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(String.format("/api/v1/posts/%d", post.getId()))
@@ -166,7 +171,8 @@ class PostsController_UserTests {
 	@WithMockUser(username = MockBlogData.UserIdGuest, roles = "USER")
 	void userCannotDeleteOthersPost() throws Exception {
 
-		Post post = blogData.AllAdminPosts.get(0);
+		PostResponseRepresentation post = blogData.AllAdminPosts.get(0);
+
 		Mockito.when(postService.getPost(post.getId())).then(r -> post);
 		Mockito.doNothing().when(postService).deletePost(post.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(String.format("/api/v1/posts/%d", post.getId()))
