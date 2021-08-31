@@ -1,0 +1,9 @@
+/*
+ * Public API Surface of auth-oidc
+ */
+export * from './lib/components/public-api';
+export * from './lib/directives/public-api';
+export * from './lib/guards/public-api';
+export * from './lib/services/public-api';
+export * from './lib/auth-oidc.module';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljLWFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3Byb2plY3RzL2F1dGgtb2lkYy9zcmMvcHVibGljLWFwaS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7R0FFRztBQUVILGNBQWMsNkJBQTZCLENBQUM7QUFDNUMsY0FBYyw2QkFBNkIsQ0FBQztBQUM1QyxjQUFjLHlCQUF5QixDQUFDO0FBQ3hDLGNBQWMsMkJBQTJCLENBQUM7QUFDMUMsY0FBYyx3QkFBd0IsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8qXG4gKiBQdWJsaWMgQVBJIFN1cmZhY2Ugb2YgYXV0aC1vaWRjXG4gKi9cblxuZXhwb3J0ICogZnJvbSAnLi9saWIvY29tcG9uZW50cy9wdWJsaWMtYXBpJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2RpcmVjdGl2ZXMvcHVibGljLWFwaSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9ndWFyZHMvcHVibGljLWFwaSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zZXJ2aWNlcy9wdWJsaWMtYXBpJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2F1dGgtb2lkYy5tb2R1bGUnO1xuIl19

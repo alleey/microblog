@@ -1,0 +1,43 @@
+import { OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { Pageable, PageModel } from 'utils';
+import { TopicModel, TopicListResponseModel } from '../../models/topic';
+import { TopicsService } from '../../services/topics.service';
+import { TopicListViewEvent } from '../topic-list-view/topic-list-view.component';
+import * as i0 from "@angular/core";
+export declare class TopicListComponent implements OnInit, OnDestroy {
+    private topicsService;
+    private router;
+    private activatedRoute;
+    enableSearch: boolean;
+    filterText: string;
+    itemTemplate: TemplateRef<any> | undefined;
+    noContentsTemplate: TemplateRef<any> | undefined;
+    headerTemplate: TemplateRef<any> | undefined;
+    footerTemplate: TemplateRef<any> | undefined;
+    onSelect: (topic: TopicModel) => void;
+    pageable: Pageable;
+    response: TopicListResponseModel | null;
+    errorDesc: any;
+    loading: boolean;
+    filter: string;
+    subscription: Subscription;
+    constructor(topicsService: TopicsService, router: Router, activatedRoute: ActivatedRoute);
+    ngOnInit(): void;
+    ngOnDestroy(): void;
+    responseHandler: {
+        next: (result: TopicListResponseModel) => void;
+        error: (err: any) => void;
+    };
+    onApplyFilter(text: string): void;
+    fetchPage(pageNum: number): void;
+    get items(): TopicModel[];
+    get page(): PageModel | undefined;
+    get hasItems(): boolean;
+    handleListViewEvent(evt: TopicListViewEvent): void;
+    navigateToTopicPosts(topic: TopicModel): void;
+    gotoPage(evt: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<TopicListComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<TopicListComponent, "blog-topic-list", never, { "enableSearch": "enableSearch"; "filterText": "filterText"; "itemTemplate": "itemTemplate"; "noContentsTemplate": "noContentsTemplate"; "headerTemplate": "headerTemplate"; "footerTemplate": "footerTemplate"; "onSelect": "onSelectTopic"; }, {}, never, never>;
+}

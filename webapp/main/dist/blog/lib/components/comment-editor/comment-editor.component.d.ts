@@ -1,0 +1,41 @@
+import { Location } from '@angular/common';
+import { OnInit, TemplateRef } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { CommentsServiceConfig } from '../../config/config';
+import { CommentModel, CommentResponseModel } from '../../models/comment';
+import { CommentsService } from '../../services/comments.service';
+import * as i0 from "@angular/core";
+export declare class CommentEditorComponent implements OnInit {
+    private config;
+    private commentsService;
+    private location;
+    private activatedRoute;
+    headerTemplate: TemplateRef<any> | undefined;
+    paramPostId?: number;
+    paramCommentId?: string;
+    updateMode: boolean;
+    postId?: number;
+    commentId?: number;
+    comment: CommentModel | null;
+    successDesc: any;
+    errorDesc: any;
+    loading: boolean;
+    form: FormGroup;
+    constructor(config: CommentsServiceConfig, commentsService: CommentsService, location: Location, activatedRoute: ActivatedRoute);
+    ngOnInit(): void;
+    get isUpdateMode(): boolean;
+    get text(): import("@angular/forms").AbstractControl | null;
+    set blogComment(item: CommentModel);
+    updateForm(): void;
+    fetchResponseHandler: {
+        next: (result: CommentResponseModel) => void;
+        error: (err: any) => boolean;
+    };
+    fetchComment(commentId: number): void;
+    createNewComment(): void;
+    updateComment(): void;
+    cancel(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CommentEditorComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CommentEditorComponent, "comment-editor", never, { "headerTemplate": "headerTemplate"; "paramPostId": "postId"; "paramCommentId": "commentId"; "updateMode": "updateMode"; }, {}, never, never>;
+}

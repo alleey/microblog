@@ -1,0 +1,5 @@
+/*
+ * Public API Surface of user-profile
+ */
+export * from './user-profile';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljLWFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uL3Byb2plY3RzL3VzZXJwcm9maWxlL3NyYy9saWIvbW9kZWxzL3B1YmxpYy1hcGkudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7O0dBRUc7QUFFSCxjQUFjLGdCQUFnQixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLypcbiAqIFB1YmxpYyBBUEkgU3VyZmFjZSBvZiB1c2VyLXByb2ZpbGVcbiAqL1xuXG5leHBvcnQgKiBmcm9tICcuL3VzZXItcHJvZmlsZSc7XG4iXX0=

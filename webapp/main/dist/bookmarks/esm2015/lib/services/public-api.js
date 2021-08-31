@@ -1,0 +1,5 @@
+/*
+ * Public API Surface of bookmarks
+ */
+export * from './bookmarks.service';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljLWFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uL3Byb2plY3RzL2Jvb2ttYXJrcy9zcmMvbGliL3NlcnZpY2VzL3B1YmxpYy1hcGkudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7O0dBRUc7QUFFSCxjQUFjLHFCQUFxQixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLypcbiAqIFB1YmxpYyBBUEkgU3VyZmFjZSBvZiBib29rbWFya3NcbiAqL1xuXG5leHBvcnQgKiBmcm9tICcuL2Jvb2ttYXJrcy5zZXJ2aWNlJztcbiJdfQ==

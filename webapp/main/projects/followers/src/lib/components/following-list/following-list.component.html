@@ -1,0 +1,41 @@
+<div *ngIf="loading; else contents">
+    <utils-loader></utils-loader>
+</div>
+
+<ng-template #contents>
+    <utils-alert *ngIf="errorDesc;else itemsList" [dismissable]="false" [minimal]="true">
+        <p>An error occurred fetching the bookmarks list: {{ errorDesc }}</p>
+    </utils-alert>
+</ng-template>
+
+<ng-template #itemsList>
+
+    <ng-container
+        [ngTemplateOutlet]="headerTemplate || defaultHeaderTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+
+    <div class="py-1">
+        <utils-search-box (onApplyFilter)="onApplyFilter" *ngIf="enableSearch"></utils-search-box>
+        <following-list-view 
+            [items]="items" 
+            [itemTemplate]="itemTemplate"
+            [noContentsTemplate]="noContentsTemplate"
+            (onSelectItem)="handleListViewEvent($event)">
+        </following-list-view>
+        <utils-pager [page]="page" (onSelectPage)="gotoPage($event)"></utils-pager>
+    </div>
+
+    <ng-container
+        [ngTemplateOutlet]="footerTemplate || defaultFooterTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+
+</ng-template>
+
+<ng-template #defaultHeaderTemplate>
+</ng-template>
+  
+<ng-template #defaultFooterTemplate>
+</ng-template>
+  

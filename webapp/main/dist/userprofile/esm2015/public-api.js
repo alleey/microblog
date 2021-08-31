@@ -1,0 +1,9 @@
+/*
+ * Public API Surface of userprofile
+ */
+export * from './lib/config/public-api';
+export * from './lib/components/public-api';
+export * from './lib/models/public-api';
+export * from './lib/services/public-api';
+export * from './lib/userprofile.module';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljLWFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3Byb2plY3RzL3VzZXJwcm9maWxlL3NyYy9wdWJsaWMtYXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOztHQUVHO0FBRUgsY0FBYyx5QkFBeUIsQ0FBQztBQUN4QyxjQUFjLDZCQUE2QixDQUFDO0FBQzVDLGNBQWMseUJBQXlCLENBQUM7QUFDeEMsY0FBYywyQkFBMkIsQ0FBQztBQUMxQyxjQUFjLDBCQUEwQixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLypcbiAqIFB1YmxpYyBBUEkgU3VyZmFjZSBvZiB1c2VycHJvZmlsZVxuICovXG5cbmV4cG9ydCAqIGZyb20gJy4vbGliL2NvbmZpZy9wdWJsaWMtYXBpJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL2NvbXBvbmVudHMvcHVibGljLWFwaSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9tb2RlbHMvcHVibGljLWFwaSc7XG5leHBvcnQgKiBmcm9tICcuL2xpYi9zZXJ2aWNlcy9wdWJsaWMtYXBpJztcbmV4cG9ydCAqIGZyb20gJy4vbGliL3VzZXJwcm9maWxlLm1vZHVsZSc7XG4iXX0=

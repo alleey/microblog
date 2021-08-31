@@ -1,0 +1,41 @@
+import { OnInit, TemplateRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { Pageable, PageModel } from 'utils';
+import { FollowingService } from '../../services/following.service';
+import { FollowedByListResponseModel, FollowedByModel } from '../../models/followed-by';
+import { FollowerListViewEvent } from '../followed-by-list-view/followed-by-list-view.component';
+import * as i0 from "@angular/core";
+export declare class FollowersListComponent implements OnInit {
+    private followersService;
+    private router;
+    private activatedRoute;
+    enableSearch: boolean;
+    filterText: string;
+    itemTemplate: TemplateRef<any> | undefined;
+    noContentsTemplate: TemplateRef<any> | undefined;
+    headerTemplate: TemplateRef<any> | undefined;
+    footerTemplate: TemplateRef<any> | undefined;
+    onSelect: (topic: FollowedByModel) => void;
+    pageable: Pageable;
+    response: FollowedByListResponseModel | null;
+    errorDesc: any;
+    loading: boolean;
+    subscription: Subscription;
+    constructor(followersService: FollowingService, router: Router, activatedRoute: ActivatedRoute);
+    ngOnInit(): void;
+    ngOnDestroy(): void;
+    onApplyFilter(text: string): void;
+    responseHandler: {
+        next: (result: FollowedByListResponseModel) => void;
+        error: (err: any) => void;
+    };
+    fetchPage(pageNum: number): void;
+    get items(): FollowedByModel[] | undefined;
+    get page(): PageModel | undefined;
+    get hasItems(): boolean;
+    handleListViewEvent(evt: FollowerListViewEvent): void;
+    gotoPage(evt: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<FollowersListComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<FollowersListComponent, "followed-by-list", never, { "enableSearch": "enableSearch"; "filterText": "filterText"; "itemTemplate": "itemTemplate"; "noContentsTemplate": "noContentsTemplate"; "headerTemplate": "headerTemplate"; "footerTemplate": "footerTemplate"; "onSelect": "onSelectBookmark"; }, {}, never, never>;
+}

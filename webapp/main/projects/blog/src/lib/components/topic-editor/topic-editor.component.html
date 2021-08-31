@@ -1,0 +1,48 @@
+<div *ngIf="loading; else contents">
+    <utils-loader></utils-loader>
+</div>
+
+<ng-template #defaultTitleTemplate let-item>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h5>CREATE A NEW TOPIC</h5>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #contents>
+    <ng-container 
+        [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+    <utils-alert *ngIf="errorDesc; else editor" [dismissable]="false" [minimal]="false">
+        <p>An error occurred accessing the post: {{ errorDesc }}</p>
+    </utils-alert>
+</ng-template>
+
+<ng-template #editor>
+    <form [formGroup]="form" novalidate onSubmit="return false;">
+        <div class="row">
+            <div class="mb-3 col-sm-9">
+                <input type="text" class="form-control" id="caption" placeholder="Topic name ... "
+                    formControlName="caption" required>
+
+                <div *ngIf="caption?.invalid && (caption?.dirty || caption?.touched)">
+                    <utils-alert *ngIf="caption?.errors?.required" [dismissable]="false" [minimal]="true">
+                        Name is required.
+                    </utils-alert>
+                    <utils-alert *ngIf="caption?.errors?.topicExists" [dismissable]="false" [minimal]="true">
+                        Topic name is already taken!
+                    </utils-alert>
+                </div>
+
+            </div>
+            <div class="mb-3 col-sm-3" *ngIf="!isUpdateMode">
+                <input class="btn btn-primary" type="button" [disabled]="loading || !form.valid" value="Create" (click)="createNewTopic()">
+            </div>
+            <div class="mb-3 col-sm-3" *ngIf="isUpdateMode">
+                <input class="btn btn-primary" type="button" [disabled]="loading || !form.valid" value="Update" (click)="updateTopic()">
+            </div>
+        </div>
+    </form>
+</ng-template>

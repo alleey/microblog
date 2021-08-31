@@ -1,0 +1,41 @@
+import { OnInit, TemplateRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { Pageable, PageModel } from 'utils';
+import { FollowingListResponseModel, FollowingModel } from '../../models/following';
+import { FollowingService } from '../../services/following.service';
+import { FollowingListViewEvent } from '../following-list-view/following-list-view.component';
+import * as i0 from "@angular/core";
+export declare class FollowingListComponent implements OnInit {
+    private followersService;
+    private router;
+    private activatedRoute;
+    enableSearch: boolean;
+    filterText: string;
+    itemTemplate: TemplateRef<any> | undefined;
+    noContentsTemplate: TemplateRef<any> | undefined;
+    headerTemplate: TemplateRef<any> | undefined;
+    footerTemplate: TemplateRef<any> | undefined;
+    onSelect: (topic: FollowingModel) => void;
+    pageable: Pageable;
+    response: FollowingListResponseModel | null;
+    errorDesc: any;
+    loading: boolean;
+    subscription: Subscription;
+    constructor(followersService: FollowingService, router: Router, activatedRoute: ActivatedRoute);
+    ngOnInit(): void;
+    ngOnDestroy(): void;
+    onApplyFilter(text: string): void;
+    responseHandler: {
+        next: (result: FollowingListResponseModel) => void;
+        error: (err: any) => void;
+    };
+    fetchPage(pageNum: number): void;
+    get items(): FollowingModel[] | undefined;
+    get page(): PageModel | undefined;
+    get hasItems(): boolean;
+    handleListViewEvent(evt: FollowingListViewEvent): void;
+    gotoPage(evt: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<FollowingListComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<FollowingListComponent, "following-list", never, { "enableSearch": "enableSearch"; "filterText": "filterText"; "itemTemplate": "itemTemplate"; "noContentsTemplate": "noContentsTemplate"; "headerTemplate": "headerTemplate"; "footerTemplate": "footerTemplate"; "onSelect": "onSelectBookmark"; }, {}, never, never>;
+}

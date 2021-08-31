@@ -1,0 +1,22 @@
+<ng-container *ngIf="topics">
+    <ng-container *ngFor="let x of topics; index as i">
+        <ng-container 
+            [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
+            [ngTemplateOutletContext]="{ $implicit: x, index: i, list: this }">
+        </ng-container>
+    </ng-container>
+</ng-container>
+<ng-container *ngIf="!topics">
+    <ng-container 
+        [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+</ng-container>
+
+<ng-template #defaultItemTemplate let-item let-parent="list">
+    <a class="btn btn-danger m-1" role="button" (click)="parent.selectItem(item, 'select')">{{item.caption}}</a>
+</ng-template>
+
+<ng-template #defaultNoContentsTemplate let-item>
+    No topic found!
+</ng-template>

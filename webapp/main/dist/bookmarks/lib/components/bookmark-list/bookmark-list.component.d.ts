@@ -1,0 +1,43 @@
+import { OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { BookmarkModel, BookmarkListResponseModel } from '../../models/bookmark';
+import { BookmarksService } from '../../services/bookmarks.service';
+import { Pageable, PageModel } from 'utils';
+import { BookmarkListViewEvent } from '../bookmark-list-view/bookmark-list-view.component';
+import * as i0 from "@angular/core";
+export declare class BookmarkListComponent implements OnInit, OnDestroy {
+    private bookmarksService;
+    private router;
+    private activatedRoute;
+    enableSearch: boolean;
+    filterText: string;
+    itemTemplate: TemplateRef<any> | undefined;
+    noContentsTemplate: TemplateRef<any> | undefined;
+    headerTemplate: TemplateRef<any> | undefined;
+    footerTemplate: TemplateRef<any> | undefined;
+    onSelect: (topic: BookmarkModel) => void;
+    pageable: Pageable;
+    response: BookmarkListResponseModel | null;
+    errorDesc: any;
+    loading: boolean;
+    subscription: Subscription;
+    constructor(bookmarksService: BookmarksService, router: Router, activatedRoute: ActivatedRoute);
+    ngOnInit(): void;
+    ngOnDestroy(): void;
+    onApplyFilter(text: string): void;
+    responseHandler: {
+        next: (result: BookmarkListResponseModel) => void;
+        error: (err: any) => void;
+    };
+    fetchPage(pageNum: number): void;
+    get items(): BookmarkModel[] | undefined;
+    get page(): PageModel | undefined;
+    get hasItems(): boolean;
+    handleListViewEvent(evt: BookmarkListViewEvent): void;
+    navigateBookmark(bookmark: BookmarkModel): void;
+    deleteBookmark(bookmark: BookmarkModel): void;
+    gotoPage(evt: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<BookmarkListComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<BookmarkListComponent, "bookmark-list", never, { "enableSearch": "enableSearch"; "filterText": "filterText"; "itemTemplate": "itemTemplate"; "noContentsTemplate": "noContentsTemplate"; "headerTemplate": "headerTemplate"; "footerTemplate": "footerTemplate"; "onSelect": "onSelectBookmark"; }, {}, never, never>;
+}

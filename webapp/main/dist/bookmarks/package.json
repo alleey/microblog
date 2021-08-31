@@ -1,0 +1,18 @@
+{
+  "name": "bookmarks",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^12.0.4",
+    "@angular/core": "^12.0.4"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
+  },
+  "main": "bundles/bookmarks.umd.js",
+  "module": "fesm2015/bookmarks.js",
+  "es2015": "fesm2015/bookmarks.js",
+  "esm2015": "esm2015/bookmarks.js",
+  "fesm2015": "fesm2015/bookmarks.js",
+  "typings": "bookmarks.d.ts",
+  "sideEffects": false
+}

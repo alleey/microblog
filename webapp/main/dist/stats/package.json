@@ -1,0 +1,18 @@
+{
+  "name": "stats",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^12.0.4",
+    "@angular/core": "^12.0.4"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
+  },
+  "main": "bundles/stats.umd.js",
+  "module": "fesm2015/stats.js",
+  "es2015": "fesm2015/stats.js",
+  "esm2015": "esm2015/stats.js",
+  "fesm2015": "fesm2015/stats.js",
+  "typings": "stats.d.ts",
+  "sideEffects": false
+}

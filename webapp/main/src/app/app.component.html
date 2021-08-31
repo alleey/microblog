@@ -1,0 +1,84 @@
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-2 sidenav py-3">
+
+      <h2>Components</h2>
+      <p>
+        <a class="btn btn-primary mr-1" role="button" [routerLink]="''">Home</a>
+        <a class="btn btn-primary mr-1" role="button" (click)="userPosts()" *authRequireLogin="true">My Posts</a>
+      </p>
+
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search Blog..">
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+        </span>
+      </div>
+
+      <ul class="nav nav-tabs" id="tab1" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="topics-tab" data-toggle="tab" href="#topics" role="tab" aria-controls="topics" aria-selected>Topics</a>
+        </li>
+        <li class="nav-item" *authRequireLogin="true">
+          <a class="nav-link" id="bookmarks-tab" data-toggle="tab" href="#bookmarks" role="tab" aria-controls="bookmarks" aria-selected="false">My Bookmarks</a>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="tab1Content">
+        <div class="tab-pane fade show active" id="topics" role="tabpanel" aria-labelledby="topics-tab">
+          <blog-topic-list>
+          </blog-topic-list>
+        </div>
+        <div class="tab-pane fade" id="bookmarks" role="tabpanel" aria-labelledby="bookmarks-tab" *authRequireLogin="true">
+          <bookmark-list>
+          </bookmark-list>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-sm-8 py-3">
+      <router-outlet></router-outlet>
+    </div>
+
+    <div class="col-sm-2 sidenav py-3">
+
+      <div class="d-flex justify-content-between" *authRequireLogin="true;else nologin">
+        <div>
+          Welcome <b>{{userName}}</b>
+        </div>
+        <a class="btn btn-primary mr-1" role="button" [routerLink]="'/logout'">Logout</a>
+      </div>
+      <ng-template #nologin>
+        Not logged in. <a class="btn btn-primary mr-1" role="button" [routerLink]="'/login'">Login</a>
+      </ng-template>
+
+      <ul class="nav nav-tabs" id="tab2" role="tablist">
+        <li class="nav-item" *authRequireLogin="true">
+          <a class="nav-link active" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected>Following</a>
+        </li>
+        <li class="nav-item" *authRequireLogin="true">
+          <a class="nav-link" id="followers-tab" data-toggle="tab" href="#followers" role="tab" aria-controls="followers" aria-selected="false">My Followers</a>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="tab2Content">
+        <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab" *authRequireLogin="true">
+          <following-list></following-list>
+        </div>
+        <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab" *authRequireLogin="true">
+          <followed-by-list></followed-by-list>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12 sidenav py-3">
+      This is a footer
+    </div>
+  </div>
+</div>

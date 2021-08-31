@@ -1,0 +1,34 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import * as i0 from "@angular/core";
+import * as i1 from "@angular/common";
+export class FollowersListViewComponent {
+    constructor() {
+        this.onSelectItem = new EventEmitter();
+    }
+    ngOnInit() { }
+    selectItem(item, opcode) {
+        this.onSelectItem.emit({
+            opcode: opcode,
+            item: item
+        });
+    }
+}
+FollowersListViewComponent.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "12.0.4", ngImport: i0, type: FollowersListViewComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+FollowersListViewComponent.ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "12.0.0", version: "12.0.4", type: FollowersListViewComponent, selector: "followed-by-list-view", inputs: { items: "items", itemTemplate: "itemTemplate", noContentsTemplate: "noContentsTemplate" }, outputs: { onSelectItem: "onSelectItem" }, ngImport: i0, template: "<ng-container *ngIf=\"items\">\n    <ul class=\"list-group checked-list-box\">\n        <li class=\"list-group-item\" *ngFor=\"let x of items; index as i\">\n            <ng-container \n                [ngTemplateOutlet]=\"itemTemplate || defaultItemTemplate\"\n                [ngTemplateOutletContext]=\"{ $implicit: x, index: i, list: this }\">\n            </ng-container>\n        </li>\n    </ul>\n</ng-container>\n<ng-container *ngIf=\"!items\">\n    <ng-container \n        [ngTemplateOutlet]=\"noContentsTemplate || defaultNoContentsTemplate\"\n        [ngTemplateOutletContext]=\"{ $implicit: this }\">\n    </ng-container>\n</ng-container>\n\n<ng-template #defaultItemTemplate let-item let-parent=\"list\">\n    <span class=\"ml-2\" (click)=\"parent.selectItem(item, 'select')\">{{item.fullName}}</span>\n</ng-template>\n\n<ng-template #defaultNoContentsTemplate let-item>\n    The list is empty at the moment!\n</ng-template>", styles: [""], directives: [{ type: i1.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }, { type: i1.NgForOf, selector: "[ngFor][ngForOf]", inputs: ["ngForOf", "ngForTrackBy", "ngForTemplate"] }, { type: i1.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet"] }] });
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "12.0.4", ngImport: i0, type: FollowersListViewComponent, decorators: [{
+            type: Component,
+            args: [{
+                    selector: 'followed-by-list-view',
+                    templateUrl: './followed-by-list-view.component.html',
+                    styleUrls: ['./followed-by-list-view.component.css']
+                }]
+        }], propDecorators: { items: [{
+                type: Input
+            }], itemTemplate: [{
+                type: Input
+            }], noContentsTemplate: [{
+                type: Input
+            }], onSelectItem: [{
+                type: Output
+            }] } });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZm9sbG93ZWQtYnktbGlzdC12aWV3LmNvbXBvbmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3Byb2plY3RzL2ZvbGxvd2Vycy9zcmMvbGliL2NvbXBvbmVudHMvZm9sbG93ZWQtYnktbGlzdC12aWV3L2ZvbGxvd2VkLWJ5LWxpc3Qtdmlldy5jb21wb25lbnQudHMiLCIuLi8uLi8uLi8uLi8uLi8uLi9wcm9qZWN0cy9mb2xsb3dlcnMvc3JjL2xpYi9jb21wb25lbnRzL2ZvbGxvd2VkLWJ5LWxpc3Qtdmlldy9mb2xsb3dlZC1ieS1saXN0LXZpZXcuY29tcG9uZW50Lmh0bWwiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLFNBQVMsRUFBRSxZQUFZLEVBQUUsS0FBSyxFQUFVLE1BQU0sRUFBZSxNQUFNLGVBQWUsQ0FBQzs7O0FBVzVGLE1BQU0sT0FBTywwQkFBMEI7SUFMdkM7UUFZRSxpQkFBWSxHQUFHLElBQUksWUFBWSxFQUF5QixDQUFDO0tBVTFEO0lBUkMsUUFBUSxLQUFVLENBQUM7SUFFbkIsVUFBVSxDQUFDLElBQXFCLEVBQUUsTUFBYztRQUM5QyxJQUFJLENBQUMsWUFBWSxDQUFDLElBQUksQ0FBQztZQUNyQixNQUFNLEVBQUUsTUFBTTtZQUNkLElBQUksRUFBRSxJQUFJO1NBQ1gsQ0FBQyxDQUFDO0lBQ0wsQ0FBQzs7dUhBaEJVLDBCQUEwQjsyR0FBMUIsMEJBQTBCLDRNQ1h2QywyNkJBdUJjOzJGRFpELDBCQUEwQjtrQkFMdEMsU0FBUzttQkFBQztvQkFDVCxRQUFRLEVBQUUsdUJBQXVCO29CQUNqQyxXQUFXLEVBQUUsd0NBQXdDO29CQUNyRCxTQUFTLEVBQUUsQ0FBQyx1Q0FBdUMsQ0FBQztpQkFDckQ7OEJBR1UsS0FBSztzQkFBYixLQUFLO2dCQUNHLFlBQVk7c0JBQXBCLEtBQUs7Z0JBQ0csa0JBQWtCO3NCQUExQixLQUFLO2dCQUdOLFlBQVk7c0JBRFgsTUFBTSIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IENvbXBvbmVudCwgRXZlbnRFbWl0dGVyLCBJbnB1dCwgT25Jbml0LCBPdXRwdXQsIFRlbXBsYXRlUmVmIH0gZnJvbSAnQGFuZ3VsYXIvY29yZSc7XG5pbXBvcnQgeyBWaWV3RXZlbnQgfSBmcm9tICd1dGlscyc7XG5pbXBvcnQgeyBGb2xsb3dlZEJ5TW9kZWwgfSBmcm9tICcuLi8uLi9tb2RlbHMvZm9sbG93ZWQtYnknO1xuXG5leHBvcnQgdHlwZSBGb2xsb3dlckxpc3RWaWV3RXZlbnQgPSBWaWV3RXZlbnQ8Rm9sbG93ZWRCeU1vZGVsPjtcblxuQENvbXBvbmVudCh7XG4gIHNlbGVjdG9yOiAnZm9sbG93ZWQtYnktbGlzdC12aWV3JyxcbiAgdGVtcGxhdGVVcmw6ICcuL2ZvbGxvd2VkLWJ5LWxpc3Qtdmlldy5jb21wb25lbnQuaHRtbCcsXG4gIHN0eWxlVXJsczogWycuL2ZvbGxvd2VkLWJ5LWxpc3Qtdmlldy5jb21wb25lbnQuY3NzJ11cbn0pXG5leHBvcnQgY2xhc3MgRm9sbG93ZXJzTGlzdFZpZXdDb21wb25lbnQgaW1wbGVtZW50cyBPbkluaXQge1xuXG4gIEBJbnB1dCgpIGl0ZW1zPzogRm9sbG93ZWRCeU1vZGVsW107XG4gIEBJbnB1dCgpIGl0ZW1UZW1wbGF0ZTogVGVtcGxhdGVSZWY8YW55PiB8IHVuZGVmaW5lZDtcbiAgQElucHV0KCkgbm9Db250ZW50c1RlbXBsYXRlOiBUZW1wbGF0ZVJlZjxhbnk+IHwgdW5kZWZpbmVkO1xuXG4gIEBPdXRwdXQoKSBcbiAgb25TZWxlY3RJdGVtID0gbmV3IEV2ZW50RW1pdHRlcjxGb2xsb3dlckxpc3RWaWV3RXZlbnQ+KCk7XG5cbiAgbmdPbkluaXQoKTogdm9pZCB7fVxuICAgIFxuICBzZWxlY3RJdGVtKGl0ZW06IEZvbGxvd2VkQnlNb2RlbCwgb3Bjb2RlOiBzdHJpbmcpOiB2b2lkIHtcbiAgICB0aGlzLm9uU2VsZWN0SXRlbS5lbWl0KHtcbiAgICAgIG9wY29kZTogb3Bjb2RlLFxuICAgICAgaXRlbTogaXRlbVxuICAgIH0pO1xuICB9XG59XG4iLCI8bmctY29udGFpbmVyICpuZ0lmPVwiaXRlbXNcIj5cbiAgICA8dWwgY2xhc3M9XCJsaXN0LWdyb3VwIGNoZWNrZWQtbGlzdC1ib3hcIj5cbiAgICAgICAgPGxpIGNsYXNzPVwibGlzdC1ncm91cC1pdGVtXCIgKm5nRm9yPVwibGV0IHggb2YgaXRlbXM7IGluZGV4IGFzIGlcIj5cbiAgICAgICAgICAgIDxuZy1jb250YWluZXIgXG4gICAgICAgICAgICAgICAgW25nVGVtcGxhdGVPdXRsZXRdPVwiaXRlbVRlbXBsYXRlIHx8IGRlZmF1bHRJdGVtVGVtcGxhdGVcIlxuICAgICAgICAgICAgICAgIFtuZ1RlbXBsYXRlT3V0bGV0Q29udGV4dF09XCJ7ICRpbXBsaWNpdDogeCwgaW5kZXg6IGksIGxpc3Q6IHRoaXMgfVwiPlxuICAgICAgICAgICAgPC9uZy1jb250YWluZXI+XG4gICAgICAgIDwvbGk+XG4gICAgPC91bD5cbjwvbmctY29udGFpbmVyPlxuPG5nLWNvbnRhaW5lciAqbmdJZj1cIiFpdGVtc1wiPlxuICAgIDxuZy1jb250YWluZXIgXG4gICAgICAgIFtuZ1RlbXBsYXRlT3V0bGV0XT1cIm5vQ29udGVudHNUZW1wbGF0ZSB8fCBkZWZhdWx0Tm9Db250ZW50c1RlbXBsYXRlXCJcbiAgICAgICAgW25nVGVtcGxhdGVPdXRsZXRDb250ZXh0XT1cInsgJGltcGxpY2l0OiB0aGlzIH1cIj5cbiAgICA8L25nLWNvbnRhaW5lcj5cbjwvbmctY29udGFpbmVyPlxuXG48bmctdGVtcGxhdGUgI2RlZmF1bHRJdGVtVGVtcGxhdGUgbGV0LWl0ZW0gbGV0LXBhcmVudD1cImxpc3RcIj5cbiAgICA8c3BhbiBjbGFzcz1cIm1sLTJcIiAoY2xpY2spPVwicGFyZW50LnNlbGVjdEl0ZW0oaXRlbSwgJ3NlbGVjdCcpXCI+e3tpdGVtLmZ1bGxOYW1lfX08L3NwYW4+XG48L25nLXRlbXBsYXRlPlxuXG48bmctdGVtcGxhdGUgI2RlZmF1bHROb0NvbnRlbnRzVGVtcGxhdGUgbGV0LWl0ZW0+XG4gICAgVGhlIGxpc3QgaXMgZW1wdHkgYXQgdGhlIG1vbWVudCFcbjwvbmctdGVtcGxhdGU+Il19

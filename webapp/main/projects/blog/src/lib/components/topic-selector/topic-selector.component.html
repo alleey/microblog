@@ -1,0 +1,15 @@
+
+
+<label class="form-label">Selected Topics:</label>
+<div>
+    <blog-topic-list-view [topics]="selectedTopics"></blog-topic-list-view>
+    <utils-alert *ngIf="maxTopicsError" [dismissable]="true" [minimal]="true">
+        Sorry, cannot select more than {{maxTopics}} topics for a post.
+    </utils-alert>
+</div>
+<label class="form-label">Available Topics:</label>
+<blog-topic-list 
+    [itemTemplate]="itemTemplate"
+    [noContentsTemplate]="noContentsTemplate"
+    [onSelectTopic]="topicClicked">
+</blog-topic-list>

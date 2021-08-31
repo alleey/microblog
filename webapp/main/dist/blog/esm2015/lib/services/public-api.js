@@ -1,0 +1,6 @@
+/*
+ * Public API Surface of blog
+ */
+export * from './posts.service';
+export * from './topics.service';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljLWFwaS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uL3Byb2plY3RzL2Jsb2cvc3JjL2xpYi9zZXJ2aWNlcy9wdWJsaWMtYXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOztHQUVHO0FBRUgsY0FBYyxpQkFBaUIsQ0FBQztBQUNoQyxjQUFjLGtCQUFrQixDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLypcbiAqIFB1YmxpYyBBUEkgU3VyZmFjZSBvZiBibG9nXG4gKi9cblxuZXhwb3J0ICogZnJvbSAnLi9wb3N0cy5zZXJ2aWNlJztcbmV4cG9ydCAqIGZyb20gJy4vdG9waWNzLnNlcnZpY2UnO1xuIl19
