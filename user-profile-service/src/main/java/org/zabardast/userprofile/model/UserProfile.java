@@ -28,10 +28,13 @@ public class UserProfile {
     @Column(name = "username", nullable = false)
     String username;
 
+    @Column(name = "first_name")
     String firstName;
 
+    @Column(name = "last_name")
     String lastName;
 
+    @Column(name = "email")
     String email;
 
     boolean enabled;

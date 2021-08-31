@@ -59,7 +59,7 @@ public class UserProfilesController {
 
 	@GetMapping("search")
 	//@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> getAllMatching(
+	public ResponseEntity<?> search(
 			@NotNull @RequestParam("q")  final String criteria,
 			final Pageable page)
 	{

@@ -13,7 +13,7 @@ import org.zabardast.stats.model.CounterStatistics;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Relation(collectionRelation = "counter")
+@Relation(collectionRelation = "statistics")
 public class CounterStatisticsResponseRepresentation {
     private String counter;
     private CounterStatistics statistics;

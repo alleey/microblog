@@ -2,10 +2,10 @@ server:
   port: ${GATEWAY_PORT:9000}
   ssl:
     enabled: false
-    key-alias: eagleeye
+    key-alias: zabardast
     key-store-type: PKCS12
-    key-store: classpath:keystore/eagleeye.p12
-    key-store-password: changeit
+    key-store: classpath:keystore/zabardast.p12
+    key-store-password: zabardast
 
 management:
   endpoint:
@@ -41,7 +41,7 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: license
+        - id: blog
           uri: lb://blog-service
           predicates:
             - Path=/blog/**
@@ -51,10 +51,40 @@ spring:
             - name: Retry
               args:
                 retries: 3
-        - id: organization
+        - id: bookmarks
           uri: lb://bookmarks-service
           predicates:
             - Path=/bookmarks/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: userprofile
+          uri: lb://user-profile-service
+          predicates:
+            - Path=/userprofile/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: followers
+          uri: lb://followers-service
+          predicates:
+            - Path=/followers/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: stats
+          uri: lb://stats-service
+          predicates:
+            - Path=/stats/**
           filters:
             - TokenRelay=
             - StripPrefix=1

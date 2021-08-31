@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.model.Counter;
 
 public final class MockStatsData {
@@ -19,12 +20,11 @@ public final class MockStatsData {
 
     }
 
-    public static Counter createCounter(String id, String owner, double value) {
-        return Counter.builder()
+    public static CounterResponseRepresentation createCounterResponse(String id, String owner, double value) {
+        return CounterResponseRepresentation.builder()
                 .counter(id)
                 .owner(owner)
                 .value(value)
-                .createdOn(new Date())
                 .build();
     }
 

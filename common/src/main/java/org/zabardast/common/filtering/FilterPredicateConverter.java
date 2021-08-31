@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.springframework.data.domain.Sort;
@@ -56,6 +58,15 @@ public class FilterPredicateConverter
         return builder.and(predicates.toArray(new Predicate[0]));
     }
 
+    <Y> Path<Y> resolve(Root<?> root, String attribute) {
+        String[] segments = attribute.split("\\.");
+        Path<Y> path = root.get(segments[0]);
+        for (int i=1; i<segments.length; i++) {
+            path = path.get(segments[i]);
+        }
+        return path;
+    }
+
     <T> Predicate buildConditionPredicate(CriteriaBuilder builder, Root<T> root, Condition condition)
             throws InvalidFilterException
     {
@@ -63,41 +74,42 @@ public class FilterPredicateConverter
         if(!StringUtils.hasText(condition.getAttribute()))
             throw new IllegalArgumentException("condition must not have empty attribute");
 
+        Expression<String> attr = resolve(root, condition.getAttribute());
         switch(condition.getOperator()) {
             case EQ:
-                return builder.equal(root.get(condition.getAttribute()), condition.getValue());
+                return builder.equal(attr, condition.getValue());
             case NEQ:
-                return builder.notEqual(root.get(condition.getAttribute()), condition.getValue());
+                return builder.notEqual(attr, condition.getValue());
             case LT:
-                return builder.lessThan(root.get(condition.getAttribute()), condition.getValue());
+                return builder.lessThan(attr, condition.getValue());
             case LTE:
-                return builder.lessThanOrEqualTo(root.get(condition.getAttribute()), condition.getValue());
+                return builder.lessThanOrEqualTo(attr, condition.getValue());
             case GT:
-                return builder.greaterThan(root.get(condition.getAttribute()), condition.getValue());
+                return builder.greaterThan(attr, condition.getValue());
             case GTE:
-                return builder.greaterThanOrEqualTo(root.get(condition.getAttribute()), condition.getValue());
+                return builder.greaterThanOrEqualTo(attr, condition.getValue());
             case LIKE:
-                return builder.like(root.get(condition.getAttribute()), condition.getValue());
+                return builder.like(attr, condition.getValue());
             case NOT_LIKE:
-                return builder.notLike(root.get(condition.getAttribute()), condition.getValue());
+                return builder.notLike(attr, condition.getValue());
             case NULL:
-                return builder.isNull(root.get(condition.getAttribute()));
+                return builder.isNull(attr);
             case NOT_NULL:
-                return builder.isNotNull(root.get(condition.getAttribute()));
+                return builder.isNotNull(attr);
             case BETWEEN:
                 if(condition.getValues() == null || condition.getValues().size() != 2)
                     throw new IllegalArgumentException("between operator must have exactly two values");
-                return builder.between(root.get(condition.getAttribute()),
+                return builder.between(attr,
                         condition.getValues().get(0),
                         condition.getValues().get(1));
             case IN:
                 if(condition.getValues() == null || condition.getValues().size() == 0)
                     throw new IllegalArgumentException("between operator must have exactly two values");
-                return root.get(condition.getAttribute()).in(condition.getValues());
+                return attr.in(condition.getValues());
             case NOT_IN:
                 if(condition.getValues() == null || condition.getValues().size() == 0)
                     throw new IllegalArgumentException("between operator must have exactly two values");
-                return builder.not(root.get(condition.getAttribute()).in(condition.getValues()));
+                return builder.not(attr.in(condition.getValues()));
         }
 
         throw new InvalidFilterException("Unrecognized operator " + condition.getOperator());

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.zabardast.stats.dto.BatchCounterRequestRepresentation;
 import org.zabardast.stats.dto.CounterRequestRepresentation;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.dto.CounterStatisticsResponseRepresentation;
@@ -72,6 +73,21 @@ public class CounterController {
 			counterService.getAllCounters(counter, page),
 			counterResponseRepresentationAssembler
 		);
+		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+	}
+
+	@PostMapping("batch")
+	@PreAuthorize("isAuthenticated")
+	public ResponseEntity<?> batchUpdate(@RequestBody List<BatchCounterRequestRepresentation> counters, Authentication authentication) {
+
+		List<?> entities = counters.stream()
+				.filter(item -> item.getOperation().equalsIgnoreCase("update"))
+				.map(item -> counterService.addCounter(item.getCounter(), authentication.getName(), item.getValue()))
+				.collect(Collectors.toList());
+		counters.stream()
+				.filter(item -> item.getOperation().equalsIgnoreCase("delete"))
+				.forEach(item -> counterService.deleteCounter(item.getCounter(), authentication.getName()));
+
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 	}
 

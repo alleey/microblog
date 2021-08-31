@@ -23,7 +23,9 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.stats.MockStatsData;
+import org.zabardast.stats.dto.BatchCounterRequestRepresentation;
 import org.zabardast.stats.dto.CounterRequestRepresentation;
+import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.model.Counter;
 import org.zabardast.stats.services.CounterService;
 
@@ -50,11 +52,11 @@ class CounterController_UserTests {
 	@WithMockUser(username = MockStatsData.UserIdGuest, roles = "USER")
 	void addCounters() throws Exception {
 
-		List<CounterRequestRepresentation> cr = Arrays.asList(
+		List<?> cr = Arrays.asList(
 			new CounterRequestRepresentation(COUNTER_ID, 1)
 		);
 
-		Counter counter = MockStatsData.createCounter(COUNTER_ID, MockStatsData.UserIdGuest, 1);
+		CounterResponseRepresentation counter = MockStatsData.createCounterResponse(COUNTER_ID, MockStatsData.UserIdGuest, 1);
 		Mockito.when(counterService.addCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -72,7 +74,7 @@ class CounterController_UserTests {
 	@WithMockUser(username = MockStatsData.UserIdGuest, roles = "USER")
 	void addCounter() throws Exception {
 
-		Counter counter = MockStatsData.createCounter(COUNTER_ID, MockStatsData.UserIdGuest, 1);
+		CounterResponseRepresentation counter = MockStatsData.createCounterResponse(COUNTER_ID, MockStatsData.UserIdGuest, 1);
 		Mockito.when(counterService.addCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -90,6 +92,7 @@ class CounterController_UserTests {
 	@WithMockUser(username = MockStatsData.UserIdGuest, roles = "USER")
 	void deleteCounter() throws Exception {
 
+		Mockito.doNothing().when(counterService).deleteCounter(COUNTER_ID, MockStatsData.UserIdGuest);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
 				.delete("/api/v1/stats/counters/{id}", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON)
@@ -99,5 +102,30 @@ class CounterController_UserTests {
 				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NO_CONTENT))
 				.andExpect(jsonPath("$").doesNotExist());
+	}
+
+
+	@Test
+	@WithMockUser(username = MockStatsData.UserIdGuest, roles = "USER")
+	void batchCountersOperation() throws Exception {
+
+		List<?> cr = Arrays.asList(
+			new BatchCounterRequestRepresentation("update", COUNTER_ID, 1),
+			new BatchCounterRequestRepresentation("delete", COUNTER_ID, 1)
+		);
+
+		CounterResponseRepresentation counter = MockStatsData.createCounterResponse(COUNTER_ID, MockStatsData.UserIdGuest, 1);
+		Mockito.when(counterService.addCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
+		Mockito.doNothing().when(counterService).deleteCounter(COUNTER_ID, MockStatsData.UserIdGuest);
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.post("/api/v1/stats/counters/batch", COUNTER_ID)
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(MockStatsData.objectToJson(cr));
+
+		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(status().is(HttpStatus.SC_OK));
 	}
 }

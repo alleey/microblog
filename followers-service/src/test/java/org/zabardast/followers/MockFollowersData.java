@@ -3,12 +3,9 @@ package org.zabardast.followers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import org.zabardast.followers.model.Follower;
+import org.zabardast.followers.dto.FollowResponseRepresentation;
 
 public final class MockFollowersData {
 
@@ -16,25 +13,32 @@ public final class MockFollowersData {
     public static final String UserIdAdmin = "742d6b04-89e8-4322-a9c4-179540b1eaaa";
     public static final String UserIdService = "2c21ad8e-2d19-4033-bd54-2cb778cd3eb7";
 
-    public final List<String> AllGuestFollowers;
-    public final List<String> AllGuestFollowing;
+    public final List<FollowResponseRepresentation> AllGuestFollowers;
+    public final List<FollowResponseRepresentation> AllGuestFollowing;
 
     public MockFollowersData() {
 
         AllGuestFollowers =
-                Arrays.asList(UserIdAdmin, UserIdService);
+                Arrays.asList(UserIdAdmin, UserIdService).stream()
+                        .map(i -> createFollowedResponse(i))
+                        .collect(Collectors.toList());
 
         AllGuestFollowing =
-                Arrays.asList(UserIdAdmin);
+                Arrays.asList(UserIdAdmin).stream()
+                        .map(i -> createFollowingResponse(i))
+                        .collect(Collectors.toList());
 
     }
 
+    public static FollowResponseRepresentation createFollowedResponse(String id) {
+        return FollowResponseRepresentation.builder()
+                .userId(id)
+                .build();
+    }
 
-    public static Follower createFollower(String id, String follower) {
-        return Follower.builder()
-                .id(id)
-                .follower(follower)
-                .createdOn(new Date())
+    public static FollowResponseRepresentation createFollowingResponse(String id) {
+        return FollowResponseRepresentation.builder()
+                .userId(id)
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package org.zabardast.stats.dto;
+package org.zabardast.followers.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +12,9 @@ import org.springframework.hateoas.server.core.Relation;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Relation(collectionRelation = "counters")
-public class CounterResponseRepresentation {
-    private String counter;
-    private String owner;
-    private double value;
+public class FollowRequestRepresentation {
+    private String userId;
+    private String userName;
+    private String followedById;
+    private String followedByName;
 }

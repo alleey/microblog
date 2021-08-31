@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.model.Counter;
 import org.zabardast.stats.services.CounterService;
 
@@ -14,7 +15,7 @@ public class CounterOwnership {
     CounterService counterService;
 
     public boolean require(String counterId, Authentication authentication) {
-        Counter counter = counterService.getCounter(counterId, authentication.getName());
+        CounterResponseRepresentation counter = counterService.getCounter(counterId, authentication.getName());
         return counter.getOwner().equalsIgnoreCase(authentication.getName());
     }
 }

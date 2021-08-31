@@ -122,6 +122,14 @@ public class UserProfileService
     }
 
     @Transactional
+    public void setSyncOnForUserProfiles(@NotNull String userProfileId) {
+        userProfileRepository.findById(userProfileId).ifPresent(found -> {
+            found.setSyncedOn(new Date());
+            userProfileRepository.save(found);
+        });
+    }
+
+    @Transactional
     public void setSyncOnForAllUserProfiles(Date timestamp) {
         userProfileRepository.setSyncOnAll(timestamp);
     }

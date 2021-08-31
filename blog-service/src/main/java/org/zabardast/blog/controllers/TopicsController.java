@@ -59,7 +59,7 @@ public class TopicsController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<?> getAllMatching(@NotNull @RequestParam("q")  final String criteria,
+	public ResponseEntity<?> search(@NotNull @RequestParam("q")  final String criteria,
 																			final Pageable page)
 	{
 		try

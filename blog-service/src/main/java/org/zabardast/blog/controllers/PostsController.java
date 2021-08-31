@@ -62,8 +62,7 @@ public class PostsController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<?> getAllMatching(@NotNull @RequestParam("q")  final String criteria,
-																		 final Pageable page)
+	public ResponseEntity<?> search(@NotNull @RequestParam("q")  final String criteria, final Pageable page)
 	{
 		try
 		{
