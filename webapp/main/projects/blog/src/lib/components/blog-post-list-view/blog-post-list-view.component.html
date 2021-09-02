@@ -1,13 +1,11 @@
 <ng-container *ngIf="posts">
     <div *ngFor="let x of posts" class="bg-light">
-        <ng-container [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
-            [ngTemplateOutletContext]="{ $implicit: x, list: this }">
+        <ng-container [ngTemplateOutlet]="itemTemplate || defaultItemTemplate" [ngTemplateOutletContext]="{ $implicit: x, list: this }">
         </ng-container>
     </div>
 </ng-container>
 <ng-container *ngIf="!posts">
-    <ng-container [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate"
-        [ngTemplateOutletContext]="{ $implicit: this }">
+    <ng-container [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate" [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
 </ng-container>
 

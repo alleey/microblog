@@ -1,7 +1,7 @@
 
 <ng-container 
     [ngTemplateOutlet]="controlTemplate || defaultTemplate"
-    [ngTemplateOutletContext]="{ $implicit: this }">
+    [ngTemplateOutletContext]="{ $implicit: this, context: context }">
 </ng-container>
 
 <ng-template #defaultTemplate let-item>

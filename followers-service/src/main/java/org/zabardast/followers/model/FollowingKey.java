@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class FollowingKey implements Serializable {
     String user;
-    String followedBy;
+    String follower;
 }

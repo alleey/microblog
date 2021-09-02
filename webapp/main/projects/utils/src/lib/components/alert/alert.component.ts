@@ -11,6 +11,8 @@ export class AlertComponent implements OnInit {
   @Input() dismissable: boolean = false;
   @Input() title: string = "Oops!";
   @Input() kind: string = "danger";
+
+  @Input() context: any;
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   @Output() onClosed = new EventEmitter<number>();

@@ -29,6 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.common.filtering.Condition;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.Operator;
@@ -68,6 +69,7 @@ class UserProfilesController_UserTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
 				.andExpect(jsonPath("$._embedded.userprofiles", hasSize(page.getNumberOfElements())))
@@ -89,6 +91,7 @@ class UserProfilesController_UserTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$._embedded.userprofiles", hasSize(page.getNumberOfElements())))
 				.andExpect(jsonPath("$.page.size", is(page.getSize())))
@@ -113,6 +116,7 @@ class UserProfilesController_UserTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$._embedded.userprofiles", hasSize(page.getNumberOfElements())))
 				.andExpect(jsonPath("$.page.size", is(page.getSize())))
@@ -132,6 +136,7 @@ class UserProfilesController_UserTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id", is(userProfile.getId())))
 				.andExpect(jsonPath("$.username", equalTo(userProfile.getUsername())))
@@ -148,6 +153,7 @@ class UserProfilesController_UserTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
 	}
 
@@ -167,6 +173,7 @@ class UserProfilesController_UserTests {
 				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_OK));
 	}
 
@@ -186,6 +193,7 @@ class UserProfilesController_UserTests {
 				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
 	}
 
@@ -204,6 +212,7 @@ class UserProfilesController_UserTests {
 				.content(MockUserProfileData.objectToJson(userProfileRequestRepresentation));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
 	}
 
@@ -220,6 +229,7 @@ class UserProfilesController_UserTests {
 				.contentType(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NO_CONTENT))
 				.andExpect(jsonPath("$").doesNotExist());
 	}
@@ -239,6 +249,7 @@ class UserProfilesController_UserTests {
 				.contentType(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
 	}
 
@@ -256,6 +267,7 @@ class UserProfilesController_UserTests {
 				.contentType(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
 	}
 }

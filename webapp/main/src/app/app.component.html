@@ -28,11 +28,11 @@
 
       <div class="tab-content" id="tab1Content">
         <div class="tab-pane fade show active" id="topics" role="tabpanel" aria-labelledby="topics-tab">
-          <blog-topic-list>
+          <blog-topic-list [onSelect]="navigateToTopicPosts">
           </blog-topic-list>
         </div>
         <div class="tab-pane fade" id="bookmarks" role="tabpanel" aria-labelledby="bookmarks-tab" *authRequireLogin="true">
-          <bookmark-list>
+          <bookmark-list [onSelect]="navigateBookmark">
           </bookmark-list>
         </div>
       </div>
@@ -66,10 +66,16 @@
 
       <div class="tab-content" id="tab2Content">
         <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab" *authRequireLogin="true">
-          <following-list></following-list>
+          <ng-template #followingItemTemplate let-item let-parent="list">
+            <user-profile-badge [userid]="item.userId"></user-profile-badge>
+          </ng-template>
+          <following-list [itemTemplate]="followingItemTemplate"></following-list>
         </div>
         <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab" *authRequireLogin="true">
-          <followed-by-list></followed-by-list>
+          <ng-template #followedItemTemplate let-item let-parent="list">
+            <user-profile-badge [userid]="item.followedById"></user-profile-badge>
+          </ng-template>
+          <follower-list [itemTemplate]="followedItemTemplate"></follower-list>
         </div>
       </div>
 

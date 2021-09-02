@@ -10,6 +10,7 @@ export class RequireOwnerDirective {
   private thenRef: TemplateRef<any>|undefined;
   private elseRef: TemplateRef<any>|undefined;
   private show: boolean = false;
+  private invert: 'yes' | 'no' = 'no';
 
   constructor(private authService: OidcAuthService,
     private templateRef: TemplateRef<any>,
@@ -32,6 +33,12 @@ export class RequireOwnerDirective {
   }
 
   @Input()
+  set authRequireOwnerDifferent(value: 'yes' | 'no') {
+    this.invert = value;
+    this.updateView();
+  }
+
+  @Input()
   set authRequireOwnerElse(ref: TemplateRef<any>) {
     this.elseRef = ref;
     this.updateView();
@@ -46,7 +53,8 @@ export class RequireOwnerDirective {
   updateView() : void {
     this.viewContainer.clear();
 
-    if (this.show) {
+    const show = this.profile && (this.invert === 'yes' ? !this.show : this.show);
+    if (show) {
       this.viewContainer.createEmbeddedView(
         !!this.thenRef ? this.thenRef : this.templateRef, { $implicit: this.profile }
       );

@@ -18,9 +18,7 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input('onSelectPost') 
-  onSelect: (post: BlogPostModel) => void = 
-    (item) => this.navigateToPost(item);
+  @Input() onSelect: (post: BlogPostModel) => void = (item) => {};
 
   state: any;
 
@@ -93,10 +91,6 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
     switch(evt.opcode) {
       case 'select': this.onSelect(evt.item); break;
     }
-  }
-
-  navigateToPost(post: BlogPostModel): void {
-    this.router.navigate(["/posts", post.id, post.slug]);
   }
 
   gotoPage(evt:any): void {

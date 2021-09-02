@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { Pageable, PageModel } from '../../models/page';
 
 @Component({
@@ -8,14 +8,13 @@ import { Pageable, PageModel } from '../../models/page';
 })
 export class PagerComponent implements OnInit {
 
-  @Input()
-  prevNextLinks: boolean = true;
+  @Input() context: any;
+  @Input() controlTemplate: TemplateRef<any> | undefined;
 
-  @Input()
-  maxPageLinks: number = 10;
+  @Input() prevNextLinks: boolean = true;
+  @Input() maxPageLinks: number = 10;
 
-  @Output() 
-  onSelectPage = new EventEmitter<number>();
+  @Output() onSelectPage = new EventEmitter<number>();
 
   pageList: Array<number> = [];
   currentPage: PageModel | undefined;

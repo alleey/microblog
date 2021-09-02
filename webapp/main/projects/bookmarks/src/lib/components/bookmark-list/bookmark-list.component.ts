@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BookmarkModel, BookmarkListResponseModel } from '../../models/bookmark';
 import { BookmarksService } from '../../services/bookmarks.service';
@@ -21,9 +21,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input('onSelectBookmark') 
-  onSelect: (topic: BookmarkModel) => void = 
-    (item) => this.navigateBookmark(item);
+  @Input() onSelect: (topic: BookmarkModel) => void = (item) => {};
         
   pageable: Pageable; 
   response : BookmarkListResponseModel|null;
@@ -33,7 +31,6 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
 
   constructor(
       private bookmarksService: BookmarksService, 
-      private router: Router, 
       private activatedRoute: ActivatedRoute) 
   { 
     this.response = null;
@@ -103,11 +100,6 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
       case 'select': this.onSelect(evt.item); break;
       case 'delete': this.deleteBookmark(evt.item); break;
     }
-  }
-
-  navigateBookmark(bookmark: BookmarkModel): void {
-    console.info(`Navigate to ${bookmark.url}`)
-    window.location.href = bookmark.url;
   }
 
   deleteBookmark(bookmark: BookmarkModel): void {

@@ -18,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.blog.MockBlogData;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.CommentResponseRepresentation;
@@ -59,6 +60,7 @@ class PostCommentsController_AdminTests {
 				.content(MockBlogData.objectToJson(commentRequest));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_OK));
 	}
 
@@ -77,6 +79,7 @@ class PostCommentsController_AdminTests {
 				.contentType(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NO_CONTENT));
 	}
 }

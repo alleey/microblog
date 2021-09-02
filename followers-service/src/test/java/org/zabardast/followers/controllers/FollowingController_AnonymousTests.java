@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.followers.MockFollowersData;
 import org.zabardast.followers.services.FollowingService;
 
@@ -52,10 +53,11 @@ class FollowingController_AnonymousTests {
 
 		Mockito.when(followingService.listFollowing(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.get("/api/v1/users/{id}/following", MockFollowersData.UserIdGuest)
+				.get("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
 				.andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
@@ -69,12 +71,13 @@ class FollowingController_AnonymousTests {
 	void addFollowerRequiresLogin() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.put("/api/v1/users/{id}/following", MockFollowersData.UserIdGuest)
+				.post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(MockFollowersData.objectToJson(blogData.AllGuestFollowers.get(0)));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
 	}
 
@@ -82,11 +85,12 @@ class FollowingController_AnonymousTests {
 	void removeFollowerRequiresLogin() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/users/{id}/following", MockFollowersData.UserIdGuest)
+				.delete("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
 	}
 }

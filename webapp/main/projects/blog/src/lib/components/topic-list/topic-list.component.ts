@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Pageable, PageModel } from 'utils';
 import { TopicModel, TopicListResponseModel } from '../../models/topic';
@@ -21,9 +21,7 @@ export class TopicListComponent implements OnInit, OnDestroy {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input('onSelectTopic') 
-  onSelect: (topic: TopicModel) => void = 
-    (item) => this.navigateToTopicPosts(item);
+  @Input() onSelect: (topic: TopicModel) => void = (item) => {};
       
   pageable: Pageable;
   response : TopicListResponseModel|null;
@@ -37,7 +35,6 @@ export class TopicListComponent implements OnInit, OnDestroy {
 
   constructor(
     private topicsService: TopicsService, 
-    private router: Router, 
     private activatedRoute: ActivatedRoute) 
   { 
     this.response = null;
@@ -106,13 +103,6 @@ export class TopicListComponent implements OnInit, OnDestroy {
     switch(evt.opcode) {
       case 'select': this.onSelect(evt.item); break;
     }
-  }
-
-  navigateToTopicPosts(topic: TopicModel): void {
-    this.router.navigate(['/topics', topic.id, "posts"], 
-    { 
-      state: { "endpoint": `topics/${topic.id}/posts` }
-    });
   }
 
   gotoPage(evt: any): void {

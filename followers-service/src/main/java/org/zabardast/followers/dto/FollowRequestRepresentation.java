@@ -13,8 +13,5 @@ import org.springframework.hateoas.server.core.Relation;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class FollowRequestRepresentation {
-    private String userId;
-    private String userName;
-    private String followedById;
-    private String followedByName;
+    private String followedId;
 }

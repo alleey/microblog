@@ -49,7 +49,7 @@ export const environment = {
     },
     counters: {
       serviceBaseUrl: "http://localhost:9000/api/v1",
-      defaultEndpoint: "stats/counters"
+      defaultEndpoint: "counters"
     },
   }
 };

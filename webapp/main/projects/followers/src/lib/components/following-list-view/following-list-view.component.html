@@ -16,7 +16,7 @@
 </ng-container>
 
 <ng-template #defaultItemTemplate let-item let-parent="list">
-    <span class="ml-2" (click)="parent.selectItem(item, 'select')">{{item.fullName}}</span>
+    <span class="ml-2" (click)="parent.selectItem(item, 'select')">{{item.userName}}</span>
 </ng-template>
 
 <ng-template #defaultNoContentsTemplate let-item>

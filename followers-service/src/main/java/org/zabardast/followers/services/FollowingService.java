@@ -2,11 +2,15 @@ package org.zabardast.followers.services;
 
 import java.util.Arrays;
 import java.util.Date;
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,10 +28,10 @@ import org.zabardast.followers.events.FollowingCreatedEvent;
 import org.zabardast.followers.events.FollowingDeletedEvent;
 import org.zabardast.followers.model.Following;
 import org.zabardast.followers.model.FollowingKey;
-import org.zabardast.followers.model.Name;
 import org.zabardast.followers.repository.FollowingRepository;
 import org.zabardast.followers.services.exceptions.FollowingNotFoundException;
 
+@Slf4j
 @Service
 public class FollowingService
 {
@@ -46,17 +50,37 @@ public class FollowingService
     @Autowired
     ModelMapper modelMapper;
 
-    @Transactional
-    public FollowResponseRepresentation listOne(@NotNull String userId, @NotNull String followedById) {
-        FollowingKey key = new FollowingKey(userId, followedById);
-        return followingRepository
-                .findById(key)
-                .map(i -> modelMapper.map(i, FollowResponseRepresentation.class))
-                .orElseThrow(() -> new FollowingNotFoundException(userId, followedById));
+    @PostConstruct
+    public void init() {
+        Converter<?,?> converter = new Converter<Following, FollowResponseRepresentation>()
+        {
+            public FollowResponseRepresentation convert(MappingContext<Following, FollowResponseRepresentation> context)
+            {
+                Following s = context.getSource();
+                FollowResponseRepresentation d = context.getDestination();
+
+                if(d == null)
+                    d = new FollowResponseRepresentation();
+
+                d.setUserId(s.getUser());
+                d.setFollowerId(s.getFollower());
+                return d;
+            }
+        };
+        modelMapper.addConverter(converter);
     }
 
     @Transactional
-    public Page<FollowResponseRepresentation> listFollowedBy(@NotNull String userId, @NotNull Pageable pageable) {
+    public FollowResponseRepresentation listOne(@NotNull String userId, @NotNull String followerId) {
+        FollowingKey key = new FollowingKey(userId, followerId);
+        return followingRepository
+                .findById(key)
+                .map(i -> modelMapper.map(i, FollowResponseRepresentation.class))
+                .orElseThrow(() -> new FollowingNotFoundException(userId, followerId));
+    }
+
+    @Transactional
+    public Page<FollowResponseRepresentation> listFollowers(@NotNull String userId, @NotNull Pageable pageable) {
         return followingRepository
                 .findAllByUser(userId, pageable)
                 .map(i -> modelMapper.map(i, FollowResponseRepresentation.class));
@@ -65,12 +89,12 @@ public class FollowingService
     @Transactional
     public Page<FollowResponseRepresentation> listFollowing(@NotNull String userId, @NotNull Pageable pageable) {
         return followingRepository
-                .findAllByFollowedBy(userId, pageable)
+                .findAllByFollower(userId, pageable)
                 .map(i -> modelMapper.map(i, FollowResponseRepresentation.class));
     }
 
     @Transactional
-    public Page<FollowResponseRepresentation> findFollowedBy(
+    public Page<FollowResponseRepresentation> findFollowers(
             @NotNull String userId,
             @NotNull Filter criteria,
             @NotNull Pageable pageable)
@@ -103,7 +127,7 @@ public class FollowingService
                 Following.class,
                 Filter.builder().conditions(Arrays.asList(
                     // Filter all records where userId is followed
-                    Condition.builder().attribute("followedBy").operator(Operator.EQ).value(userId).build(),
+                    Condition.builder().attribute("follower").operator(Operator.EQ).value(userId).build(),
                     criteria
                 )).build(),
                 pageable.getSort());
@@ -123,10 +147,8 @@ public class FollowingService
                                                @NotNull FollowRequestRepresentation followRequest)
     {
         Following following = Following.builder()
-                .user(followRequest.getUserId())
-                .userName(new Name(followRequest.getUserName()))
-                .followedBy(userId)
-                .followedByName(new Name(followRequest.getFollowedByName()))
+                .user(followRequest.getFollowedId())
+                .follower(userId)
                 .createdOn(new Date())
                 .build();
         Following saved = followingRepository.save(following);

@@ -5,15 +5,8 @@ import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Pageable } from 'utils';
 import { FollowingServiceConfig, FollowingServiceConfigToken } from '../config/config';
-import { FollowedByListResponseModel, FollowedByResponseModel } from '../models/followed-by';
-import { FollowingListResponseModel } from '../models/following';
+import { FollowsListResponseModel, FollowsResponseModel } from '../models/follows';
 
-export interface FollowRequest {
-  userId: string;
-  userName: string;
-  followedById: string;
-  followedByName: string;
-};
 
 @Injectable({
   providedIn: 'root'
@@ -34,22 +27,15 @@ export class FollowingService {
     });
   }
 
-  public followedByOne(endpoint: string, userId: string, followedById: string): Observable<FollowedByResponseModel> {
+  public findFollower(endpoint: string, userId: string, followedById: string): Observable<FollowsResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
-    console.info("followed-by : " + followedById);
-
     return this.httpClient
-            .get<FollowedByResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followedBy/${followedById}`)
-            .pipe(
-              map(data => {
-                return data as FollowedByResponseModel;
-              })
-            );
+            .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followers/${followedById}`);
   }
 
-  public followedBy(endpoint: string, userId: string, pageable?: Pageable): Observable<FollowedByListResponseModel> {
+  public followers(endpoint: string, userId: string, pageable?: Pageable): Observable<FollowsListResponseModel> {
 
     const page: number = pageable ? pageable.page : 0;
     const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.pageSize;
@@ -57,63 +43,24 @@ export class FollowingService {
     const owner = !!userId ? userId : this.userProfile?.sub;
 
     return this.httpClient
-            .get<FollowedByListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followedBy`, {
+            .get<FollowsListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followers`, {
               params: {
                 "page": page.toString(),
                 "size": pageSize.toString(),
-                "sort": "followedByName,asc"
+                "sort": "createdOn,asc"
               }
-            })
-            .pipe(
-              map(data => {
-                return data as FollowedByListResponseModel;
-              })
-            );
+            });
   }
 
-  public findFollowedByMatching(endpoint: string, userId: string, name: string, pageable?: Pageable): Observable<FollowedByListResponseModel> {
-
-    const page: number = pageable ? pageable.page : 0;
-    const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.pageSize;
-    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
-    const owner = !!userId ? userId : this.userProfile?.sub;
-
-    const query = {
-      "conditions": [
-        { "attribute": "followedByName.fullName", "operator": "like", "value": `%${name}%` }
-      ]
-    };
-    return this.httpClient
-            .get<FollowedByListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followedBy/search`, 
-            {
-              "params": { 
-                "q": JSON.stringify(query),
-                "page": page.toString(),
-                "size": pageSize.toString(),
-                "sort": "followedByName,asc"
-              }
-            })
-            .pipe(
-              map(data => {
-                return data as FollowedByListResponseModel;
-              })
-            );
-  }
-
-  public followingOne(endpoint: string, userId: string, followedById: string): Observable<FollowedByResponseModel> {
+  public findFollowing(endpoint: string, userId: string, followedById: string): Observable<FollowsResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
     return this.httpClient
-            .get<FollowedByResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${followedById}`)
-            .pipe(
-              map(data => {
-                return data as FollowedByResponseModel;
-              })
-            );
+            .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${followedById}`);
   }
 
-  public following(endpoint: string, userId: string, pageable?: Pageable): Observable<FollowingListResponseModel> {
+  public following(endpoint: string, userId: string, pageable?: Pageable): Observable<FollowsListResponseModel> {
 
     const page: number = pageable ? pageable.page : 0;
     const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.pageSize;
@@ -121,59 +68,24 @@ export class FollowingService {
     const owner = !!userId ? userId : this.userProfile?.sub;
 
     return this.httpClient
-            .get<FollowingListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following`, {
+            .get<FollowsListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following`, {
               params: {
                 "page": page.toString(),
                 "size": pageSize.toString(),
-                "sort": "userName,asc"
+                "sort": "createdOn,asc"
               }
-            })
-            .pipe(
-              map(data => {
-                return data as FollowingListResponseModel;
-              })
-            );
+            });
   }
 
-  public findFollowingMatching(endpoint: string, userId: string, name: string, pageable?: Pageable): Observable<FollowingListResponseModel> {
+  public follow(endpoint: string, userId: string, userTofollow: string): Observable<FollowsResponseModel> {
 
-    const page: number = pageable ? pageable.page : 0;
-    const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.pageSize;
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
-    const query = {
-      "conditions": [
-        { "attribute": "userName.fullName", "operator": "like", "value": `%${name}%` }
-      ]
-    };
     return this.httpClient
-            .get<FollowingListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/search`, 
-            {
-              "params": { 
-                "q": JSON.stringify(query),
-                "page": page.toString(),
-                "size": pageSize.toString(),
-                "sort": "userName,asc"
-              }
+            .post<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following`, {
+              "followedId": userTofollow
             })
-            .pipe(
-              map(data => {
-                return data as FollowingListResponseModel;
-              })
-            );
-  }
-
-  public follow(endpoint: string, followReq: FollowRequest): Observable<void> {
-
-    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
-
-    followReq.followedById = !!followReq.followedById ? followReq.followedById : this.userProfile?.sub;
-    followReq.followedByName = !!followReq.followedByName ? followReq.followedByName : this.userProfile?.name;
-    const owner = followReq.followedById;
-
-    return this.httpClient
-            .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following`, followReq)
             .pipe(
               catchError((error: any) => {
                 return throwError(new Error(error.status));

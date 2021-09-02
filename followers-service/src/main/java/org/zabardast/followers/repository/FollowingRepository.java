@@ -9,6 +9,6 @@ import org.zabardast.followers.model.FollowingKey;
 
 @Repository
 public interface FollowingRepository extends PagingAndSortingRepository<Following, FollowingKey> {
-    public Page<Following> findAllByUser(String followedId, Pageable page);
-    public Page<Following> findAllByFollowedBy(String followingId, Pageable page);
+    public Page<Following> findAllByUser(String user, Pageable page);
+    public Page<Following> findAllByFollower(String follower, Pageable page);
 }

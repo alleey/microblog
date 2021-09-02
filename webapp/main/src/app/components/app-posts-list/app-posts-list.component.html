@@ -1,18 +1,15 @@
-<blog-post-list [headerTemplate]="header" [itemTemplate]="thisItemTemplate">
+<blog-post-list 
+    [headerTemplate]="header" 
+    [itemTemplate]="postSummary"
+    [onSelect]="navigateToPost">
 </blog-post-list>
 
-<ng-template #thisItemTemplate let-item let-parent="list">
+<ng-template #postSummary let-item let-parent="list">
     <div class="p-1">
         <a (click)="parent.selectItem(item, 'select')" class="posttitle">{{item.title}}</a>
         <div class="created">
-            <user-profile-badge [userid]="item.owner">
-            </user-profile-badge>
-            <span *authRequireLogin="true">
-                <followed-by-badge [userid]="item.owner"></followed-by-badge>
-                <following-badge [userid]="item.owner"></following-badge>
-            </span>
-             posted 
-            {{item.createdOn | prettyDate}}.
+            <user-profile-badge [userid]="item.owner"></user-profile-badge>
+             posted {{item.createdOn | prettyDate}}.
         </div>
         <p class="posttext ">
             {{item.text}}

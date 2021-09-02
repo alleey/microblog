@@ -54,7 +54,12 @@ import { CommentEditorComponent } from './components/comment-editor/comment-edit
     TopicListComponent,
     BlogPostEditorComponent,
     BlogPostComponent,
-    BlogPostViewComponent
+    BlogPostViewComponent,
+    TopicSelectorComponent,
+    TopicEditorComponent,
+    CommentListComponent,
+    CommentListViewComponent,
+    CommentEditorComponent
   ]
 })
 export class BlogModule {

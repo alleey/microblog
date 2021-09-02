@@ -20,25 +20,20 @@ public final class MockFollowersData {
 
         AllGuestFollowers =
                 Arrays.asList(UserIdAdmin, UserIdService).stream()
-                        .map(i -> createFollowedResponse(i))
+                        .map(i -> createFollowsResponse(i, UserIdGuest))
                         .collect(Collectors.toList());
 
         AllGuestFollowing =
                 Arrays.asList(UserIdAdmin).stream()
-                        .map(i -> createFollowingResponse(i))
+                        .map(i -> createFollowsResponse(i, UserIdGuest))
                         .collect(Collectors.toList());
 
     }
 
-    public static FollowResponseRepresentation createFollowedResponse(String id) {
+    public static FollowResponseRepresentation createFollowsResponse(String id, String follower) {
         return FollowResponseRepresentation.builder()
                 .userId(id)
-                .build();
-    }
-
-    public static FollowResponseRepresentation createFollowingResponse(String id) {
-        return FollowResponseRepresentation.builder()
-                .userId(id)
+                .followerId(follower)
                 .build();
     }
 

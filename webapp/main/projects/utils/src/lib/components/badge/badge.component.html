@@ -6,7 +6,7 @@
 <ng-container 
     *ngIf="isActive" 
     [ngTemplateOutlet]="activeControlTemplate || defaultActiveControlTemplate"
-    [ngTemplateOutletContext]="{ $implicit: this }">
+    [ngTemplateOutletContext]="{ $implicit: this, context: context }">
 </ng-container>
 
 <ng-template #defaultActiveControlTemplate let-item>

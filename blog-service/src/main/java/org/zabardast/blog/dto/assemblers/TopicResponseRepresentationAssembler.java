@@ -16,8 +16,9 @@ public class TopicResponseRepresentationAssembler implements
     public EntityModel<TopicResponseRepresentation> toModel(TopicResponseRepresentation blogTopic) {
         return EntityModel.of(
                 blogTopic,
-            WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TopicsController.class)
-                .getTopicById(blogTopic.getId()))
+            WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder.methodOn(TopicsController.class).getTopicById(blogTopic.getId())
+                )
                 .withSelfRel()
 //            WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(TopicsController.class)
 //                .getOwnersTopics()))

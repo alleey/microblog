@@ -15,7 +15,5 @@ import org.springframework.hateoas.server.core.Relation;
 @Relation(collectionRelation = "follows")
 public class FollowResponseRepresentation {
     private String userId;
-    private String userName;
-    private String followedById;
-    private String followedByName;
+    private String followerId;
 }

@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { ViewEvent } from 'utils';
-import { FollowingModel } from '../../models/following';
+import { FollowsModel } from '../../models/follows';
 
-export type FollowingListViewEvent = ViewEvent<FollowingModel>;
+export type FollowingListViewEvent = ViewEvent<FollowsModel>;
 
 @Component({
   selector: 'following-list-view',
@@ -11,7 +11,7 @@ export type FollowingListViewEvent = ViewEvent<FollowingModel>;
 })
 export class FollowingListViewComponent implements OnInit {
 
-  @Input() items?: FollowingModel[];
+  @Input() items?: FollowsModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
@@ -20,7 +20,7 @@ export class FollowingListViewComponent implements OnInit {
 
   ngOnInit(): void {}
     
-  selectItem(item: FollowingModel, opcode: string): void {
+  selectItem(item: FollowsModel, opcode: string): void {
     this.onSelectItem.emit({
       opcode: opcode,
       item: item

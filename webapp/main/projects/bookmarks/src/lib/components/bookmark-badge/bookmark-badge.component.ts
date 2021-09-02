@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { BookmarkModel, BookmarkResponseModel } from '../../models/bookmark';
 import { BookmarksService } from '../../services/bookmarks.service';
 
@@ -8,7 +9,7 @@ import { BookmarksService } from '../../services/bookmarks.service';
   templateUrl: './bookmark-badge.component.html',
   styleUrls: ['./bookmark-badge.component.scss']
 })
-export class BookmarkBadgeComponent implements OnInit {
+export class BookmarkBadgeComponent implements OnInit, OnDestroy {
 
   @Input() url: string = "";
   @Input() caption: string = "";
@@ -18,11 +19,20 @@ export class BookmarkBadgeComponent implements OnInit {
 
   item?: BookmarkModel;
   loading: boolean = false;
+  subscription: Subscription = new Subscription();
 
   constructor(private service: BookmarksService) { }
 
   ngOnInit(): void {
     this.checkStatus();
+    // Requery when the backend data changes
+    this.subscription.add(
+      this.service.onChange.subscribe({ next: () => this.checkStatus() })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   get isActive(): boolean {

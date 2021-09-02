@@ -1,16 +1,20 @@
 <blog-post 
-    [headerTemplate]="header"
-    [footerTemplate]="footer"
->
+    [headerTemplate]="postHeader" 
+    [contentTemplate]="postContents" 
+    [footerTemplate]="postFooter">
 </blog-post>
 
-
-<ng-template #header let-item let-parent="list">
+<ng-template #postHeader let-item let-parent="list">
     <div class="d-flex justify-content-between">
         <div>
             <h2 class="blog-post-list-post-title">{{item.title}}</h2>
             <div class="created">
-                <user-profile-badge [userid]="item.owner"></user-profile-badge> posted
+                <user-profile-badge [userid]="item.owner"></user-profile-badge>
+                <span *authRequireOwner="item.owner different 'yes'" class="mx-1">
+                    <follower-badge [userid]="item.owner" class="mx-1"></follower-badge>
+                    <following-badge [userid]="item.owner" class="mx-1"></following-badge>
+                </span>
+                posted
                 {{item.createdOn | prettyDate}}.
             </div>
         </div>
@@ -26,9 +30,37 @@
             </div>
         </div>
     </div>
-    <hr class="my-4">
 </ng-template>
 
-<ng-template #footer let-item let-parent="list">
-    
+<ng-template #postContents let-item let-parent="list">postFooter
+    <p class="posttext ">
+        {{item.text}}
+    </p>
+    <h5>Posted under Topics:</h5>
+    <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
+    <ng-container *ngIf="parent.enableComments">
+        <comment-editor [updateMode]="false" *authRequireLogin="true"></comment-editor>
+        <hr class="my-4">
+        <h5>Comments:</h5>
+        <div class="mb-3 col-sm-12">
+            <blog-comment-list 
+                [postId]="item.id" 
+                [itemTemplate]="commentContents">
+            </blog-comment-list>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #postFooter let-item let-parent="list">
+</ng-template>
+
+<ng-template #commentContents let-item>
+    <div class="created"> 
+        <user-profile-badge [userid]="item.owner"></user-profile-badge>
+        commented on {{ item.createdOn | prettyDate }}.
+    </div>
+    <p class="posttext ">
+      {{item.text}} 
+    </p>
+    <hr class="my-4">
 </ng-template>

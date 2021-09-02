@@ -4,12 +4,13 @@ package org.zabardast.followers.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Optional;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.ExposesResourceFor;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.followers.dto.FollowRequestRepresentation;
 import org.zabardast.followers.dto.FollowResponseRepresentation;
-import org.zabardast.followers.dto.assemblers.FollowRepresentationAssembler;
+import org.zabardast.followers.dto.assemblers.FollowResponseRepresentationAssembler;
 import org.zabardast.followers.model.Following;
 import org.zabardast.followers.services.FollowingService;
 
@@ -45,12 +46,14 @@ public class FollowingController {
 	PagedResourcesAssembler<FollowResponseRepresentation> followResponseRepresentationPagedResourcesAssembler;
 
 	@Autowired
-	FollowRepresentationAssembler followRepresentationAssembler;
+	FollowResponseRepresentationAssembler assembler;
 
-	@GetMapping(value = "{followedId}")
+	@GetMapping("{followedId}")
 	public ResponseEntity<?> getOne(@PathVariable String userId, @PathVariable String followedId) {
-		FollowResponseRepresentation response = followingService.listOne(followedId, userId);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(response);
+		EntityModel<?> entity = assembler.toModel(
+			followingService.listOne(followedId, userId)
+		);
+		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
 	}
 
 	@GetMapping("")
@@ -59,7 +62,7 @@ public class FollowingController {
 	{
 		PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
 			followingService.listFollowing(userId, page),
-			followRepresentationAssembler
+			assembler
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 	}
@@ -76,8 +79,8 @@ public class FollowingController {
 			Filter filter = mapper.readValue(criteria, Filter.class);
 
 			PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
-					followingService.findFollowing(userId, filter, page),
-					followRepresentationAssembler
+				followingService.findFollowing(userId, filter, page),
+				assembler
 			);
 			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 		}
@@ -88,14 +91,15 @@ public class FollowingController {
 		}
 	}
 
-	@PutMapping(value = "")
+	@PostMapping()
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
 	public ResponseEntity<?> follow(@PathVariable String userId,
 									@RequestBody FollowRequestRepresentation followRequest)
 	{
-		FollowResponseRepresentation following = followingService
-				.follow(userId, followRequest);
-		return ResponseEntity.ok().build();
+		EntityModel<?> entity = assembler.toModel(
+			followingService.follow(userId, followRequest)
+		);
+		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
 	}
 
 	@DeleteMapping(value = "{followedId}")

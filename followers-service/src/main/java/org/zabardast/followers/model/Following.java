@@ -32,20 +32,8 @@ public class Following implements Serializable {
     String user;
 
     @Id
-    @Column(name = "followed_by_id", nullable = false)
-    String followedBy;
-
-    @Embedded
-    @AttributeOverrides({
-        @AttributeOverride(name = "full", column = @Column(name = "user_name"))
-    })
-    private Name userName;
-
-    @Embedded
-    @AttributeOverrides({
-        @AttributeOverride(name = "full", column = @Column(name = "followed_by_name"))
-    })
-    private Name followedByName;
+    @Column(name = "follower_id", nullable = false)
+    String follower;
 
     @Column(name = "created_on", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)

@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.blog.MockBlogData;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.CommentResponseRepresentation;
@@ -62,6 +63,7 @@ class PostCommentsController_AnonymousTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
 				.andExpect(jsonPath("$._embedded.comments", hasSize(page.getNumberOfElements())))
@@ -84,6 +86,7 @@ class PostCommentsController_AnonymousTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$._embedded.comments", hasSize(page.getNumberOfElements())))
 				.andExpect(jsonPath("$.page.size", is(page.getSize())))
@@ -105,6 +108,7 @@ class PostCommentsController_AnonymousTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id", is((int)comment.getId())))
 				.andExpect(jsonPath("$.text", equalTo(comment.getText())))
@@ -120,6 +124,7 @@ class PostCommentsController_AnonymousTests {
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
 	}
 
@@ -133,6 +138,7 @@ class PostCommentsController_AnonymousTests {
 				.content(MockBlogData.objectToJson(newComment));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
 	}
 
@@ -146,6 +152,7 @@ class PostCommentsController_AnonymousTests {
 				.content(MockBlogData.objectToJson(newComment));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
 	}
 
@@ -157,6 +164,7 @@ class PostCommentsController_AnonymousTests {
 				.contentType(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
 	}
 }

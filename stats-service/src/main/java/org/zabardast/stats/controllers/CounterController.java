@@ -35,7 +35,7 @@ import org.zabardast.stats.services.CounterService;
 @Slf4j
 @CrossOrigin("*")
 @RestController
-@RequestMapping(value = "/api/v1/stats/counters")
+@RequestMapping(value = "/api/v1/counters")
 @ExposesResourceFor(Counter.class)
 public class CounterController {
 
@@ -51,7 +51,7 @@ public class CounterController {
 	@Autowired
 	PagedResourcesAssembler<CounterResponseRepresentation> pagedAssembler;
 
-	@GetMapping("{counter}")
+	@GetMapping("{counter}/stats")
 	//@PreAuthorize("isAuthenticated")
 	public ResponseEntity<?> getCounterStatistics(@PathVariable String counter) {
 
@@ -74,6 +74,15 @@ public class CounterController {
 			counterResponseRepresentationAssembler
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+	}
+
+	@GetMapping("{counter}")
+	//@PreAuthorize("isAuthenticated")
+	public ResponseEntity<?> getCounter(@PathVariable String counter, Authentication authentication) {
+		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
+			counterService.getCounter(authentication.getName(), counter)
+		);
+		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
 	}
 
 	@PostMapping("batch")
@@ -103,7 +112,10 @@ public class CounterController {
 	@PutMapping("{counter}")
 	@PreAuthorize("isAuthenticated")
 	public ResponseEntity<?> addCounter(@PathVariable String counter, @RequestBody double value, Authentication authentication) {
-		CounterResponseRepresentation entity = counterService.addCounter(counter, authentication.getName(), value);
+
+		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
+			counterService.addCounter(counter, authentication.getName(), value)
+		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
 	}
 

@@ -1,1 +1,0 @@
-{"version":3,"file":"pretty-date.pipe.d.ts","sourceRoot":"","sources":["../../../../projects/utils/src/lib/pipes/pretty-date.pipe.ts"],"names":[],"mappings":"AAAA,OAAO,EAAQ,aAAa,EAAE,MAAM,eAAe,CAAC;AACpD,OAAO,KAAK,MAAM,MAAM,QAAQ,CAAC;;AAEjC,qBAGa,cAAe,YAAW,aAAa;IAElD,SAAS,CAAC,KAAK,EAAE,IAAI,GAAG,MAAM,CAAC,MAAM,GAAG,MAAM;yCAFnC,cAAc;uCAAd,cAAc;CAM1B"}

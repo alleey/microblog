@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.blog.MockBlogData;
 import org.zabardast.blog.dto.TopicRequestRepresentation;
 import org.zabardast.blog.dto.TopicResponseRepresentation;
@@ -53,6 +54,7 @@ class TopicsController_UserTests {
 				.content(MockBlogData.objectToJson(newTopic));
 
 		mockMvc.perform(requestBuilder)
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
 	}
 

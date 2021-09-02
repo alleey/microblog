@@ -7,6 +7,7 @@ import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 })
 export class LoaderComponent implements OnInit {
 
+  @Input() context: any;
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   constructor() { }

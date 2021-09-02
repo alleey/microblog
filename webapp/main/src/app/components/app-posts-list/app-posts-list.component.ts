@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { BlogPostModel } from 'projects/blog/src/public-api';
 
 @Component({
   selector: 'app-posts-list',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppPostsListComponent implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   ngOnInit(): void {
+  }
+
+  navigateToPost(post: BlogPostModel): void {
+    this.router.navigate(["/posts", post.id, post.slug]);
   }
 
 }

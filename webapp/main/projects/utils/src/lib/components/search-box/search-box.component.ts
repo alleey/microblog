@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -10,13 +10,14 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class SearchBoxComponent implements OnInit, OnDestroy {
 
   @ViewChild('searchBox')
-  searchBox!: ElementRef;
+  searchBox?: ElementRef;
 
-  @Input()
-  debounceTime: number = 500;
+  @Input() debounceTime: number = 500;
 
-  @Output() 
-  onApplyFilter = new EventEmitter<string>();
+  @Input() context: any;
+  @Input() controlTemplate: TemplateRef<any> | undefined;
+
+  @Output() onApplyFilter = new EventEmitter<string>();
 
   public filter$ = new Subject<string>();
 
@@ -38,7 +39,11 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
   }
 
   doSearch() {
-    const value = this.searchBox.nativeElement.value
-    this.filter$.next(value)
+    const value = this.searchBox?.nativeElement.value;
+    this.search(value);
+  }
+
+  search(text: string) {
+    this.filter$.next(text);
   }
 }
