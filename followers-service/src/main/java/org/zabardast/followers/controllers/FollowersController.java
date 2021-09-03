@@ -56,7 +56,7 @@ public class FollowersController {
 	{
 		PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
 			followingService.listFollowers(userId, page),
-				assembler
+			assembler
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
 	}

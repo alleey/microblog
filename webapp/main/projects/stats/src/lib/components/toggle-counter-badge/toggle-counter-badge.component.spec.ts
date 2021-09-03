@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SwitchCounterComponent } from './switch-counter.component';
+import { ToggleCounterBadgeComponent } from './toggle-counter-badge.component';
 
-describe('SwitchCounterComponent', () => {
-  let component: SwitchCounterComponent;
-  let fixture: ComponentFixture<SwitchCounterComponent>;
+describe('ToggleCounterBadgeComponent', () => {
+  let component: ToggleCounterBadgeComponent;
+  let fixture: ComponentFixture<ToggleCounterBadgeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SwitchCounterComponent ]
+      declarations: [ ToggleCounterBadgeComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SwitchCounterComponent);
+    fixture = TestBed.createComponent(ToggleCounterBadgeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

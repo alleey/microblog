@@ -4,6 +4,6 @@
   *ngIf="userProfile">
 </ng-container>
 
-<ng-template #defaultContentTemplate let-item let-parent="list">
-  <span (click)="parent.selectItem(item, 'select')" class="fullname">{{item.firstName}} {{item.lastName}}</span>
+<ng-template #defaultContentTemplate let-item let-control="list">
+  <span (click)="control.selectItem(item, 'select')" class="fullname">{{item.firstName}} {{item.lastName}}</span>
 </ng-template>

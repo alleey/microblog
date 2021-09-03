@@ -1,0 +1,10 @@
+<ng-container 
+    [ngTemplateOutlet]="controlTemplate || defaultControlTemplate"
+    [ngTemplateOutletContext]="{ $implicit: this, counter: statistics.statistics }">
+</ng-container>
+
+<ng-template #defaultControlTemplate let-control let-counter="counter">
+    <button type="button" [ngClass]="['btn', 'btn-' + control.kind]">
+        {{control.caption}} <span class="ml-2 badge badge-light">{{counter.count}}</span>
+    </button>
+</ng-template>

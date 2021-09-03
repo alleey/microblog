@@ -1,8 +1,11 @@
 package org.zabardast.stats.services;
 
 import java.util.Date;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,7 @@ import org.zabardast.stats.model.CounterStatistics;
 import org.zabardast.stats.repository.CounterRepository;
 import org.zabardast.stats.services.exceptions.CounterNotFoundException;
 
+@Slf4j
 @Service
 public class CounterService
 {
@@ -75,18 +79,28 @@ public class CounterService
         return modelMapper.map(saved, CounterResponseRepresentation.class);
     }
 
-    public CounterResponseRepresentation addCounter(@NotNull String counterId, @NotNull String ownerId, double value)
+    public CounterResponseRepresentation setCounter(@NotNull String counterId, @NotNull String ownerId, double value)
+    {
+        return this.setInternal(counterId, ownerId, (f) -> value);
+    }
+
+    public CounterResponseRepresentation increment(@NotNull String counterId, @NotNull String ownerId, double value)
+    {
+        return this.setInternal(counterId, ownerId, (f) -> value + f);
+    }
+
+    CounterResponseRepresentation setInternal(@NotNull String counterId, @NotNull String ownerId, Function<Double, Double> valueSetter)
     {
         return counterRepository.findById(new CounterKey(counterId, ownerId))
-            .map(found -> {
-                found.setValue(value);
-                Counter saved = counterRepository.save(found);
-                eventPublisher.publishEvent(new CounterUpdatedEvent(this, saved));
-                return modelMapper.map(saved, CounterResponseRepresentation.class);
-            })
-            .orElseGet(() -> {
-                return newCounter(counterId, ownerId, value);
-            });
+                .map(found -> {
+                    found.setValue(valueSetter.apply(found.getValue()));
+                    Counter saved = counterRepository.save(found);
+                    eventPublisher.publishEvent(new CounterUpdatedEvent(this, saved));
+                    return modelMapper.map(saved, CounterResponseRepresentation.class);
+                })
+                .orElseGet(() -> {
+                    return newCounter(counterId, ownerId, valueSetter.apply(0d));
+                });
     }
 
     @Transactional

@@ -17,7 +17,7 @@
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
-    <utils-alert *ngIf="successDesc" [dismissable]="false" [minimal]="false">
+    <utils-alert *ngIf="successDesc" [dismissable]="true" [minimal]="false" [kind]="'success'" [title]="'Congratulations!'">
         <p>{{ successDesc }}</p>
     </utils-alert>
     <utils-alert *ngIf="errorDesc; else editor" [dismissable]="false" [minimal]="false">

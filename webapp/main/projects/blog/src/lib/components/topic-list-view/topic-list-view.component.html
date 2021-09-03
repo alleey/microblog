@@ -13,8 +13,8 @@
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item let-parent="list">
-    <a class="btn btn-danger m-1" role="button" (click)="parent.selectItem(item, 'select')">{{item.caption}}</a>
+<ng-template #defaultItemTemplate let-item let-control="list">
+    <a class="btn btn-danger m-1" role="button" (click)="control.selectItem(item, 'select')">{{item.caption}}</a>
 </ng-template>
 
 <ng-template #defaultNoContentsTemplate let-item>

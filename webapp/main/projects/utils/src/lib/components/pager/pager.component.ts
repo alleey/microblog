@@ -32,7 +32,6 @@ export class PagerComponent implements OnInit {
       return this.currentPage;
   }
 
-
   get numberOfPages(): number {
     return this.currentPage ? this.currentPage.totalPages : 0;
   }
@@ -44,16 +43,14 @@ export class PagerComponent implements OnInit {
   }
 
   get nextPage(): number {
-    if(!this.prevNextLinks || !this.currentPage || this.currentPage.number >= this.currentPage.totalPages)
+    if(!this.prevNextLinks || !this.currentPage || ((this.currentPage.number + 1) >= this.currentPage.totalPages))
       return -1;
     return (this.currentPage.number + 1);
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
   
   selectItem(page: number): void {
     this.onSelectPage.emit(page);
   }
-
 }

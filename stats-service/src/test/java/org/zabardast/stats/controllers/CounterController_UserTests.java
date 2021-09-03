@@ -26,7 +26,6 @@ import org.zabardast.stats.MockStatsData;
 import org.zabardast.stats.dto.BatchCounterRequestRepresentation;
 import org.zabardast.stats.dto.CounterRequestRepresentation;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
-import org.zabardast.stats.model.Counter;
 import org.zabardast.stats.services.CounterService;
 
 @SpringBootTest()
@@ -35,7 +34,7 @@ import org.zabardast.stats.services.CounterService;
 @ActiveProfiles("test")
 class CounterController_UserTests {
 
-	public static final String COUNTER_ID = "test";
+	public static final String COUNTER_ID = "test.view:3";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -50,35 +49,13 @@ class CounterController_UserTests {
 
 	@Test
 	@WithMockUser(username = MockStatsData.UserIdGuest, roles = "USER")
-	void addCounters() throws Exception {
-
-		List<?> cr = Arrays.asList(
-			new CounterRequestRepresentation(COUNTER_ID, 1)
-		);
-
-		CounterResponseRepresentation counter = MockStatsData.createCounterResponse(COUNTER_ID, MockStatsData.UserIdGuest, 1);
-		Mockito.when(counterService.addCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
-
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/stats/counters", COUNTER_ID)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockStatsData.objectToJson(cr));
-
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_OK));
-	}
-
-	@Test
-	@WithMockUser(username = MockStatsData.UserIdGuest, roles = "USER")
 	void addCounter() throws Exception {
 
 		CounterResponseRepresentation counter = MockStatsData.createCounterResponse(COUNTER_ID, MockStatsData.UserIdGuest, 1);
-		Mockito.when(counterService.addCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
+		Mockito.when(counterService.setCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.put("/api/v1/stats/counters/{id}", COUNTER_ID)
+				.post("/api/v1/counters/{id}", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(MockStatsData.objectToJson(1.0));
@@ -94,7 +71,7 @@ class CounterController_UserTests {
 
 		Mockito.doNothing().when(counterService).deleteCounter(COUNTER_ID, MockStatsData.UserIdGuest);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/stats/counters/{id}", COUNTER_ID)
+				.delete("/api/v1/counters/{id}", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON);
 
@@ -115,11 +92,11 @@ class CounterController_UserTests {
 		);
 
 		CounterResponseRepresentation counter = MockStatsData.createCounterResponse(COUNTER_ID, MockStatsData.UserIdGuest, 1);
-		Mockito.when(counterService.addCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
+		Mockito.when(counterService.setCounter(COUNTER_ID,MockStatsData.UserIdGuest, 1)).then(r -> counter);
 		Mockito.doNothing().when(counterService).deleteCounter(COUNTER_ID, MockStatsData.UserIdGuest);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/stats/counters/batch", COUNTER_ID)
+				.post("/api/v1/counters/batch")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(MockStatsData.objectToJson(cr));

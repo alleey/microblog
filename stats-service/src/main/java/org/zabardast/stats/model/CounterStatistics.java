@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class CounterStatistics implements Serializable {
-    long count;
-    double min;
-    double max;
-    double sum;
-    double avg;
+    Long count;
+    Double min;
+    Double max;
+    Double sum;
+    Double avg;
 }

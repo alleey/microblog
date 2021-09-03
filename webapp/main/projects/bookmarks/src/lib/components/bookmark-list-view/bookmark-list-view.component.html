@@ -15,9 +15,9 @@
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item let-parent="list">
-    <i class="fa fa-times" (click)="parent.selectItem(item, 'delete')"></i>
-    <a class="ml-2" class="ml-1 bookmark-list-bookmark-title" (click)="parent.selectItem(item, 'select')">{{item.caption}}</a>
+<ng-template #defaultItemTemplate let-item let-control="list">
+    <i class="fa fa-times" (click)="control.selectItem(item, 'delete')"></i>
+    <a class="ml-2" class="ml-1 bookmark-list-bookmark-title" (click)="control.selectItem(item, 'select')">{{item.caption}}</a>
 </ng-template>
 
 <ng-template #defaultNoContentsTemplate let-item>

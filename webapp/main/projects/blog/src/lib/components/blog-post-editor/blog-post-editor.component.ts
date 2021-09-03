@@ -138,8 +138,7 @@ export class BlogPostEditorComponent implements OnInit {
   }      
 
   updateResponseHandler = {
-    next: (result: BlogPostResponseModel) => {
-      this.blogPost = result;
+    next: () => {
       this.assignTopics();
     },
     error: (err: any) => {

@@ -66,13 +66,13 @@
 
       <div class="tab-content" id="tab2Content">
         <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab" *authRequireLogin="true">
-          <ng-template #followingItemTemplate let-item let-parent="list">
+          <ng-template #followingItemTemplate let-item let-control="list">
             <user-profile-badge [userid]="item.userId"></user-profile-badge>
           </ng-template>
           <following-list [itemTemplate]="followingItemTemplate"></following-list>
         </div>
         <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab" *authRequireLogin="true">
-          <ng-template #followedItemTemplate let-item let-parent="list">
+          <ng-template #followedItemTemplate let-item let-control="list">
             <user-profile-badge [userid]="item.followedById"></user-profile-badge>
           </ng-template>
           <follower-list [itemTemplate]="followedItemTemplate"></follower-list>

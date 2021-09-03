@@ -1,5 +1,5 @@
 server:
-  port: ${FOLLOWERS_SERVICE_PORT:9084}
+  port: ${STATS_SERVICE_PORT:9084}
 
 management:
   endpoints:

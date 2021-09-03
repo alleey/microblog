@@ -32,7 +32,7 @@ public class Counter {
     String owner;
 
     @Column(name = "value", nullable = true)
-    private double value;
+    private Double value;
 
     @Column(name = "created_on", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)

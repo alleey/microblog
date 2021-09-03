@@ -1,11 +1,10 @@
 <utils-badge 
-    [isActive]="isActive"
+    [isActive]="isPositive"
     [activeCaption]="activeCaption"
-    [inactiveCaption]="inactiveCaption || activeCaption"
+    [inactiveCaption]="inactiveCaption"
     [activeControlTemplate]="activeControlTemplate"
     [inactiveControlTemplate]="inactiveControlTemplate"
-    (onAdd)="toggle()"
-    (onRemove)="toggle()">
+    (onAdd)="set()"
+    (onRemove)="unset()">
+    <i class="fa fa-check"></i>
 </utils-badge>
-
-  

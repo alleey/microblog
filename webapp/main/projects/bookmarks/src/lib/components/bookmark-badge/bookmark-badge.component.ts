@@ -63,7 +63,9 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
   deleteBookmark(): void {
     if(this.item)
       this.service.delete("bookmarks", this.item.id).subscribe({
-        next: () => {},
+        next: () => {
+          this.item = undefined;
+        },
         error: (err: any) => {
           console.log(err.message);
         }

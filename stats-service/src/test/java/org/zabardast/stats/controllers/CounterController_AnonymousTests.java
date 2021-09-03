@@ -32,7 +32,7 @@ import org.zabardast.stats.services.CounterService;
 @ActiveProfiles("test")
 class CounterController_AnonymousTests {
 
-	public static final String COUNTER_ID = "test";
+	public static final String COUNTER_ID = "test.views:3";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -43,13 +43,13 @@ class CounterController_AnonymousTests {
 	private MockStatsData blogData = new MockStatsData();
 
 	@Test
-	void getCounter() throws Exception {
+	void getCounterStatistics() throws Exception {
 
-		CounterStatistics cs = CounterStatistics.builder().min(0).avg(1).max(2).count(2).build();
+		CounterStatistics cs = CounterStatistics.builder().min(0d).avg(1d).max(2d).count(2l).build();
 
 		Mockito.when(counterService.getCounterStatistics(COUNTER_ID)).then(r -> cs);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.get("/api/v1/stats/counters/{id}", COUNTER_ID)
+				.get("/api/v1/counters/{id}/stats", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON);
 
 		mockMvc.perform(requestBuilder)
@@ -66,7 +66,7 @@ class CounterController_AnonymousTests {
 		);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/stats/counters", COUNTER_ID)
+				.post("/api/v1/counters", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(MockStatsData.objectToJson(cr));
@@ -81,7 +81,7 @@ class CounterController_AnonymousTests {
 		CounterRequestRepresentation cr = new CounterRequestRepresentation(COUNTER_ID, 1);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.put("/api/v1/stats/counters/{id}", COUNTER_ID)
+				.put("/api/v1/counters/{id}", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(MockStatsData.objectToJson(cr));
@@ -94,7 +94,7 @@ class CounterController_AnonymousTests {
 	void deleteCounterRequiresLogin() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/stats/counters/{id}", COUNTER_ID)
+				.delete("/api/v1/counters/{id}", COUNTER_ID)
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON);
 

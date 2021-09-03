@@ -84,17 +84,14 @@ export class PostsService {
             );
   }
 
-  public update(endpoint: string, id: number, slug: string, title: string, text: string): Observable<BlogPostResponseModel> {
+  public update(endpoint: string, id: number, slug: string, title: string, text: string): Observable<void> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     let postRepr = {
       "slug": slug, "title": title, "text": text
     };
     return this.httpClient
-            .put<BlogPostResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, postRepr)
+            .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, postRepr)
             .pipe(
-              map(data => {
-                return data as BlogPostResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })

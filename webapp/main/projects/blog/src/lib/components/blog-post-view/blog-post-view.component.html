@@ -17,14 +17,14 @@
 
 </div>
 
-<ng-template #defaultContentTemplate let-item let-parent="list">
+<ng-template #defaultContentTemplate let-item let-control="list">
   <p class="posttext ">
     {{item.text}}
   </p>
   <h5>Posted under Topics:</h5>
   <blog-topic-list-view [topics]="topics"></blog-topic-list-view>
   <hr class="my-4">
-  <ng-container *ngIf="parent.enableComments">
+  <ng-container *ngIf="control.enableComments">
     <comment-editor [updateMode]="false" *authRequireLogin="true"></comment-editor>
     <hr class="my-4">
     <h5>Comments:</h5>
@@ -34,7 +34,7 @@
   </ng-container>
 </ng-template>
 
-<ng-template #defaultHeaderTemplate let-item let-parent="list">
+<ng-template #defaultHeaderTemplate let-item let-control="list">
   <div class="d-flex justify-content-between">
     <div>
       <h2 class="blog-post-list-post-title">{{item.title}}</h2>
@@ -42,10 +42,10 @@
     </div>
     <div class="d-flex justify-content-between">
       <div class="ml-1" *authRequireOwner="item.owner">
-        <a class="btn btn-success" role="button" (click)="parent.selectItem(item, 'edit')">Edit</a>
+        <a class="btn btn-success" role="button" (click)="control.selectItem(item, 'edit')">Edit</a>
       </div>
       <div class="ml-1" *authRequireOwner="item.owner">
-        <a class="btn btn-success" role="button" (click)="parent.selectItem(item, 'delete')">Delete</a>
+        <a class="btn btn-success" role="button" (click)="control.selectItem(item, 'delete')">Delete</a>
       </div>
     </div>
   </div>

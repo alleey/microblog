@@ -1,22 +1,22 @@
 <ng-container  *ngIf="numberOfPages"
     [ngTemplateOutlet]="controlTemplate || defaultTemplate"
-    [ngTemplateOutletContext]="{ $implicit: this, currentPage: currentPage, previousPage: previousPage, nextPage: nextPage, pageList: pageList, context: context }">
+    [ngTemplateOutletContext]="{ $implicit: this, context: context }">
 </ng-container>
 
-<ng-template #defaultTemplate let-parent>
-        <nav>
+<ng-template #defaultTemplate let-control>
+    <nav>
         <ul class="pagination flex-wrap">
-            <li [class.disabled]="previousPage == -1" class="page-item">
-                <a class="page-link" (click)="parent.selectItem(previousPage)">
+            <li [class.disabled]="control.previousPage == -1" class="page-item">
+                <a class="page-link" (click)="control.selectItem(control.previousPage)">
                     <span aria-hidden="true">&laquo;</span>
                     <span class="sr-only">Previous</span>
                 </a>
             </li>
-            <li class="page-item" *ngFor="let page of pageList" [class.active]="currentPage?.number === (page-1)">
-                <a class="page-link" (click)="parent.selectItem(page)">{{page}}</a>
+            <li class="page-item" *ngFor="let page of control.pageList" [class.active]="control.currentPage?.number === (page-1)">
+                <a class="page-link" (click)="control.selectItem(page)">{{page}}</a>
             </li>
-            <li [class.disabled]="nextPage == -1" class="page-item">
-                <a class="page-link" (click)="parent.selectItem(nextPage)">
+            <li [class.disabled]="control.nextPage == -1" class="page-item">
+                <a class="page-link" (click)="control.selectItem(control.nextPage)">
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">Next</span>
                 </a>

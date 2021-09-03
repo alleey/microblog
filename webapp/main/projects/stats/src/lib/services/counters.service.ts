@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, count, map, tap } from 'rxjs/operators';
 import { CountersServiceConfig, CountersServiceConfigToken } from '../config/config';
 import { CounterListResponseModel, CounterResponseModel } from '../models/counter';
 import { CounterStatisticsModel } from '../models/counter-statistics';
@@ -29,14 +29,16 @@ export class CountersService {
 
 	getCounterStatistics(endpoint: string, counter: string): Observable<CounterStatisticsModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+    const counterId = encodeURIComponent(counter);
     return this.httpClient
-            .get<CounterStatisticsModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counter}/stats`);
+            .get<CounterStatisticsModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}/stats`);
   }
 
 	getCounter(endpoint: string, counter: string): Observable<CounterResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+    const counterId = encodeURIComponent(counter);
     return this.httpClient
-            .get<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counter}`);
+            .get<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`);
   }
 
 	batchUpdate(endpoint: string, counters: BatchCounterRequest[]): Observable<CounterListResponseModel> {
@@ -50,10 +52,23 @@ export class CountersService {
             );
   }
 
+	increment(endpoint: string, counter: string, value: number): Observable<CounterResponseModel> {
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+    const counterId = encodeURIComponent(counter);
+    return this.httpClient
+            .post<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}/increment`, value)
+            .pipe(
+              tap({
+                next: x => { this.onChange.next(x); }
+              })
+            );
+  }
+
 	setCounter(endpoint: string, counter: string, value: number): Observable<CounterResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+    const counterId = encodeURIComponent(counter);
     return this.httpClient
-            .put<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counter}`, value)
+            .post<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`, value)
             .pipe(
               tap({
                 next: x => { this.onChange.next(x); }
@@ -63,8 +78,9 @@ export class CountersService {
 
 	unsetCounter(endpoint: string, counter: string): Observable<void> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+    const counterId = encodeURIComponent(counter);
     return this.httpClient
-            .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counter}`)
+            .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`)
             .pipe(
               catchError((error: any) => {
                 return throwError(new Error(error.status));

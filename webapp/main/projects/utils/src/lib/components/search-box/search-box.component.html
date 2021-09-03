@@ -3,11 +3,11 @@
     [ngTemplateOutletContext]="{ $implicit: this, context: context }">
 </ng-container>
 
-<ng-template #defaultTemplate let-parent>
+<ng-template #defaultTemplate let-control>
     <div class="input-group rounded py-2">
         <input #searchBox type="search" class="form-control rounded" 
-            placeholder="Search" aria-label="Search" aria-describedby="search-addon" (input)="parent.doSearch()"/>
-        <span class="input-group-text border-0" id="search-addon" (click)="parent.doSearch()">
+            placeholder="Search" aria-label="Search" aria-describedby="search-addon" (input)="control.doSearch()"/>
+        <span class="input-group-text border-0" id="search-addon" (click)="control.doSearch()">
             <i class="fas fa-search"></i>
         </span>
     </div>
