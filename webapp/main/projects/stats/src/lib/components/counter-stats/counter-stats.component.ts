@@ -1,7 +1,9 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ViewModelHolder } from 'utils';
 import { Subscription } from 'rxjs';
 import { CounterStatisticsResponseModel } from '../../models/counter-statistics';
 import { CountersService } from '../../services/counters.service';
+
 
 @Component({
   selector: 'counter-stats',
@@ -17,9 +19,8 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
 
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
-  stats?: CounterStatisticsResponseModel;
-  loading: boolean = false;
-  subscription: Subscription = new Subscription();
+  viewModel = new ViewModelHolder<CounterStatisticsResponseModel>();
+  subscription = new Subscription();
 
   constructor(private service: CountersService) { }
 
@@ -35,61 +36,11 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  get hasValue(): boolean {
-    return !!this.stats;
-  }
-
-  get statistics(): CounterStatisticsResponseModel {
-    return !!this.stats ? this.stats : {
-      counter: this.counterId,
-      statistics: {
-        count:0, min:0, max:0, avg: 0, sum:0
-      }
-    }
-  }
-
-  responseHandler = {
-    next: (result: CounterStatisticsResponseModel) => {
-      this.stats = result;
-      this.loading = false;
-      console.log(result);
-    },
-    error: (err: any) => {
-      this.loading = false;
-      console.log(err.message);
-    }
-  };
+  get hasValue() { return this.viewModel.hasValue; }
 
   checkStatus() {
-    this.service.getCounterStatistics("", this.counterId).subscribe(this.responseHandler);
+    this.service
+      .getCounterStatistics("", this.counterId)
+      .subscribe(this.viewModel.expectModel());
   }
-
-  public set(): void {
-    this.service.setCounter("", this.counterId, this.counterValue).subscribe({
-      error: (err: any) => {
-        this.loading = false;
-        console.log(err.message);
-      }
-    });
-  }
-
-  public unset(): void {
-    this.service.unsetCounter("", this.counterId).subscribe({
-      error: (err: any) => {
-        this.loading = false;
-        console.log(err.message);
-      }
-    });
-  }
-
-  // toggle(): void {
-
-  //   if(this.isActive) {
-  //     this.service.unsetCounter("", this.counterId).subscribe({
-  //       next: () => { this.value = 0; }
-  //     });
-  //   } else {
-  //     this.service.setCounter("", this.counterId, this.counterValue).subscribe(this.responseHandler);
-  //   }
-  // }
 }

@@ -6,7 +6,7 @@
 <ng-template #defaultTemplate let-control>
     <div class="input-group rounded py-2">
         <input #searchBox type="search" class="form-control rounded" 
-            placeholder="Search" aria-label="Search" aria-describedby="search-addon" (input)="control.doSearch()"/>
+            placeholder="Search" aria-label="Search" aria-describedby="search-addon" (input)="control.doSearch()" data-testid="search-box"/>
         <span class="input-group-text border-0" id="search-addon" (click)="control.doSearch()">
             <i class="fas fa-search"></i>
         </span>

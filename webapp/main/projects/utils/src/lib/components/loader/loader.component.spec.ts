@@ -19,7 +19,12 @@ describe('LoaderComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should render message correctly', () => {
+    component.message = "test";
+
+    fixture.detectChanges();
+    const { debugElement } = fixture;
+    
+    expect(debugElement.nativeElement.innerHTML).toContain(component.message);
   });
 });

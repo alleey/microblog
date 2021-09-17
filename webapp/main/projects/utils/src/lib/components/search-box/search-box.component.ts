@@ -19,8 +19,7 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
 
   @Output() onApplyFilter = new EventEmitter<string>();
 
-  public filter$ = new Subject<string>();
-
+  filter$ = new Subject<string>();
   subscription!: Subscription;
 
   constructor() { }

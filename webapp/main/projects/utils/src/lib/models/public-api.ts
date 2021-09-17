@@ -4,3 +4,4 @@
 
 export * from './page';
 export * from './view-event';
+export * from './view-model-holder';

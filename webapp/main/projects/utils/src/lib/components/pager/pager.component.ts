@@ -8,18 +8,16 @@ import { Pageable, PageModel } from '../../models/page';
 })
 export class PagerComponent implements OnInit {
 
-  @Input() context: any;
-  @Input() controlTemplate: TemplateRef<any> | undefined;
-
-  @Input() prevNextLinks: boolean = true;
-  @Input() maxPageLinks: number = 10;
-
-  @Output() onSelectPage = new EventEmitter<number>();
-
   pageList: Array<number> = [];
   currentPage: PageModel | undefined;
 
-  @Input() 
+  @Input() context: any;
+  @Input() controlTemplate: TemplateRef<any> | undefined;
+  @Input() prevNextLinks: boolean = true;
+
+  @Output() onSelectPage = new EventEmitter<number>();
+
+  @Input()
   set page(value: PageModel | undefined) {
     this.currentPage = value;
     this.pageList = [];
@@ -27,9 +25,9 @@ export class PagerComponent implements OnInit {
       this.pageList = Array.from({length: this.numberOfPages},(v,k)=>k+1);
     //console.info("Current page " + this.currentPage);
   }
- 
+
   get page(): PageModel | undefined {
-      return this.currentPage;
+    return this.currentPage;
   }
 
   get numberOfPages(): number {
@@ -49,7 +47,7 @@ export class PagerComponent implements OnInit {
   }
 
   ngOnInit(): void { }
-  
+
   selectItem(page: number): void {
     this.onSelectPage.emit(page);
   }

@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { ViewModelHolder } from 'utils';
 import { CounterResponseModel } from '../../models/counter';
 import { CountersService } from '../../services/counters.service';
 
@@ -20,9 +21,8 @@ export class ToggleCounterBadgeComponent implements OnInit {
   @Input() activeControlTemplate: TemplateRef<any> | undefined;
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
-  stats?: CounterResponseModel;
-  loading: boolean = false;
-  subscription: Subscription = new Subscription();
+  viewModel = new ViewModelHolder<CounterResponseModel>();
+  subscription = new Subscription();
 
   constructor(private service: CountersService) { }
 
@@ -39,40 +39,25 @@ export class ToggleCounterBadgeComponent implements OnInit {
   }
 
   get isPositive(): boolean {
-    return !!this.stats && this.stats.value > 0;
+    return this.viewModel.hasValue && this.viewModel.Model!.value > 0;
   }
 
-  responseHandler = {
-    next: (result: CounterResponseModel) => {
-      this.stats = result;
-      this.loading = false;
-      console.log(result);
-    },
-    error: (err: any) => {
-      this.loading = false;
-      console.log(err.message);
-    }
-  };
-
   checkStatus() {
-    this.service.getCounter("", this.counterId).subscribe(this.responseHandler);
+    this.service
+      .getCounter("", this.counterId)
+      .subscribe(this.viewModel.expectModel());
   }
 
   public set(): void {
-    this.service.setCounter("", this.counterId, this.counterValue).subscribe(this.responseHandler);
+    this.service
+      .setCounter("", this.counterId, this.counterValue)
+      .subscribe(this.viewModel.expectModel());
   }
 
   public unset(): void {
-    this.service.unsetCounter("", this.counterId).subscribe({
-      next: () => {
-        this.stats = undefined;
-        this.loading = false;
-      },      
-      error: (err: any) => {
-        this.loading = false;
-        console.log(err.message);
-      }
-    });
+    this.service
+      .unsetCounter("", this.counterId)
+      .subscribe(this.viewModel.expectNothing());
   }
 
   // toggle(): void {

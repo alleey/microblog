@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
-import { catchError, count, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+import { CounterStatisticsResponseModel } from '../models/counter-statistics';
 import { CountersServiceConfig, CountersServiceConfigToken } from '../config/config';
 import { CounterListResponseModel, CounterResponseModel } from '../models/counter';
 import { CounterStatisticsModel } from '../models/counter-statistics';
@@ -27,7 +28,7 @@ export class CountersService {
     private httpClient: HttpClient) 
   { }
 
-	getCounterStatistics(endpoint: string, counter: string): Observable<CounterStatisticsModel> {
+	getCounterStatistics(endpoint: string, counter: string): Observable<CounterStatisticsResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const counterId = encodeURIComponent(counter);
     return this.httpClient
@@ -82,9 +83,6 @@ export class CountersService {
     return this.httpClient
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`)
             .pipe(
-              catchError((error: any) => {
-                return throwError(new Error(error.status));
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })

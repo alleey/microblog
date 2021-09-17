@@ -6,17 +6,17 @@
 <ng-template #defaultTemplate let-control>
     <nav>
         <ul class="pagination flex-wrap">
-            <li [class.disabled]="control.previousPage == -1" class="page-item">
-                <a class="page-link" (click)="control.selectItem(control.previousPage)">
+            <li class="page-item previous-link">
+                <a [class.disabled]="control.previousPage == -1" class="page-link previous-link" (click)="control.selectItem(control.previousPage)" data-testid="previous-link">
                     <span aria-hidden="true">&laquo;</span>
                     <span class="sr-only">Previous</span>
                 </a>
             </li>
             <li class="page-item" *ngFor="let page of control.pageList" [class.active]="control.currentPage?.number === (page-1)">
-                <a class="page-link" (click)="control.selectItem(page)">{{page}}</a>
+                <a class="page-link page" (click)="control.selectItem(page)" [attr.data-testid]="'page-link-' + page">{{page}}</a>
             </li>
-            <li [class.disabled]="control.nextPage == -1" class="page-item">
-                <a class="page-link" (click)="control.selectItem(control.nextPage)">
+            <li class="page-item next-link">
+                <a [class.disabled]="control.nextPage == -1" class="page-link next-link" (click)="control.selectItem(control.nextPage)" data-testid="next-link">
                     <span aria-hidden="true">&raquo;</span>
                     <span class="sr-only">Next</span>
                 </a>

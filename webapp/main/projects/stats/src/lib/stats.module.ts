@@ -6,11 +6,13 @@ import { CountersServiceConfigToken, StatsModuleConfig } from './config/config';
 import { CounterStatsComponent } from './components/counter-stats/counter-stats.component';
 import { CountersService } from './services/counters.service';
 import { ToggleCounterBadgeComponent } from './components/toggle-counter-badge/toggle-counter-badge.component';
+import { SetCounterDirective } from './directives/set-counter.directive';
 
 @NgModule({
   declarations: [
     CounterStatsComponent,
-    ToggleCounterBadgeComponent
+    ToggleCounterBadgeComponent,
+    SetCounterDirective
   ],
   imports: [
     CommonModule,
@@ -19,7 +21,8 @@ import { ToggleCounterBadgeComponent } from './components/toggle-counter-badge/t
   ],
   exports: [
     CounterStatsComponent,
-    ToggleCounterBadgeComponent
+    ToggleCounterBadgeComponent,
+    SetCounterDirective
   ]
 })
 export class StatsModule {
