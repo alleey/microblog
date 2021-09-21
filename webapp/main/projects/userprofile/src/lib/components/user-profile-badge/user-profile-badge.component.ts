@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { ViewModelHolder } from 'utils';
 import { UserProfileModel, UserProfileResponseModel } from '../../models/user-profile';
 import { UserProfileService } from '../../services/user-profile.service';
 import { UserProfileBadgeViewEvent } from '../user-profile-badge-view/user-profile-badge-view.component';
@@ -16,48 +17,29 @@ export class UserProfileBadgeComponent implements OnInit {
   @Input() onSelect: (topic: UserProfileModel) => void = (item) => {};
 
   userId?: string;
-
-  response : UserProfileResponseModel|null;
-  errorDesc: any = "";
-  loading: boolean = false;
+  viewModel = new ViewModelHolder<UserProfileResponseModel>();
 
   constructor(
     private userProfileService: UserProfileService, 
-    private router: Router, 
     private activatedRoute: ActivatedRoute) 
-  { 
-    this.response = null;
-  }
+  { }
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
-      this.userId = params.userId ?? this.paramUserId;
+      this.userId = !!params.userId ? params.userId : this.paramUserId;
       this.fetchUserProfile(this.userId!);
     });
   }
 
   fetchUserProfile(userId: string): void {
     this.userId = userId;
-
-    this.loading = true;
-    this.userProfileService.one("", this.userId)
-      .subscribe(
-      {
-        next: (result: UserProfileResponseModel) => {
-          this.response = result;
-          this.loading = false;
-        },
-        error: (err: any) => {
-          this.errorDesc = err.message;
-          this.loading = false;
-          console.log(this.errorDesc);
-        }
-      }
-    );
+    this.userProfileService
+      .one("", this.userId)
+      .subscribe(this.viewModel.expectModel());
   }
 
   get userProfileItem(): UserProfileModel {
-    return this.response!;
+    return this.viewModel.Model!;
   }
 
   handleViewEvent(evt: UserProfileBadgeViewEvent) {

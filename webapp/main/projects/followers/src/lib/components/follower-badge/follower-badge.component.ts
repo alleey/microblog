@@ -9,7 +9,7 @@ import { FollowingService } from '../../services/following.service';
   templateUrl: './follower-badge.component.html',
   styleUrls: ['./follower-badge.component.css']
 })
-export class FollowedByBadgeComponent implements OnInit, OnDestroy {
+export class FollowerBadgeComponent implements OnInit, OnDestroy {
 
   @Input("userid") userId: string = "";
 
@@ -20,10 +20,13 @@ export class FollowedByBadgeComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   subscription: Subscription = new Subscription();
 
-  constructor(private service: FollowingService, private authService: OidcAuthService) { }
+  constructor(
+    private service: FollowingService, 
+    private authService: OidcAuthService) 
+  { }
 
   ngOnInit(): void { 
-    this.authService.userSubject.subscribe(profile => {
+    this.authService.userSubject.subscribe(user => {
       this.checkStatus();
     });
     // Requery when the backend data changes

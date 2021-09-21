@@ -11,5 +11,4 @@ export class LoginCallbackComponent implements OnInit {
   ngOnInit(): void {
     this.authService.completeSignin();
   }
-
 }

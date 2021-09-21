@@ -1,6 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { UserProfileModel } from '../../models/user-profile';
 
-import { UserProfileBadgeViewComponent } from './user-profile-badge-view.component';
+import { UserProfileBadgeViewComponent, UserProfileBadgeViewEvent } from './user-profile-badge-view.component';
 
 describe('UserProfileBadgeViewComponent', () => {
   let component: UserProfileBadgeViewComponent;
@@ -19,7 +21,31 @@ describe('UserProfileBadgeViewComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+  it('should fire onSelect when clicked', fakeAsync(() => {
+
+    const model: UserProfileModel = {
+      id: "userId",
+      firstName: "first name",
+      lastName: "last name",
+      username: "username",
+    };
+
+    component.userProfile = model;
+    fixture.detectChanges();
+
+    let el = fixture.debugElement.query(By.css('[data-testid="userName"]')).nativeElement;
+    let firedEvent: UserProfileBadgeViewEvent|undefined = undefined;
+
+    component.onSelectItem.subscribe({
+      next: (evt: UserProfileBadgeViewEvent) => {
+        firedEvent = evt;
+      }
+    });
+    el.click();
+    tick();
+
+    expect(firedEvent).toBeTruthy();
+    expect(component.userId).toEqual(model.id);
+  }));
+
 });

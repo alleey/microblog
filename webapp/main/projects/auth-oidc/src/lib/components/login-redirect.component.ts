@@ -11,5 +11,4 @@ export class LoginRedirectComponent implements OnInit {
   ngOnInit(): void {
     this.authService.startSignin();
   }
-
 }

@@ -7,20 +7,32 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { OidcAuthService } from '../services/auth.service';
+import { OidcAuthService, User } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private authService: OidcAuthService) {}
+  user: User|null = null;
+
+  constructor(private authService: OidcAuthService)
+  {
+    this.authService.userSubject.subscribe(user => {
+      this.user = user;
+    });
+  }
+
+  get authorizationHeader(): string {
+    const user = this.user!;
+    return `${user.token_type} ${user.access_token}`;
+  }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
-    if(this.authService.isLoggedIn) {
+    if(!!this.user) {
       //console.log("Adding authentication header");
       request = request.clone({
         setHeaders: {
-          Authorization: this.authService.authorizationHeader
+          Authorization: this.authorizationHeader
         }
       });
     } else {

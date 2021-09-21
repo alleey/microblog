@@ -15,9 +15,10 @@ describe('ToggleCounterBadgeComponent', () => {
   beforeEach(async () => {
 
     service = jasmine.createSpyObj<CountersService>('CounterService', 
-      ['getCounter', 'setCounter', 'unsetCounter']
+      ['getCounter', 'setCounter', 'unsetCounter'], {
+        onChange: new Subject()
+      }
     );
-    service.onChange = new Subject();
 
     await TestBed.configureTestingModule({
       imports: [UtilsModule],
@@ -73,7 +74,6 @@ describe('ToggleCounterBadgeComponent', () => {
     expect(component.isPositive).toBeFalse();
     expect(debugElement.nativeElement.innerHTML).toContain(component.inactiveCaption);
   });
-
 
   it('should unset counter when active and clicked', fakeAsync(() => {
 

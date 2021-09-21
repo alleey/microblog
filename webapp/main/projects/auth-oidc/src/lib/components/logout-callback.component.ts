@@ -11,5 +11,4 @@ export class LogoutCallbackComponent implements OnInit {
   ngOnInit(): void {
     this.authService.completeSignout();
   }
-
 }

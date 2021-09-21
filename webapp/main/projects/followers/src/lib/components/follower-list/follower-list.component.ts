@@ -28,7 +28,6 @@ export class FollowersListComponent implements OnInit {
 
   constructor(
       private followersService: FollowingService, 
-      private router: Router, 
       private activatedRoute: ActivatedRoute) 
   { 
     this.response = null;

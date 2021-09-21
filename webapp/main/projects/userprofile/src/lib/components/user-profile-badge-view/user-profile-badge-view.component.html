@@ -5,5 +5,5 @@
 </ng-container>
 
 <ng-template #defaultContentTemplate let-item let-control="list">
-  <span (click)="control.selectItem(item, 'select')" class="fullname">{{item.firstName}} {{item.lastName}}</span>
+  <span data-testid="userName" (click)="control.selectItem(item, 'select')" class="fullname">{{item.firstName}} {{item.lastName}}</span>
 </ng-template>

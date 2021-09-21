@@ -5,7 +5,7 @@
       <h2>Components</h2>
       <p>
         <a class="btn btn-primary mr-1" role="button" [routerLink]="''">Home</a>
-        <a class="btn btn-primary mr-1" role="button" (click)="userPosts()" *authRequireLogin="true">My Posts</a>
+        <a class="btn btn-primary mr-1" role="button" (click)="userPosts()" *authRequireLogin="'yes'">My Posts</a>
       </p>
 
       <div class="input-group mb-3">
@@ -21,7 +21,7 @@
         <li class="nav-item">
           <a class="nav-link active" id="topics-tab" data-toggle="tab" href="#topics" role="tab" aria-controls="topics" aria-selected>Topics</a>
         </li>
-        <li class="nav-item" *authRequireLogin="true">
+        <li class="nav-item" *authRequireLogin="'yes'">
           <a class="nav-link" id="bookmarks-tab" data-toggle="tab" href="#bookmarks" role="tab" aria-controls="bookmarks" aria-selected="false">My Bookmarks</a>
         </li>
       </ul>
@@ -31,7 +31,7 @@
           <blog-topic-list [onSelect]="navigateToTopicPosts">
           </blog-topic-list>
         </div>
-        <div class="tab-pane fade" id="bookmarks" role="tabpanel" aria-labelledby="bookmarks-tab" *authRequireLogin="true">
+        <div class="tab-pane fade" id="bookmarks" role="tabpanel" aria-labelledby="bookmarks-tab" *authRequireLogin="'yes'">
           <bookmark-list [onSelect]="navigateBookmark">
           </bookmark-list>
         </div>
@@ -45,7 +45,7 @@
 
     <div class="col-sm-2 sidenav py-3">
 
-      <div class="d-flex justify-content-between" *authRequireLogin="true;else nologin">
+      <div class="d-flex justify-content-between" *authRequireLogin="'yes' else nologin">
         <div>
           Welcome <b>{{userName}}</b>
         </div>
@@ -56,22 +56,22 @@
       </ng-template>
 
       <ul class="nav nav-tabs" id="tab2" role="tablist">
-        <li class="nav-item" *authRequireLogin="true">
+        <li class="nav-item" *authRequireLogin="'yes'">
           <a class="nav-link active" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected>Following</a>
         </li>
-        <li class="nav-item" *authRequireLogin="true">
+        <li class="nav-item" *authRequireLogin="'yes'">
           <a class="nav-link" id="followers-tab" data-toggle="tab" href="#followers" role="tab" aria-controls="followers" aria-selected="false">My Followers</a>
         </li>
       </ul>
 
       <div class="tab-content" id="tab2Content">
-        <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab" *authRequireLogin="true">
+        <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab" *authRequireLogin="'yes'">
           <ng-template #followingItemTemplate let-item let-control="list">
             <user-profile-badge [userid]="item.userId"></user-profile-badge>
           </ng-template>
           <following-list [itemTemplate]="followingItemTemplate"></following-list>
         </div>
-        <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab" *authRequireLogin="true">
+        <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab" *authRequireLogin="'yes'">
           <ng-template #followedItemTemplate let-item let-control="list">
             <user-profile-badge [userid]="item.followedById"></user-profile-badge>
           </ng-template>

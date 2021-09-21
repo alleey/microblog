@@ -20,9 +20,10 @@ describe('SetCounterDirective', () => {
   beforeEach(async () => {
 
     service = jasmine.createSpyObj<CountersService>('CounterService', 
-      ['getCounter', 'setCounter', 'unsetCounter']
+      ['getCounter', 'setCounter', 'unsetCounter'], {
+        onChange: new Subject()
+      }
     );
-    service.onChange = new Subject();
 
     await TestBed.configureTestingModule({
       imports: [UtilsModule],

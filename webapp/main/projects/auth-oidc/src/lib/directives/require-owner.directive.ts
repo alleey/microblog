@@ -1,15 +1,15 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { OidcAuthService } from '../services/auth.service';
+import { OidcAuthService, Profile } from '../services/auth.service';
 
 @Directive({
   selector: '[authRequireOwner]'
 })
 export class RequireOwnerDirective {
 
-  private profile: any = undefined;
+  private profile?: Profile = undefined;
   private thenRef: TemplateRef<any>|undefined;
   private elseRef: TemplateRef<any>|undefined;
-  private show: boolean = false;
+  private sameOwner: boolean = false;
   private invert: 'yes' | 'no' = 'no';
 
   constructor(private authService: OidcAuthService,
@@ -17,19 +17,16 @@ export class RequireOwnerDirective {
     private viewContainer: ViewContainerRef) 
   { 
     this.authService.userSubject
-      .subscribe(profile => {
-        this.profile = profile;
+      .subscribe(user => {
+        this.profile = user?.profile;
         this.updateView();
       });
   }
 
   @Input()
   set authRequireOwner(ownerId: string) {
-    const show = (ownerId.toLowerCase() === this.profile?.sub.toLowerCase());
-    if (show != this.show) {
-      this.show = show;
-      this.updateView();
-    }
+    this.sameOwner = (ownerId.toLowerCase() === this.profile?.sub.toLowerCase());
+    this.updateView();
   }
 
   @Input()
@@ -53,7 +50,9 @@ export class RequireOwnerDirective {
   updateView() : void {
     this.viewContainer.clear();
 
-    const show = this.profile && (this.invert === 'yes' ? !this.show : this.show);
+    const show = (this.sameOwner && this.invert === 'no') || 
+                 (!this.sameOwner && this.invert === 'yes');
+                 
     if (show) {
       this.viewContainer.createEmbeddedView(
         !!this.thenRef ? this.thenRef : this.templateRef, { $implicit: this.profile }

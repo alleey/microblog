@@ -8,7 +8,7 @@ import { FollowersListViewComponent } from './components/follower-list-view/foll
 import { FollowersListComponent } from './components/follower-list/follower-list.component';
 import { FollowingListViewComponent } from './components/following-list-view/following-list-view.component';
 import { FollowingListComponent } from './components/following-list/following-list.component';
-import { FollowedByBadgeComponent } from './components/follower-badge/follower-badge.component';
+import { FollowerBadgeComponent } from './components/follower-badge/follower-badge.component';
 import { FollowingBadgeComponent } from './components/following-badge/following-badge.component';
 
 @NgModule({
@@ -17,7 +17,7 @@ import { FollowingBadgeComponent } from './components/following-badge/following-
     FollowersListComponent,
     FollowingListViewComponent,
     FollowingListComponent,
-    FollowedByBadgeComponent,
+    FollowerBadgeComponent,
     FollowingBadgeComponent,
   ],
   imports: [
@@ -30,7 +30,7 @@ import { FollowingBadgeComponent } from './components/following-badge/following-
     FollowersListComponent,
     FollowingListViewComponent,
     FollowingListComponent,
-    FollowedByBadgeComponent,
+    FollowerBadgeComponent,
     FollowingBadgeComponent,
   ]
 })

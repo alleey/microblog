@@ -14,9 +14,10 @@ describe('CounterStatsComponent', () => {
   beforeEach(async () => {
 
     service = jasmine.createSpyObj<CountersService>('CounterService', 
-      ['getCounterStatistics']
+      ['getCounterStatistics'], {
+        onChange: new Subject()
+      }
     );
-    service.onChange = new Subject();
 
     await TestBed.configureTestingModule({
       imports: [UtilsModule],

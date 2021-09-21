@@ -11,5 +11,4 @@ export class LogoutRedirectComponent implements OnInit {
   ngOnInit(): void {
     this.authService.startSignout();
   }
-
 }

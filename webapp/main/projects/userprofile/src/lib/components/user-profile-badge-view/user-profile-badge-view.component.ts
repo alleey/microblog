@@ -12,7 +12,6 @@ export type UserProfileBadgeViewEvent = ViewEvent<UserProfileModel>;
 export class UserProfileBadgeViewComponent implements OnInit {
 
   @Input() userProfile!: UserProfileModel;
-
   @Input() contentTemplate: TemplateRef<any> | undefined;
 
   @Output() onSelectItem = new EventEmitter<UserProfileBadgeViewEvent>();

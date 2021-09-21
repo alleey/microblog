@@ -25,7 +25,7 @@
   <blog-topic-list-view [topics]="topics"></blog-topic-list-view>
   <hr class="my-4">
   <ng-container *ngIf="control.enableComments">
-    <comment-editor [updateMode]="false" *authRequireLogin="true"></comment-editor>
+    <comment-editor [updateMode]="false" *authRequireLogin="'yes'"></comment-editor>
     <hr class="my-4">
     <h5>Comments:</h5>
     <div class="mb-3 col-sm-12">

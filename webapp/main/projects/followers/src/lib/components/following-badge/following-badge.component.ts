@@ -21,10 +21,13 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   subscription: Subscription = new Subscription();
 
-  constructor(private service: FollowingService, private authService: OidcAuthService) { }
+  constructor(
+    private service: FollowingService, 
+    private authService: OidcAuthService) 
+  { }
 
   ngOnInit(): void { 
-    this.authService.userSubject.subscribe(profile => {
+    this.authService.userSubject.subscribe(user => {
       this.checkStatus();
     });
     // Requery when the backend data changes

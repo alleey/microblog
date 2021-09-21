@@ -1,23 +1,24 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
-import { OidcAuthService } from '../services/auth.service';
+import { OidcAuthService, Profile } from '../services/auth.service';
 
 @Directive({
   selector: '[authRequireRole]'
 })
 export class RequireRoleDirective {
 
-  private profile: any = undefined;
+  private profile?: Profile = undefined;
   private thenRef: TemplateRef<any>|undefined;
   private elseRef: TemplateRef<any>|undefined;
-  private show: boolean = false;
+  private matchingRoles: boolean = false;
+  private invert: 'yes' | 'no' = 'no';
 
   constructor(private authService: OidcAuthService,
     private templateRef: TemplateRef<any>,
     private viewContainer: ViewContainerRef) 
   { 
     this.authService.userSubject
-      .subscribe(profile => {
-        this.profile = profile;
+      .subscribe(user => {
+        this.profile = user?.profile;
         this.updateView();
       });
   }
@@ -25,11 +26,14 @@ export class RequireRoleDirective {
   @Input()
   set authRequireRole(role: string) {
     const roles: string[] = this.profile?.roles;
-    const show = !!roles?.find(x => x.toLowerCase() === role.toLowerCase());
-    if (show != this.show) {
-      this.show = show;
-      this.updateView();
-    }
+    this.matchingRoles = !!roles?.find(x => x.toLowerCase() === role.toLowerCase());
+    this.updateView();
+  }
+
+  @Input()
+  set authRequireRoleDifferent(value: 'yes' | 'no') {
+    this.invert = value;
+    this.updateView();
   }
 
   @Input()
@@ -45,13 +49,15 @@ export class RequireRoleDirective {
   }
 
   updateView() : void {
+
+    const show = (this.matchingRoles && this.invert === 'no') || 
+                 (!this.matchingRoles && this.invert === 'yes');
+
     this.viewContainer.clear();
 
-    if (this.show) {
+    if (show) {
       this.viewContainer.createEmbeddedView(
-        !!this.thenRef ? this.thenRef : this.templateRef, {
-        $implicit: this.profile,
-      });
+        !!this.thenRef ? this.thenRef : this.templateRef, { $implicit: this.profile });
     } 
     else if (!!this.elseRef) {
       this.viewContainer.createEmbeddedView(this.elseRef);

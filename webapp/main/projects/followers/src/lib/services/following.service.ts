@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { OidcAuthService } from 'auth-oidc';
+import { OidcAuthService, Profile } from 'auth-oidc';
 import { Observable, Subject, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Pageable } from 'utils';
 import { FollowingServiceConfig, FollowingServiceConfigToken } from '../config/config';
 import { FollowsListResponseModel, FollowsResponseModel } from '../models/follows';
@@ -14,7 +14,7 @@ import { FollowsListResponseModel, FollowsResponseModel } from '../models/follow
 export class FollowingService {
 
   public onChange: Subject<any> = new Subject<any>();
-  private userProfile: any;
+  private userProfile?: Profile;
 
   constructor(
     @Inject(FollowingServiceConfigToken) 
@@ -22,8 +22,8 @@ export class FollowingService {
     private authService: OidcAuthService,
     private httpClient: HttpClient) 
   { 
-    this.authService.userSubject.subscribe(profile => {
-      this.userProfile = profile;
+    this.authService.userSubject.subscribe(user => {
+      this.userProfile = user?.profile;
     });
   }
 
@@ -33,6 +33,14 @@ export class FollowingService {
 
     return this.httpClient
             .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followers/${followedById}`);
+  }
+
+  public findFollowing(endpoint: string, userId: string, followedById: string): Observable<FollowsResponseModel> {
+    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+    const owner = !!userId ? userId : this.userProfile?.sub;
+
+    return this.httpClient
+            .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${followedById}`);
   }
 
   public followers(endpoint: string, userId: string, pageable?: Pageable): Observable<FollowsListResponseModel> {
@@ -50,14 +58,6 @@ export class FollowingService {
                 "sort": "createdOn,asc"
               }
             });
-  }
-
-  public findFollowing(endpoint: string, userId: string, followedById: string): Observable<FollowsResponseModel> {
-    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
-    const owner = !!userId ? userId : this.userProfile?.sub;
-
-    return this.httpClient
-            .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${followedById}`);
   }
 
   public following(endpoint: string, userId: string, pageable?: Pageable): Observable<FollowsListResponseModel> {

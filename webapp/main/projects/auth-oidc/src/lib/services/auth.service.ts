@@ -1,9 +1,7 @@
 import { Inject, Injectable, InjectionToken } from '@angular/core';
 import { Router, RouterStateSnapshot } from '@angular/router';
-
-import { UserManager, UserManagerSettings, User, Profile } from 'oidc-client';
+import { UserManager, UserManagerSettings, User as OidcUser, Profile as OidcProfile } from 'oidc-client';
 import { BehaviorSubject } from 'rxjs';
-
 
 export interface OidcAuthConfig {
   clientId: string,               // client_id
@@ -16,9 +14,12 @@ export interface OidcAuthConfig {
   responseType: string,           // response_type
   scope: string,                  // scope
   mock?: any                       // for testing/development
-}
+};
 
 export const OidcAuthConfigToken = new InjectionToken<OidcAuthConfig>("AuthServiceConfig");
+
+export type User = OidcUser;
+export type Profile = OidcProfile;
 
 @Injectable({
   providedIn: 'root'
@@ -26,10 +27,9 @@ export const OidcAuthConfigToken = new InjectionToken<OidcAuthConfig>("AuthServi
 export class OidcAuthService {
 
   private userManager: UserManager;
-  private user: User | null = null;
   private redirectUrl!: string;
 
-  public userSubject = new BehaviorSubject<Profile|undefined>(undefined); 
+  public userSubject = new BehaviorSubject<User|null>(null); 
 
   constructor(
     @Inject(OidcAuthConfigToken) private config: OidcAuthConfig, 
@@ -55,29 +55,24 @@ export class OidcAuthService {
           if(user?.expired) {
             user = null;
           }
-          this.user = user;
-          this.userSubject.next(user?.profile);
+          this.userSubject.next(user);
           //console.log(user);
       });
   }
 
-  get isLoggedIn(): boolean {
-    if(this.config.mock)
-      return true;
-    //console.log(this.user);
-    return this.user != null && !this.user.expired;
-  }
+  // get isLoggedIn(): boolean {
+  //   if(this.config.mock)
+  //     return true;
+  //   //console.log(this.user);
+  //   return this.user != null && !this.user.expired;
+  // }
 
-  get claims(): any {
+  public get user(): User|null {
     return this.userSubject.getValue();
   }
 
-  get authorizationHeader(): string {
-    const user = this.user;
-    if(!user) {
-      return '';
-    }
-    return `${user.token_type} ${user.access_token}`;
+  public get claims(): Profile|undefined {
+    return this.user?.profile;
   }
 
   startSignin(): Promise<void> {
@@ -88,8 +83,7 @@ export class OidcAuthService {
 
   completeSignin(): Promise<void> {
     return this.userManager.signinRedirectCallback().then(user => {
-      this.user = user;
-      this.userSubject.next(user?.profile);
+      this.userSubject.next(user);
       //console.log("Login ok: " + user + " redirecting to " + this.redirectUrl);
       this.router.navigateByUrl(this.redirectUrl);
     });
@@ -101,8 +95,7 @@ export class OidcAuthService {
 
   completeSignout(): Promise<void> {
     return this.userManager.signoutRedirectCallback().then(user => {
-      this.user = null;
-      this.userSubject.next(undefined);
+      this.userSubject.next(null);
       //console.log("Logout ok redirecting to " + this.redirectUrl);
       this.router.navigateByUrl("/");
     });

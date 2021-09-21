@@ -1,8 +1,8 @@
-<utils-loader *ngIf="loading; else contents"></utils-loader>
+<utils-loader *ngIf="viewModel.isLoading; else contents"></utils-loader>
 
 <ng-template #contents>
-    <utils-alert *ngIf="errorDesc; else viewer" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ errorDesc }}</p>
+    <utils-alert *ngIf="viewModel.hasError; else viewer" [dismissable]="false" [minimal]="false">
+        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 

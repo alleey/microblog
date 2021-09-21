@@ -24,7 +24,7 @@
                 <toggle-counter-badge [activeCaption]="'Like'" [counterId]="'post.likes:' + item.id"></toggle-counter-badge>
             </div>
             <div class="ml-1">
-                <bookmark-badge [url]="item.permalink" [caption]="item.title" *authRequireLogin="true"></bookmark-badge>
+                <bookmark-badge [url]="item.permalink" [caption]="item.title" *authRequireLogin="'yes'"></bookmark-badge>
             </div>
             <div class="ml-1" *authRequireOwner="item.owner">
                 <a class="btn btn-success" role="button" (click)="control.selectItem(item, 'edit')">Edit</a>
@@ -45,7 +45,7 @@
     <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
 
     <div *ngIf="control.enableComments" class="mt-3">
-        <comment-editor [updateMode]="false" *authRequireLogin="true"></comment-editor>
+        <comment-editor [updateMode]="false" *authRequireLogin="'yes'"></comment-editor>
         <hr class="my-4">
         <h5>Comments:</h5>
         <div class="mb-3 col-sm-12">

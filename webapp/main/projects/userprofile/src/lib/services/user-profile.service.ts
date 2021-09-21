@@ -20,11 +20,6 @@ export class UserProfileService {
 
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-              .get<UserProfileResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
-              .pipe(
-                map(data => {
-                  return data as UserProfileResponseModel;
-                })
-              );
+              .get<UserProfileResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`);
   }
 }
