@@ -1,7 +1,6 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { CountersService } from '../../services/counters.service';
 import { CounterStatisticsResponseModel } from '../../models/counter-statistics';
-import { UtilsModule } from 'utils';
 
 import { CounterStatsComponent } from './counter-stats.component';
 import { of, Subject, throwError } from 'rxjs';
@@ -20,7 +19,6 @@ describe('CounterStatsComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      imports: [UtilsModule],
       declarations: [CounterStatsComponent],
       providers: [
         { provide: CountersService, useValue: service }

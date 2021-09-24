@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Pageable } from 'utils';
-import { Observable, Subject, throwError } from 'rxjs';
-import { catchError, map, tap } from "rxjs/operators";
+import { Observable, Subject } from 'rxjs';
+import { map, tap } from "rxjs/operators";
 import { BookmarkResponseModel, BookmarkListResponseModel } from '../models/bookmark';
 import { BookmarksServiceConfig, BookmarksServiceConfigToken } from '../config/config';
 
@@ -32,12 +32,7 @@ export class BookmarksService {
                 "size": pageSize.toString(),
                 "sort": "caption,asc"
               }
-            })
-            .pipe(
-              map(data => {
-                return data as BookmarkListResponseModel;
-              })
-            );
+            });
   }
 
   public findMatchingCaption(endpoint: string, caption: string, pageable?: Pageable): Observable<BookmarkListResponseModel> {
@@ -64,27 +59,16 @@ export class BookmarksService {
                 "size": pageSize.toString(),
                 "sort": "caption,asc"
               }
-            })
-            .pipe(
-              map(data => {
-                return data as BookmarkListResponseModel;
-              })
-            );
+            });
   }
 
   public findByUrl(endpoint: string, url: string): Observable<BookmarkResponseModel> {
-    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const query = {
       "conditions": [
         { "attribute": "url", "operator": "eq", "value": url }
       ]
     };
-    return this.httpClient
-            .get<BookmarkListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/search`, 
-            {
-              "params": { "q": JSON.stringify(query) }
-            })
-            .pipe(
+    return this.search(endpoint, query).pipe(
               map(data => {
                 return data._embedded.bookmarks[0] as BookmarkResponseModel;
               })
@@ -99,9 +83,6 @@ export class BookmarksService {
     return this.httpClient
             .post<BookmarkResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}`, boomarkRepr)
             .pipe(
-              map(data => {
-                return data as BookmarkResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
@@ -113,9 +94,6 @@ export class BookmarksService {
     return this.httpClient
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
             .pipe(
-              catchError((error: any) => {
-                return throwError(new Error(error.status));
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })

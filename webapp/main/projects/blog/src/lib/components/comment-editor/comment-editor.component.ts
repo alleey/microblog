@@ -15,7 +15,7 @@ export class CommentEditorComponent implements OnInit {
 
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input("postId") paramPostId?: number;
-  @Input("commentId") paramCommentId?: string;
+  @Input("commentId") paramCommentId?: number;
   @Input() updateMode: boolean = true;
 
   postId?: number;
@@ -44,9 +44,9 @@ export class CommentEditorComponent implements OnInit {
       ]),
     });
 
-    this.activatedRoute.params.subscribe(params => {
-      this.postId = params.postId ?? this.paramPostId;
-      this.commentId = params.commentId ?? this.paramCommentId;
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.postId = <number> (params.get("postId") ?? this.paramPostId);
+      this.commentId = <number> (params.get("commentId") ?? this.paramCommentId);
       if(this.isUpdateMode)
         this.fetchComment(this.commentId!);
     });

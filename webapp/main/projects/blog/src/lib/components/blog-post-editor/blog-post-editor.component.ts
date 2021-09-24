@@ -83,8 +83,8 @@ export class BlogPostEditorComponent implements OnInit {
       }
     });
 
-    this.activatedRoute.params.subscribe(params => {
-      this.postId = params.postId ?? this.paramPostId;
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.postId = <number> (params.get("postId") ?? this.paramPostId);
       if(this.isUpdateMode)
         this.fetchPost(this.postId!);
     });

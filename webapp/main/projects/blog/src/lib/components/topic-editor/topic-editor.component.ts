@@ -13,7 +13,7 @@ import { TopicsService } from '../../services/topics.service';
 export class TopicEditorComponent implements OnInit {
 
   @Input() headerTemplate: TemplateRef<any> | undefined;
-  @Input("topicId") paramTopicId?: string;
+  @Input("topicId") paramTopicId?: number;
   @Input() updateMode: boolean = true;
 
   topicId?: number;
@@ -26,7 +26,6 @@ export class TopicEditorComponent implements OnInit {
 
   constructor(
     private topicService: TopicsService,
-    private router: Router, 
     private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
@@ -36,8 +35,8 @@ export class TopicEditorComponent implements OnInit {
       "caption": new FormControl("", Validators.required)
     });
 
-    this.activatedRoute.params.subscribe(params => {
-      this.topicId = params.topicId ?? this.paramTopicId;
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.topicId = <number> (params.get("topicId") ?? this.paramTopicId);
       if(this.isUpdateMode)
         this.fetchTopic(this.topicId!);
     });

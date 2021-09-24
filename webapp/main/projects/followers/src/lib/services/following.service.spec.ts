@@ -87,17 +87,15 @@ describe('FollowingService', () => {
   it('returns followers of logged in user with default paging', () => {
 
     const userId = "me";
-    const followerById = "notme";
+    const followedById = "notme";
 
     const followerListResponse: FollowsListResponseModel = {
       _embedded: {
         follows: [
-          { userId: userId, followedById: followerById }
+          { userId: userId, followedById: followedById }
         ]
       },
-      page: {
-        number: 0, size: 1, totalElements:1, totalPages: 1
-      }
+      page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
     };
 
     let apiResponse: FollowsListResponseModel|undefined;
@@ -130,9 +128,7 @@ describe('FollowingService', () => {
           { userId: userId, followedById: followerById }
         ]
       },
-      page: {
-        number: 0, size: 1, totalElements:1, totalPages: 1
-      }
+      page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
     };
 
     let apiResponse: FollowsListResponseModel|undefined;
@@ -149,6 +145,54 @@ describe('FollowingService', () => {
     controller.verify();
 
     expect(apiResponse).toEqual(followerListResponse);
+  });
+
+  it('logged in user is set to follow given user', () => {
+
+    const userId = "me";
+    const userToFollow = "notme";
+    const followsResponse: FollowsResponseModel = {
+      userId: userToFollow,
+      followedById: userId
+    };
+
+    let apiResponse: FollowsResponseModel|undefined;
+
+    authService.userSubject.next({ profile: { sub: userId }} as User);
+    service.follow("", "", userToFollow).subscribe({
+      next: (res: FollowsResponseModel) => {
+        apiResponse = res;
+      }
+    });
+
+    controller
+      .expectOne({ method: 'POST', url: `http://localhost/users/${userId}/following`})
+      .flush(followsResponse);
+    controller.verify();
+
+    expect(apiResponse).toEqual(followsResponse);
+  });
+
+  it('logged in user is set to unfollow given user', () => {
+
+    const userId = "me";
+    const userToUnfollow = "notme";
+
+    let apiResponse = false;
+
+    authService.userSubject.next({ profile: { sub: userId }} as User);
+    service.unfollow("", "", userToUnfollow).subscribe({
+      next: () => {
+        apiResponse = true;
+      }
+    });
+
+    controller
+      .expectOne({ method: 'DELETE', url: `http://localhost/users/${userId}/following/${userToUnfollow}`})
+      .flush({});
+    controller.verify();
+
+    expect(apiResponse).toEqual(true);
   });
 
 });

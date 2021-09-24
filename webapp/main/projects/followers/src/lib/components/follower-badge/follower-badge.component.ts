@@ -1,7 +1,8 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { OidcAuthService } from 'auth-oidc';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { FollowsModel, FollowsResponseModel } from '../../models/follows';
+import { ViewModelHolder } from 'utils';
+import { FollowsResponseModel } from '../../models/follows';
 import { FollowingService } from '../../services/following.service';
 
 @Component({
@@ -11,22 +12,22 @@ import { FollowingService } from '../../services/following.service';
 })
 export class FollowerBadgeComponent implements OnInit, OnDestroy {
 
-  @Input("userid") userId: string = "";
-
+  @Input("userid") paramUserId: string = "";
   @Input() activeControlTemplate: TemplateRef<any> | undefined;
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
-  item?: FollowsModel;
-  loading: boolean = false;
+  userId?: string;
+  viewModel = new ViewModelHolder<FollowsResponseModel>();
   subscription: Subscription = new Subscription();
 
   constructor(
     private service: FollowingService, 
-    private authService: OidcAuthService) 
-  { }
+    private activatedRoute: ActivatedRoute) 
+    { }
 
   ngOnInit(): void { 
-    this.authService.userSubject.subscribe(user => {
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.userId = params.get("userId") ?? this.paramUserId;
       this.checkStatus();
     });
     // Requery when the backend data changes
@@ -40,21 +41,12 @@ export class FollowerBadgeComponent implements OnInit, OnDestroy {
   }
 
   get isActive(): boolean {
-    return this.item?.userId != undefined;
+    return this.viewModel.Model?.userId != undefined;
   }
 
   checkStatus() {
-    this.service.findFollower("", "", this.userId).subscribe({
-      next: (result: FollowsResponseModel) => {
-        this.item = result;
-        this.loading = false;
-        console.log(result);
-  
-      },
-      error: (err: any) => {
-        this.loading = false;
-        console.log(err.message);
-      }
-    });
+    this.service
+      .findFollower("", "", this.userId!)
+      .subscribe(this.viewModel.expectModel());
   }
 }

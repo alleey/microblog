@@ -25,8 +25,8 @@ export class UserProfileBadgeComponent implements OnInit {
   { }
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
-      this.userId = !!params.userId ? params.userId : this.paramUserId;
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.userId = params.get("userId") ?? this.paramUserId;
       this.fetchUserProfile(this.userId!);
     });
   }

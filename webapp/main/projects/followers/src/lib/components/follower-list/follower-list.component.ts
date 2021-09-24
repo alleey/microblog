@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Pageable, PageModel } from 'utils';
+import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { FollowingService } from '../../services/following.service';
 import { FollowsListResponseModel, FollowsModel } from '../../models/follows';
 import { FollowerListViewEvent } from '../follower-list-view/follower-list-view.component';
@@ -21,24 +21,21 @@ export class FollowersListComponent implements OnInit {
   @Input() onSelect: (topic: FollowsModel) => void = (item) => {};
         
   pageable: Pageable; 
-  response : FollowsListResponseModel|null;
-  errorDesc: any = "";
-  loading: boolean = false;
+  viewModel = new ViewModelHolder<FollowsListResponseModel>();
   subscription: Subscription = new Subscription();
 
   constructor(
       private followersService: FollowingService, 
       private activatedRoute: ActivatedRoute) 
   { 
-    this.response = null;
     this.pageable = {
       page: 0
     };
   }
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
-      const pageNum = params.pageNum ?? 0;
+    this.activatedRoute.paramMap.subscribe(params => {
+      const pageNum = <number> (params.get("pageNum") ?? 0);
       this.fetchPage(pageNum);
     });
     // Requery when the backend data changes
@@ -51,29 +48,19 @@ export class FollowersListComponent implements OnInit {
     this.subscription.unsubscribe();
   }
 
-  responseHandler = {
-    next: (result: FollowsListResponseModel) => {
-      this.response = result;
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      console.log(this.errorDesc);
-    }
-  }
-
   fetchPage(pageNum: number): void {
     this.pageable.page = pageNum;
-    this.followersService.followers("", "", this.pageable).subscribe(this.responseHandler);
+    this.followersService
+      .followers("", "", this.pageable)
+      .subscribe(this.viewModel.expectModel());
   }
 
   get items(): FollowsModel[] | undefined {
-    return this.response?._embedded?.follows;
+    return this.viewModel.Model?._embedded?.follows;
   }
 
   get page(): PageModel|undefined {
-    return this.response?.page;
+    return this.viewModel.Model?.page;
   }
 
   get hasItems(): boolean {

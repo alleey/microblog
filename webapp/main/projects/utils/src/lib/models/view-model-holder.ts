@@ -27,12 +27,12 @@ export class ViewModelHolder<T> {
       next: (result: T) => {
         this.Model = result;
         this.loading = false;
-        console.log(result);
+        //console.log(this.Model);
       },
       error: (err: Error) => {
         this.Error = err;
         this.loading = false;
-        console.log(err.message);
+        //console.log(err.message);
       }
     };
   }
@@ -48,7 +48,6 @@ export class ViewModelHolder<T> {
       error: (err: Error) => {
         this.Error = err;
         this.loading = false;
-        console.log(err.message);
       }
     };
   }

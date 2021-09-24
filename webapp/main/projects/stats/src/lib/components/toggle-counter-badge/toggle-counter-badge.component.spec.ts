@@ -84,7 +84,7 @@ describe('ToggleCounterBadgeComponent', () => {
       value: 1
     };
     service.getCounter.withArgs("", counterId).and.returnValue(of(response));
-    service.unsetCounter.withArgs("", counterId).and.returnValue(of());
+    service.unsetCounter.withArgs("", counterId).and.returnValue(of(undefined));
 
     component.counterId = counterId;
     fixture.detectChanges();

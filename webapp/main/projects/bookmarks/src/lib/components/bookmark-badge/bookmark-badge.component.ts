@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ViewModelHolder } from 'utils';
 import { BookmarkModel, BookmarkResponseModel } from '../../models/bookmark';
 import { BookmarksService } from '../../services/bookmarks.service';
 
@@ -17,8 +18,7 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
   @Input() activeControlTemplate: TemplateRef<any> | undefined;
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
-  item?: BookmarkModel;
-  loading: boolean = false;
+  viewModel = new ViewModelHolder<BookmarkResponseModel>();
   subscription: Subscription = new Subscription();
 
   constructor(private service: BookmarksService) { }
@@ -36,39 +36,24 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
   }
 
   get isActive(): boolean {
-    return this.item?.id != undefined;
+    return this.viewModel.Model?.id != undefined;
   }
 
-  responseHandler = {
-    next: (result: BookmarkResponseModel) => {
-      this.item = result;
-      this.loading = false;
-      console.log(result);
-
-    },
-    error: (err: any) => {
-      this.loading = false;
-      console.log(err.message);
-    }
-  };
-
   checkStatus() {
-    this.service.findByUrl("bookmarks", this.url).subscribe(this.responseHandler);
+    this.service
+      .findByUrl("", this.url)
+      .subscribe(this.viewModel.expectModel());
   }
 
   createBookmark(): void {
-    this.service.create("bookmarks", this.caption, this.url).subscribe(this.responseHandler);
+    this.service
+      .create("", this.caption, this.url)
+      .subscribe(this.viewModel.expectModel());
   }
 
   deleteBookmark(): void {
-    if(this.item)
-      this.service.delete("bookmarks", this.item.id).subscribe({
-        next: () => {
-          this.item = undefined;
-        },
-        error: (err: any) => {
-          console.log(err.message);
-        }
-      });
+    this.service
+      .delete("", this.viewModel.Model!.id)
+      .subscribe(this.viewModel.expectNothing());
   }
 }

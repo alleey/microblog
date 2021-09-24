@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BookmarkModel, BookmarkListResponseModel } from '../../models/bookmark';
 import { BookmarksService } from '../../services/bookmarks.service';
-import { Pageable, PageModel } from 'utils';
+import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { BookmarkListViewEvent } from '../bookmark-list-view/bookmark-list-view.component';
 
 @Component({
@@ -24,24 +24,21 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   @Input() onSelect: (topic: BookmarkModel) => void = (item) => {};
         
   pageable: Pageable; 
-  response : BookmarkListResponseModel|null;
-  errorDesc: any = "";
-  loading: boolean = false;
+  viewModel = new ViewModelHolder<BookmarkListResponseModel>();
   subscription: Subscription = new Subscription();
 
   constructor(
       private bookmarksService: BookmarksService, 
       private activatedRoute: ActivatedRoute) 
   { 
-    this.response = null;
     this.pageable = {
       page: 0
     };
   }
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
-      const pageNum = params.pageNum ?? 0;
+    this.activatedRoute.paramMap.subscribe(params => {
+      const pageNum = <number> (params.get("pageNum") ?? 0);
       this.fetchPage(pageNum);
     });
     // Requery when the backend data changes
@@ -59,36 +56,28 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
     this.fetchPage(0);
   }
 
-  responseHandler = {
-    next: (result: BookmarkListResponseModel) => {
-      this.response = result;
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      console.log(this.errorDesc);
-    }
-  }
-
   fetchPage(pageNum: number): void {
     this.pageable.page = pageNum;
     if(!!this.filterText)
     {
-      this.bookmarksService.findMatchingCaption("", this.filterText, this.pageable).subscribe(this.responseHandler);
+      this.bookmarksService
+        .findMatchingCaption("", this.filterText, this.pageable)
+        .subscribe(this.viewModel.expectModel());
     }
     else
     {
-      this.bookmarksService.all("", this.pageable).subscribe(this.responseHandler);
+      this.bookmarksService
+        .all("", this.pageable)
+        .subscribe(this.viewModel.expectModel());
     }
   }
 
   get items(): BookmarkModel[]|undefined {
-    return this.response?._embedded?.bookmarks;
+    return this.viewModel.Model?._embedded?.bookmarks;
   }
 
   get page(): PageModel|undefined {
-    return this.response?.page;
+    return this.viewModel.Model?.page;
   }
 
   get hasItems(): boolean {
@@ -103,14 +92,9 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   }
 
   deleteBookmark(bookmark: BookmarkModel): void {
-    this.bookmarksService.delete("", bookmark.id)
-      .subscribe(
-        {
-          error: (err: any) => {
-            this.errorDesc = err.message;
-          }
-        }
-      );
+    this.bookmarksService
+      .delete("", bookmark.id)
+      .subscribe(this.viewModel.expectNothing());
   }
 
   gotoPage(evt:any): void {

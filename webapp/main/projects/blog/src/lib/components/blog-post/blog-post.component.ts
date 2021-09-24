@@ -12,6 +12,8 @@ import { BlogPostViewEvent } from '../blog-post-view/blog-post-view.component';
 })
 export class BlogPostComponent implements OnInit {
 
+  @Input("postId") paramPostId?: number;
+
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() contentTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
@@ -33,8 +35,9 @@ export class BlogPostComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
-      this.fetchPost(params.postId, params.slug);
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.postId = <number> (params.get("postId") ?? this.paramPostId);
+      this.fetchPost(this.postId, params.get("slug") ?? "");
     });
   }
 

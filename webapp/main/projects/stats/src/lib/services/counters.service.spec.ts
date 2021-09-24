@@ -14,7 +14,7 @@ describe('CountersService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, UtilsModule],
+      imports: [HttpClientTestingModule],
       providers: [CountersService, 
         {
           provide: CountersServiceConfigToken,

@@ -13,9 +13,7 @@ describe('UserProfileBadgeViewComponent', () => {
       declarations: [ UserProfileBadgeViewComponent ]
     })
     .compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(UserProfileBadgeViewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

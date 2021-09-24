@@ -1,10 +1,10 @@
-<div *ngIf="loading; else contents">
+<div *ngIf="viewModel.isLoading; else contents">
     <utils-loader></utils-loader>
 </div>
 
 <ng-template #contents>
-    <utils-alert *ngIf="errorDesc;else itemsList" [dismissable]="false" [minimal]="true">
-        <p>An error occurred fetching the bookmarks list: {{ errorDesc }}</p>
+    <utils-alert *ngIf="viewModel.hasError; else itemsList" [dismissable]="false" [minimal]="true">
+        <p>An error occurred fetching the bookmarks list: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 

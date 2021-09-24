@@ -44,8 +44,8 @@ export class TopicListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
-      const pageNum = params.pageNum ?? 0;
+    this.activatedRoute.paramMap.subscribe(params => {
+      const pageNum = <number> (params.get("pageNum") ?? 0);
       this.fetchPage(pageNum);
     }); 
     // Requery when the backend data changes

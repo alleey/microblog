@@ -1,7 +1,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { UserProfileService } from '../../services/user-profile.service';
@@ -9,12 +9,13 @@ import { UserProfileModel } from '../../models/user-profile';
 import { UserProfileBadgeComponent } from './user-profile-badge.component';
 import { UserProfileResponseModel } from '../../models/user-profile';
 import { UserProfileBadgeViewComponent } from '../user-profile-badge-view/user-profile-badge-view.component';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('UserProfileBadgeComponent', () => {
   let component: UserProfileBadgeComponent;
   let fixture: ComponentFixture<UserProfileBadgeComponent>;
   let service: jasmine.SpyObj<UserProfileService>;
-  let activatedRouteParams = new BehaviorSubject<any>({ userId: "" });
+  let route: ActivatedRoute;
 
   beforeEach(async () => {
 
@@ -24,14 +25,9 @@ describe('UserProfileBadgeComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ UserProfileBadgeComponent, UserProfileBadgeViewComponent ],
+      imports: [RouterTestingModule],
       providers: [
         { provide: UserProfileService, useValue: service },
-        { 
-          provide: ActivatedRoute, 
-          useValue: {
-            params: activatedRouteParams
-          } 
-        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })
@@ -39,7 +35,7 @@ describe('UserProfileBadgeComponent', () => {
 
     fixture = TestBed.createComponent(UserProfileBadgeComponent);
     component = fixture.componentInstance;
-    activatedRouteParams.next({ userId: "" });
+    route = TestBed.inject(ActivatedRoute);
   });
 
   it('should render badge when userprofile is found', () => {
@@ -59,6 +55,7 @@ describe('UserProfileBadgeComponent', () => {
     const badge = debugElement.query(By.css('user-profile-badge-view'));
     
     expect(badge).toBeTruthy();
+    expect(component.userProfileItem).toEqual(userProfile);
   });
 
   it('should render error if user not found', () => {
@@ -86,7 +83,9 @@ describe('UserProfileBadgeComponent', () => {
     };
     service.one.withArgs("", userId).and.returnValue(of(userProfile));
 
-    activatedRouteParams.next({ userId: userId });
+    spyOnProperty(route, "paramMap").and.returnValue(
+      of(convertToParamMap({ userId: userId }))
+    );
     component.paramUserId = "thisshouldnotbeused";
     fixture.detectChanges();
 

@@ -1,7 +1,9 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { OidcAuthService } from 'auth-oidc';
 import { Subscription } from 'rxjs';
-import { FollowsModel, FollowsResponseModel } from '../../models/follows';
+import { ViewModelHolder } from 'utils';
+import { FollowsResponseModel } from '../../models/follows';
 import { FollowingService } from '../../services/following.service';
 
 @Component({
@@ -11,23 +13,22 @@ import { FollowingService } from '../../services/following.service';
 })
 export class FollowingBadgeComponent implements OnInit, OnDestroy {
 
-  @Input("userid") userId: string = "";
-  @Input() userName: string = "";
-
+  @Input("userid") paramUserId: string = "";
   @Input() activeControlTemplate: TemplateRef<any> | undefined;
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
-  item?: FollowsModel;
-  loading: boolean = false;
+  userId?: string;
+  viewModel = new ViewModelHolder<FollowsResponseModel>();
   subscription: Subscription = new Subscription();
 
   constructor(
     private service: FollowingService, 
-    private authService: OidcAuthService) 
-  { }
+    private activatedRoute: ActivatedRoute) 
+    { }
 
   ngOnInit(): void { 
-    this.authService.userSubject.subscribe(user => {
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.userId = params.get("userId") ?? this.paramUserId;
       this.checkStatus();
     });
     // Requery when the backend data changes
@@ -41,39 +42,24 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
   }
 
   get isActive(): boolean {
-    return this.item?.userId != undefined;
+    return !!this.viewModel.Model?.userId;
   }
 
-  responseHandler = {
-    next: (result: FollowsResponseModel) => {
-      this.item = result;
-      this.loading = false;
-      console.log(result);
-
-    },
-    error: (err: any) => {
-      this.loading = false;
-      console.log(err.message);
-    }
-  };
-
   checkStatus() {
-    this.service.findFollowing("", "", this.userId).subscribe(this.responseHandler);
+    this.service
+      .findFollowing("", "", this.userId!)
+      .subscribe(this.viewModel.expectModel());
   }
 
   follow(): void {
-    this.service.follow("", "", this.userId).subscribe(this.responseHandler);
+    this.service
+      .follow("", "", this.userId!)
+      .subscribe(this.viewModel.expectModel());
   }
 
   unfollow(): void {
-    if(this.item)
-      this.service.unfollow("", "", this.item!.userId).subscribe({
-        next: () => {
-          this.item = undefined;
-        },
-        error: (err: any) => {
-          console.log(err.message);
-        }
-      });
+    this.service
+      .unfollow("", "", this.userId!)
+      .subscribe(this.viewModel.expectNothing());
   }
 }
