@@ -1,4 +1,4 @@
-<div *ngIf="loading; else contents">
+<div *ngIf="viewModel.isLoading; else contents">
     <utils-loader></utils-loader>
 </div>
 
@@ -15,11 +15,11 @@
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
-    <utils-alert *ngIf="successDesc" [dismissable]="false" [minimal]="false">
+    <utils-alert data-testid="editorSuccess" *ngIf="successDesc" [dismissable]="false" [minimal]="false">
         <p>{{ successDesc }}</p>
     </utils-alert>
-    <utils-alert *ngIf="errorDesc; else editor" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ errorDesc }}</p>
+    <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure; else editor" [dismissable]="false" [minimal]="false">
+        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 
@@ -27,19 +27,22 @@
     <form [formGroup]="form" novalidate onSubmit="return false;">
         <div class="row">
             <div class="mb-3 col-sm-12">
-                <textarea class="form-control" id="postText" rows="3" formControlName="text" required></textarea>
+                <textarea class="form-control" id="postText" rows="3" formControlName="text" required aria-required="true"></textarea>
                 <div *ngIf="text?.invalid && (text?.dirty || text?.touched)">
-                    <utils-alert *ngIf="text?.errors?.pattern" [dismissable]="false" [minimal]="true">
+                    <utils-alert data-testid="requiredError" *ngIf="text?.errors?.required" [dismissable]="false" [minimal]="true">
                         Sorry, cannot leave this empty!
+                    </utils-alert>
+                    <utils-alert data-testid="maxLengthError" *ngIf="text?.errors?.maxLength" [dismissable]="false" [minimal]="true">
+                        Conent length exceeds limit.
                     </utils-alert>
                 </div>
             </div>
         </div>
         <div class="mb-3" *ngIf="!isUpdateMode">
-            <input class="btn btn-primary" type="button" [disabled]="loading || !form.valid" value="Post" (click)="createNewComment()">
+            <input data-testid="create" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Post" (click)="createNewComment()">
         </div>
         <div class="mb-3" *ngIf="isUpdateMode">
-            <input class="btn btn-primary" type="button" [disabled]="loading || !form.valid" value="Update" (click)="updateComment()">
+            <input data-testid="update" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updateComment()">
         </div>
     </form>
 </ng-template>

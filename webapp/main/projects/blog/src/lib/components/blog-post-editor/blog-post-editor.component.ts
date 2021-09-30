@@ -7,7 +7,7 @@ import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
 import { TopicModel } from '../../models/topic';
 import { PostsService } from '../../services/posts.service';
 import { TopicsService } from '../../services/topics.service';
-import { uniqueSlugValidator } from '../../validators/unique-slug-validator.directive';
+import { uniqueSlugValidator } from '../../validators/unique-slug-validator';
 import { TopicSelectorComponent } from '../topic-selector/topic-selector.component';
 
 function slugify(text: string) {

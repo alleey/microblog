@@ -1,8 +1,9 @@
 import { Location } from '@angular/common';
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TopicModel, TopicResponseModel, TopicListResponseModel } from '../../models/topic';
+import { ActivatedRoute } from '@angular/router';
+import { ViewModelHolder } from 'utils';
+import { TopicResponseModel } from '../../models/topic';
 import { TopicsService } from '../../services/topics.service';
 
 @Component({
@@ -16,13 +17,9 @@ export class TopicEditorComponent implements OnInit {
   @Input("topicId") paramTopicId?: number;
   @Input() updateMode: boolean = true;
 
-  topicId?: number;
-  topic : TopicModel|null = null;
-
-  errorDesc: any = "";
-  loading: boolean = false;
-
   form!: FormGroup;
+  topicId?: number;
+  viewModel = new ViewModelHolder<TopicResponseModel>();
 
   constructor(
     private topicService: TopicsService,
@@ -42,51 +39,43 @@ export class TopicEditorComponent implements OnInit {
     });
   }
 
-  get isUpdateMode(): boolean { 
-    return this.updateMode && this.topicId !== undefined; 
-  }
   get caption() { return this.form.get('caption'); }
-
-  set theTopic(item: TopicModel) {
-    this.topic = this.updateMode ? item : null;
-    this.topicId = this.updateMode ? this.topic?.id : undefined;
-    console.info("Got post id: " + this.topicId!);
-  }
+  get isUpdateMode(): boolean { return this.updateMode && this.topicId !== undefined;}
+  get topic(): TopicResponseModel|undefined { return this.viewModel.Model; }
 
   updateForm(): void {
-    this.caption!.setValue (this.topic?.caption);
+    if(this.isUpdateMode) {
+      this.topicId = this.viewModel.Model?.id;
+      this.caption!.setValue (this.topic?.caption);
+    } else {
+
+    }
   }
 
-  fetchResponseHandler = {
-    next: (result: TopicResponseModel) => {
-      this.theTopic = result;
-      this.updateForm();
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      return false;
-    }
-  };
-
   fetchTopic(topicId: number): void {
-    this.loading = true;
     this.topicService
       .one("", topicId)
-      .subscribe(this.fetchResponseHandler);
-  }      
+      .subscribe(this.viewModel.expectModel({
+        nextObserver: {
+          next: (i: TopicResponseModel) => this.updateForm()
+        }
+      }));
+  }
 
   createNewTopic(): void {
     this.topicService
       .create("", this.caption?.value)
-      .subscribe(this.fetchResponseHandler);
+      .subscribe(this.viewModel.expectModel({
+        nextObserver: {
+          next: (i: TopicResponseModel) => this.updateForm()
+        }
+      }));
   }
 
   updateTopic(): void {
     this.topicService
       .update("", this.topicId!, this.caption?.value)
-      .subscribe(this.fetchResponseHandler);
+      .subscribe(this.viewModel.expectNothing());
   }
 
   cancel(): void {

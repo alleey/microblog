@@ -57,7 +57,7 @@ export class ToggleCounterBadgeComponent implements OnInit {
   public unset(): void {
     this.service
       .unsetCounter("", this.counterId)
-      .subscribe(this.viewModel.expectNothing());
+      .subscribe(this.viewModel.expectUndefined());
   }
 
   // toggle(): void {

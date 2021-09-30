@@ -20,10 +20,11 @@ describe('LogoutRedirectComponent', () => {
       ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(LogoutRedirectComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should call startSignout', () => {

@@ -29,23 +29,13 @@ export class CommentsService {
                   "size": pageSize.toString(),
                   "sort": "createdOn,desc"
                 }
-              })
-              .pipe(
-                map(data => {
-                  return data as CommentListResponseModel;
-                })
-              );
+              });
   }
 
   public one(endpoint: string, postId: number, id: number): Observable<CommentResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-              .get<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
-              .pipe(
-                map(data => {
-                  return data as CommentResponseModel;
-                })
-              );
+              .get<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`);
   }
 
   public create(endpoint: string, postId: number, text: string): Observable<CommentResponseModel> {
@@ -56,26 +46,20 @@ export class CommentsService {
     return this.httpClient
             .post<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments`, commentRepr)
             .pipe(
-              map(data => {
-                return data as CommentResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
             );
   }
 
-  public update(endpoint: string, postId: number, id: number, text: string): Observable<CommentResponseModel> {
+  public update(endpoint: string, postId: number, id: number, text: string): Observable<void> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     let commentRepr = {
       "text": text
     };
     return this.httpClient
-            .put<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`, commentRepr)
+            .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`, commentRepr)
             .pipe(
-              map(data => {
-                return data as CommentResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
@@ -87,9 +71,6 @@ export class CommentsService {
     return this.httpClient
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
             .pipe(
-              catchError((error: any) => {
-                return throwError(new Error(error.status));
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })

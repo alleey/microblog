@@ -58,6 +58,31 @@ describe('BookmarksService', () => {
       },
       page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
     };
+    const pageable = { page: 10, limit: 100 };
+
+    let apiResponse: BookmarkListResponseModel|undefined;
+    service.all("", pageable).subscribe({
+      next: (res: BookmarkListResponseModel) => {
+        apiResponse = res;
+      }
+    });
+
+    controller.expectOne(`http://localhost/bookmarks?page=${pageable.page}&size=${pageable.limit}&sort=caption,asc`).flush(bookmarks);
+    controller.verify();
+
+    expect(apiResponse).toEqual(bookmarks);
+  });
+
+  it('returns list of bookmarks with custom pagination settings', () => {
+
+    const bookmarks: BookmarkListResponseModel = {
+      _embedded: {
+        bookmarks: [
+          { id: 1, caption: "localhost", url: "http://localhost", createdOn: new Date(), lastAccessedOn: new Date() }
+        ]
+      },
+      page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
+    };
 
     let pageable: Pageable = { page: 3, limit: 20 };
     let apiResponse: BookmarkListResponseModel|undefined;
@@ -98,6 +123,37 @@ describe('BookmarksService', () => {
 
     let encoded = encodeURI(JSON.stringify(query));
     controller.expectOne(`http://localhost/bookmarks/search?q=${encoded}&page=0&size=10&sort=caption,asc`).flush(bookmarks);
+    controller.verify();
+
+    expect(apiResponse).toEqual(bookmarks);
+  });
+
+  it('returns search results with custom pagination settings', () => {
+
+    const bookmarks: BookmarkListResponseModel = {
+      _embedded: {
+        bookmarks: [
+          { id: 1, caption: "localhost", url: "http://localhost", createdOn: new Date(), lastAccessedOn: new Date() }
+        ]
+      },
+      page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
+    };
+    const pageable = { page: 10, limit: 100 };
+
+    let query = {
+      "conditions": [
+        { "attribute": "caption", "operator": "like", "value": `%something%` }
+      ]
+    };
+    let apiResponse: BookmarkListResponseModel|undefined;
+    service.search("", query, pageable).subscribe({
+      next: (res: BookmarkListResponseModel) => {
+        apiResponse = res;
+      }
+    });
+
+    let encoded = encodeURI(JSON.stringify(query));
+    controller.expectOne(`http://localhost/bookmarks/search?q=${encoded}&page=${pageable.page}&size=${pageable.limit}&sort=caption,asc`).flush(bookmarks);
     controller.verify();
 
     expect(apiResponse).toEqual(bookmarks);

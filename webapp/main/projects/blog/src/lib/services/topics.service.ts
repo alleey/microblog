@@ -29,29 +29,19 @@ export class TopicsService {
                 "size": pageSize.toString(),
                 "sort": "caption,asc"
               }
-            })
-            .pipe(
-              map(data => {
-                return data as TopicListResponseModel;
-              })
-            );
+            });
   }
 
   public one(endpoint: string, id: number): Observable<TopicResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-              .get<TopicResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
-              .pipe(
-                map(data => {
-                  return data as TopicResponseModel;
-                })
-              );
+              .get<TopicResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`);
   }
 
   public findByCaption(endpoint: string, caption: string, pageable?: Pageable): Observable<TopicListResponseModel> {
     const query = {
       "conditions": [
-        { "attribute": "caption", "operator": "eq", "value": `%${caption}%` }
+        { "attribute": "caption", "operator": "eq", "value": `${caption}` }
       ]
     };
     return this.search(endpoint, query, pageable);
@@ -81,12 +71,7 @@ export class TopicsService {
                 "size": pageSize.toString(),
                 "sort": "caption,asc"
               }
-            })
-            .pipe(
-              map(data => {
-                return data as TopicListResponseModel;
-              })
-            );
+            });
   }
 
   public create(endpoint: string, caption: string): Observable<TopicResponseModel> {
@@ -97,26 +82,20 @@ export class TopicsService {
     return this.httpClient
             .post<TopicResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}`, topicRepr)
             .pipe(
-              map(data => {
-                return data as TopicResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
             );
   }
 
-  public update(endpoint: string, id: number, caption: string): Observable<TopicResponseModel> {
+  public update(endpoint: string, id: number, caption: string): Observable<void> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const topicRepr = {
       "caption": caption
     };
     return this.httpClient
-            .put<TopicResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, topicRepr)
+            .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, topicRepr)
             .pipe(
-              map(data => {
-                return data as TopicResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
@@ -128,9 +107,6 @@ export class TopicsService {
     return this.httpClient
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
             .pipe(
-              catchError((error: any) => {
-                return throwError(new Error(error.status));
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })

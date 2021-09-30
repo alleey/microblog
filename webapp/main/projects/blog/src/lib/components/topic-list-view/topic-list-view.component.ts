@@ -11,8 +11,7 @@ export type TopicListViewEvent = ViewEvent<TopicModel>;
 })
 export class TopicListViewComponent implements OnInit {
 
-  @Input() topics!: TopicModel[];
-
+  @Input() items!: TopicModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 

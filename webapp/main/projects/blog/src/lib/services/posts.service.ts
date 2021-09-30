@@ -29,42 +29,40 @@ export class PostsService {
                   "size": pageSize.toString(),
                   "sort": "createdOn,desc"
                 }
-              })
-              .pipe(
-                map(data => {
-                  return data as BlogPostListResponseModel;
-                })
-              );
+              });
   }
 
   public one(endpoint: string, id: number): Observable<BlogPostResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-              .get<BlogPostResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
-              .pipe(
-                map(data => {
-                  return data as BlogPostResponseModel;
-                })
-              );
+              .get<BlogPostResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`);
   }
 
-  public findBySlug(endpoint: string, slug: string): Observable<BlogPostListResponseModel> {
+  public search(endpoint: string, query: any, pageable?: Pageable): Observable<BlogPostListResponseModel> {
+
+    const page: number = pageable ? pageable.page : 0;
+    const pageSize: number = (pageable && pageable.limit) ? pageable.limit : this.config.pageSize;
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+
+    return this.httpClient
+            .get<BlogPostListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/search`, 
+            {
+              "params": { 
+                "q": JSON.stringify(query),
+                "page": page.toString(),
+                "size": pageSize.toString(),
+                "sort": "createdOn,desc"
+              }
+            });
+  }
+
+  public findBySlug(endpoint: string, slug: string, pageable?: Pageable): Observable<BlogPostListResponseModel> {
     const query = {
       "conditions": [
         { "attribute": "slug", "operator": "eq", "value": slug }
       ]
     };
-    return this.httpClient
-            .get<BlogPostListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/search`, 
-            {
-              "params": { "q": JSON.stringify(query) }
-            })
-            .pipe(
-              map(data => {
-                return data as BlogPostListResponseModel;
-              })
-            );
+    return this.search(endpoint, query, pageable);
   }
 
   public create(endpoint: string, slug: string, title: string, text: string): Observable<BlogPostResponseModel> {
@@ -75,9 +73,6 @@ export class PostsService {
     return this.httpClient
             .post<BlogPostResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}`, postRepr)
             .pipe(
-              map(data => {
-                return data as BlogPostResponseModel;
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
@@ -103,9 +98,6 @@ export class PostsService {
     return this.httpClient
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
             .pipe(
-              catchError((error: any) => {
-                return throwError(new Error(error.status));
-              }),
               tap({
                 next: x => { this.onChange.next(x); }
               })
@@ -116,11 +108,6 @@ export class PostsService {
   public assignTopics(endpoint: string, id: number, topicIds: number[]): Observable<void> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     return this.httpClient
-            .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}/topics`, topicIds)
-            .pipe(
-              catchError((error: any) => {
-                return throwError(new Error(error.status));
-              })
-            );
+            .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}/topics`, topicIds);
   }
 }

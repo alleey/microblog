@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { ViewEvent } from 'utils';
 import { CommentModel } from '../../models/comment';
+
+export type CommentListViewEvent = ViewEvent<CommentModel>;
 
 @Component({
   selector: 'comment-list-view',
@@ -8,16 +11,18 @@ import { CommentModel } from '../../models/comment';
 })
 export class CommentListViewComponent implements OnInit {
 
-  @Input() comments!: CommentModel[];
-
+  @Input() items!: CommentModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
-  @Output() onSelectItem = new EventEmitter<CommentModel>();
+  @Output() onSelectItem = new EventEmitter<CommentListViewEvent>();
 
   ngOnInit(): void {}
 
-  selectItem(entity: CommentModel): void {
-    this.onSelectItem.emit(entity);
+  selectItem(item: CommentModel, opcode: string): void {
+    this.onSelectItem.emit({
+      opcode: opcode,
+      item: item
+    });
   }
 }

@@ -42,7 +42,9 @@ describe('RequireRoleDirective', () => {
         { provide: OidcAuthService, useValue: service }
       ]
     }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(HostComponent);
   });
 

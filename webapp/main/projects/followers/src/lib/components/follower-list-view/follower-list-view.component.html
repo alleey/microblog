@@ -16,7 +16,7 @@
 </ng-container>
 
 <ng-template #defaultItemTemplate let-item let-control="list">
-    <span data-testid="userName" class="ml-2" (click)="control.selectItem(item, 'select')">{{item.followedById}}</span>
+    <span data-testid="select" class="ml-2" (click)="control.selectItem(item, 'select')">{{item.followedById}}</span>
 </ng-template>
 
 <ng-template #defaultNoContentsTemplate let-item>

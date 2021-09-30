@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Pageable, PageModel } from 'utils';
-import { CommentModel, CommentListResponseModel } from '../../models/comment';
+import { CommentListResponseModel, CommentModel } from '../../models/comment';
 import { CommentsService } from '../../services/comments.service';
 
 @Component({

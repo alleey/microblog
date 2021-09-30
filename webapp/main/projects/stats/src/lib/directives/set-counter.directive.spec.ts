@@ -30,7 +30,9 @@ describe('SetCounterDirective', () => {
         { provide: CountersService, useValue: service }
       ]
     }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(HostComponent);
   });
 

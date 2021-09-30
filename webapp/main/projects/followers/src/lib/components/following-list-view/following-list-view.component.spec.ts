@@ -13,7 +13,9 @@ describe('FollowingListViewComponent', () => {
       declarations: [ FollowingListViewComponent ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(FollowingListViewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -30,7 +32,7 @@ describe('FollowingListViewComponent', () => {
     component.items = models;
     fixture.detectChanges();
 
-    let el = fixture.debugElement.query(By.css('[data-testid="userName"]')).nativeElement;
+    let el = fixture.debugElement.query(By.css('[data-testid="select"]')).nativeElement;
     let firedEvent: FollowingListViewEvent|undefined = undefined;
 
     component.onSelectItem.subscribe({

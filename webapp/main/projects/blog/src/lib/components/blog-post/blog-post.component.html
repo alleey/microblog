@@ -1,16 +1,16 @@
-<div *ngIf="loading; else contents">
+<div *ngIf="viewModel.isLoading; else contents">
     <utils-loader></utils-loader>
 </div>
 
 <ng-template #contents>
-    <utils-alert *ngIf="errorDesc; else viewer" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ errorDesc }}</p>
+    <utils-alert *ngIf="viewModel.isFailure; else viewer" [dismissable]="false" [minimal]="false">
+        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 
 <ng-template #viewer>
     <blog-post-view 
-        [post]="postItem" 
+        [item]="postItem" 
         [topics]="postItem?.topics"
         [headerTemplate]="headerTemplate"
         [contentTemplate]="contentTemplate"

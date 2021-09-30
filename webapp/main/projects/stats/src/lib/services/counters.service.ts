@@ -42,16 +42,16 @@ export class CountersService {
             .get<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`);
   }
 
-	batchUpdate(endpoint: string, counters: BatchCounterRequest[]): Observable<CounterListResponseModel> {
-    const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
-    return this.httpClient
-            .post<CounterListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/batch`, counters)
-            .pipe(
-              tap({
-                next: x => { this.onChange.next(x); }
-              })
-            );
-  }
+	// batchUpdate(endpoint: string, counters: BatchCounterRequest[]): Observable<CounterListResponseModel> {
+  //   const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
+  //   return this.httpClient
+  //           .post<CounterListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/batch`, counters)
+  //           .pipe(
+  //             tap({
+  //               next: x => { this.onChange.next(x); }
+  //             })
+  //           );
+  // }
 
 	increment(endpoint: string, counter: string, value: number): Observable<CounterResponseModel> {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;

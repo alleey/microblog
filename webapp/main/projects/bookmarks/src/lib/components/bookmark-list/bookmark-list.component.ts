@@ -28,7 +28,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   subscription: Subscription = new Subscription();
 
   constructor(
-      private bookmarksService: BookmarksService, 
+      private service: BookmarksService, 
       private activatedRoute: ActivatedRoute) 
   { 
     this.pageable = {
@@ -43,7 +43,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
     });
     // Requery when the backend data changes
     this.subscription.add(
-      this.bookmarksService.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
+      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
     );
   }
 
@@ -60,13 +60,13 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
     this.pageable.page = pageNum;
     if(!!this.filterText)
     {
-      this.bookmarksService
+      this.service
         .findMatchingCaption("", this.filterText, this.pageable)
         .subscribe(this.viewModel.expectModel());
     }
     else
     {
-      this.bookmarksService
+      this.service
         .all("", this.pageable)
         .subscribe(this.viewModel.expectModel());
     }
@@ -92,9 +92,9 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   }
 
   deleteBookmark(bookmark: BookmarkModel): void {
-    this.bookmarksService
+    this.service
       .delete("", bookmark.id)
-      .subscribe(this.viewModel.expectNothing());
+      .subscribe(this.viewModel.expectUndefined());
   }
 
   gotoPage(evt:any): void {

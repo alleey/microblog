@@ -1,23 +1,23 @@
-<ng-container *ngIf="posts">
-    <div *ngFor="let x of posts" class="bg-light">
+<ng-container *ngIf="items">
+    <div *ngFor="let x of items" class="bg-light">
         <ng-container [ngTemplateOutlet]="itemTemplate || defaultItemTemplate" [ngTemplateOutletContext]="{ $implicit: x, list: this }">
         </ng-container>
     </div>
 </ng-container>
-<ng-container *ngIf="!posts">
+<ng-container *ngIf="!items">
     <ng-container [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate" [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
 </ng-container>
 
 <ng-template #defaultItemTemplate let-item let-control="list">
     <div class="p-1">
-        <a (click)="control.selectItem(item, 'select')"><h4 class="blog-post-list-post-title">{{item.title}}</h4></a>
+        <a data-testid="select" (click)="control.selectItem(item, 'select')"><h4 class="blog-post-list-post-title">{{item.title}}</h4></a>
         <div class="created"> {{item.owner}} created the post on {{item.createdOn | prettyDate }}.</div>
         <p class="posttext ">
             {{item.text}}
         </p>
         <p>
-            <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
+            <blog-topic-list-view [items]="item.topics"></blog-topic-list-view>
         </p>
         <button class="btn btn-success" (click)="control.selectItem(item, 'select')">Read More...</button>
         <hr class="my-4">

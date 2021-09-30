@@ -12,7 +12,9 @@ describe('PagerComponent', () => {
       declarations: [ PagerComponent ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(PagerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

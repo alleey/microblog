@@ -9,11 +9,11 @@ export interface BlogPostModel {
     createdOn: Date;
     updateOn?: Date;
     permalink: string;
-    topics: any
+    topics?: any
 }
 
 export interface BlogPostResponseModel extends BlogPostModel {
-    comments: any,
+    comments?: any,
 }
 
 export interface BlogPostListResponseModel {

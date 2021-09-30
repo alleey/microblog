@@ -20,7 +20,9 @@ describe('LogoutCallbackComponent', () => {
       ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(LogoutCallbackComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

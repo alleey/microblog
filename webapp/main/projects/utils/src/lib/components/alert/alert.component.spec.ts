@@ -12,7 +12,9 @@ describe('AlertComponent', () => {
       declarations: [ AlertComponent ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(AlertComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -28,26 +30,50 @@ describe('AlertComponent', () => {
   });
 
   it('should render dismissable', () => {
-    component.dismissable = true;
 
-    fixture.detectChanges();
     const { debugElement } = fixture;
-    
+
+    component.dismissable = true;
+    fixture.detectChanges();
     const closeButton = debugElement.query(
       By.css('[data-dismiss="alert"]')
     );    
+
     expect(closeButton).toBeTruthy();
   });
 
   it('should not render dismissable', () => {
-    component.dismissable = false;
 
-    fixture.detectChanges();
     const { debugElement } = fixture;
-    
+
+    component.dismissable = false;
+    fixture.detectChanges();
     const closeButton = debugElement.query(
       By.css('[data-dismiss="alert"]')
     );    
+
     expect(closeButton).toBeFalsy();
   });
+
+  it('close button click should emit event', () => {
+
+    const { debugElement } = fixture;
+
+    component.dismissable = true;
+    fixture.detectChanges();
+    const closeButton = debugElement.query(
+      By.css('[data-testid="close"]')
+    ).nativeElement;
+    
+    let eventFired = false;
+    component.onClosed.subscribe({
+      next: () => { 
+        eventFired = true;
+      }
+    });
+    closeButton.click();
+
+    expect(eventFired).toBeTrue();
+  });
 });
+

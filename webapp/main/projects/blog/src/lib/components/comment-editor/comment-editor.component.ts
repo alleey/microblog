@@ -1,9 +1,12 @@
 import { Location } from '@angular/common';
-import { Component, Inject, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, Inject, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ViewModelHolder } from 'utils';
 import { CommentsServiceConfig, CommentsServiceConfigToken } from '../../config/config';
-import { CommentModel, CommentResponseModel } from '../../models/comment';
+import { CommentResponseModel } from '../../models/comment';
 import { CommentsService } from '../../services/comments.service';
 
 @Component({
@@ -11,31 +14,29 @@ import { CommentsService } from '../../services/comments.service';
   templateUrl: './comment-editor.component.html',
   styleUrls: ['./comment-editor.component.css']
 })
-export class CommentEditorComponent implements OnInit {
+export class CommentEditorComponent implements OnInit, OnDestroy {
 
-  @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input("postId") paramPostId?: number;
   @Input("commentId") paramCommentId?: number;
   @Input() updateMode: boolean = true;
-
-  postId?: number;
-  commentId?: number;
-  comment : CommentModel|null = null;
-
-  successDesc: any = "";
-  errorDesc: any = "";
-  loading: boolean = false;
+  @Input() headerTemplate: TemplateRef<any> | undefined;
 
   form!: FormGroup;
 
+  postId?: number;
+  commentId?: number;
+  successDesc: any = "";
+  viewModel = new ViewModelHolder<CommentResponseModel>();
+
+  destory$ = new Subject();
+
   constructor(
     @Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig,
-    private commentsService: CommentsService, 
+    private service: CommentsService, 
     private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
-
     this.form = new FormGroup(
     {
       "text": new FormControl("", [
@@ -48,56 +49,54 @@ export class CommentEditorComponent implements OnInit {
       this.postId = <number> (params.get("postId") ?? this.paramPostId);
       this.commentId = <number> (params.get("commentId") ?? this.paramCommentId);
       if(this.isUpdateMode)
-        this.fetchComment(this.commentId!);
+        this.fetchComment(this.postId!, this.commentId!);
     });
   }
 
-  get isUpdateMode(): boolean { 
-    return this.updateMode && this.commentId !== undefined; 
+  ngOnDestroy(): void {
+    this.destory$.next();
+    this.destory$.complete();
   }
 
+  get isUpdateMode(): boolean { return this.updateMode && this.commentId !== undefined; }
   get text() { return this.form.get('text'); }
+  get comment(): CommentResponseModel|undefined { return this.viewModel.Model; }
 
-  set blogComment(item: CommentModel) {
-    this.comment = this.updateMode ? item : null;
-    this.commentId = this.updateMode ? this.comment?.id : undefined;
-    console.info("Got comment id: " + this.commentId!);
-  }
-
-  updateForm(): void {
-    this.text!.setValue (this.comment?.text);
-  }
-
-  fetchResponseHandler = {
-    next: (result: CommentResponseModel) => {
-      this.blogComment = result;
-      this.updateForm();
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      return false;
+  updateForm(item: CommentResponseModel): void {
+    if(this.isUpdateMode) {
+      this.commentId = item.id;
+      this.text!.setValue (item.text);
+    } else {
     }
-  };
+  }
 
-  fetchComment(commentId: number): void {
-    this.loading = true;
-    this.commentsService
-      .one("", this.postId!, commentId)
-      .subscribe(this.fetchResponseHandler);
+  fetchComment(postId: number, commentId: number): void {
+    this.service
+      .one("", postId, commentId)
+      .pipe(takeUntil(this.destory$))
+      .subscribe(this.viewModel.expectModel({
+        nextObserver: {
+          next: (i: CommentResponseModel) => this.updateForm(i)
+        }
+      }));
   }      
 
   createNewComment(): void {
-    this.commentsService
+    this.service
       .create("", this.postId!, this.text?.value)
-      .subscribe(this.fetchResponseHandler);
+      .pipe(takeUntil(this.destory$))
+      .subscribe(this.viewModel.expectModel({
+        nextObserver: {
+          next: (i: CommentResponseModel) => this.updateForm(i)
+        }
+      }));
   }
 
   updateComment(): void {
-    this.commentsService
+    this.service
       .update("", this.postId!, this.commentId!, this.text?.value)
-      .subscribe(this.fetchResponseHandler);
+      .pipe(takeUntil(this.destory$))
+      .subscribe(this.viewModel.expectNothing());
   }
 
   cancel(): void {

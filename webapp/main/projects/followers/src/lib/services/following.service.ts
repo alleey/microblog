@@ -31,6 +31,8 @@ export class FollowingService {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
+    if(!owner) 
+      return throwError(new Error("Cannot determine userid"));
     return this.httpClient
             .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followers/${followedById}`);
   }
@@ -39,6 +41,8 @@ export class FollowingService {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
+    if(!owner) 
+      return throwError(new Error("Cannot determine userid"));
     return this.httpClient
             .get<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${followedById}`);
   }
@@ -50,6 +54,8 @@ export class FollowingService {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
+    if(!owner) 
+      return throwError(new Error("Cannot determine userid"));
     return this.httpClient
             .get<FollowsListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/followers`, {
               params: {
@@ -67,6 +73,8 @@ export class FollowingService {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
+    if(!owner) 
+      return throwError(new Error("Cannot determine userid"));
     return this.httpClient
             .get<FollowsListResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following`, {
               params: {
@@ -82,6 +90,8 @@ export class FollowingService {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
+    if(!owner) 
+      return throwError(new Error("Cannot determine userid"));
     return this.httpClient
             .post<FollowsResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following`, {
               "followedId": userTofollow
@@ -98,6 +108,8 @@ export class FollowingService {
     const apiEndpoint = endpoint ? endpoint : this.config.defaultEndpoint;
     const owner = !!userId ? userId : this.userProfile?.sub;
 
+    if(!owner) 
+      return throwError(new Error("Cannot determine userid"));
     return this.httpClient
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${userToUnfollow}`)
             .pipe(

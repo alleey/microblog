@@ -1,23 +1,25 @@
-<ng-container *ngIf="comments">
-    <div *ngFor="let x of comments" class="bg-light">
+<ng-container *ngIf="items">
+    <div *ngFor="let x of items" class="bg-light">
         <ng-container 
             [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
             [ngTemplateOutletContext]="{ $implicit: x, list: this }">
         </ng-container>
     </div>
 </ng-container>
-<ng-container *ngIf="!comments">
+<ng-container *ngIf="!items">
     <ng-container 
         [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item>
+<ng-template #defaultItemTemplate let-item let-control="list">
+    <span data-testid="select" (click)="control.selectItem(item, 'select')">
     <div class="created"> {{item.owner}} commented on {{ item.createdOn | prettyDate }}.</div>
     <p class="posttext ">
       {{item.text}} 
     </p>
+    </span>
     <hr class="my-4">
 </ng-template>
 

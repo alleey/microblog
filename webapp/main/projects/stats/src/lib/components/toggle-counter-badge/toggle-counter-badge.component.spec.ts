@@ -28,7 +28,9 @@ describe('ToggleCounterBadgeComponent', () => {
       ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(ToggleCounterBadgeComponent);
     component = fixture.componentInstance;
   });

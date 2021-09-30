@@ -12,7 +12,7 @@ export type BlogPostViewEvent = ViewEvent<BlogPostModel>;
 })
 export class BlogPostViewComponent implements OnInit {
 
-  @Input() post!: BlogPostModel;
+  @Input() item!: BlogPostModel;
   @Input() topics!: TopicModel[];
   @Input() enableComments: boolean = true;
 
@@ -27,7 +27,7 @@ export class BlogPostViewComponent implements OnInit {
   ngOnInit(): void { }
 
   get postId(): number {
-    return this.post.id;
+    return this.item.id;
   }
 
   selectItem(item: BlogPostModel, opcode: string): void {

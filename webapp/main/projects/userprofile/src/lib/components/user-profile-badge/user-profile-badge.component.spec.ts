@@ -32,7 +32,9 @@ describe('UserProfileBadgeComponent', () => {
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(UserProfileBadgeComponent);
     component = fixture.componentInstance;
     route = TestBed.inject(ActivatedRoute);

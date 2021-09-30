@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ViewModelHolder } from 'utils';
 import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
 import { TopicModel } from '../../models/topic';
 import { PostsService } from '../../services/posts.service';
@@ -22,16 +23,13 @@ export class BlogPostComponent implements OnInit {
   postSlug?: string;
   permalink: string = "";
 
-  response : BlogPostResponseModel|null;
-  errorDesc: any = "";
-  loading: boolean = false;
+  viewModel = new ViewModelHolder<BlogPostResponseModel>();
 
   constructor(
-    private postService: PostsService, 
+    private service: PostsService, 
     private router: Router, 
     private activatedRoute: ActivatedRoute) 
   { 
-    this.response = null;
   }
 
   ngOnInit(): void {
@@ -44,33 +42,23 @@ export class BlogPostComponent implements OnInit {
   fetchPost(postId: number, postSlug?: string): void {
     this.postId = postId;
     this.postSlug = postSlug;
-
-    this.loading = true;
-    this.postService.one("posts", this.postId)
-      .subscribe(
-      {
-        next: (result: BlogPostResponseModel) => {
-          this.postItem = result;
-          this.loading = false;
-        },
-        error: (err: any) => {
-          this.errorDesc = err.message;
-          this.loading = false;
-          console.log(this.errorDesc);
+    this.service
+      .one("posts", this.postId)
+      .subscribe(this.viewModel.expectModel({
+        nextObserver: {
+          next: (i: BlogPostResponseModel) => this.update(i)
         }
-      }
-    );
+      }));
   }
 
-  set postItem(item: BlogPostResponseModel) {
-    this.response = item;
-    this.response.permalink = window.location.origin + this.router.url;
-    this.postId = this.response.id;
-    this.postSlug = this.response.slug;
+  update(item: BlogPostResponseModel) {
+    item.permalink = window.location.origin + this.router.url;
+    this.postId = item.id;
+    this.postSlug = item.slug;
   }
 
   get postItem(): BlogPostResponseModel {
-    return this.response!;
+    return this.viewModel.Model!;
   }
 
   handleViewEvent(evt: BlogPostViewEvent) {
@@ -85,6 +73,5 @@ export class BlogPostComponent implements OnInit {
   }
 
   deletePost(post: BlogPostModel): void {
-    
   }
 }

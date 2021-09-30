@@ -15,7 +15,7 @@ export class AlertComponent implements OnInit {
   @Input() context: any;
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
-  @Output() onClosed = new EventEmitter<number>();
+  @Output() onClosed = new EventEmitter();
 
   constructor() { }
 

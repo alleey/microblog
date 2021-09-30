@@ -5,7 +5,7 @@ import { of, Subject, throwError } from 'rxjs';
 import { FollowingService } from '../../services/following.service';
 import { FollowingBadgeComponent } from './following-badge.component';
 import { FollowsResponseModel } from '../../models/follows';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
 describe('FollowingBadgeComponent', () => {
@@ -31,13 +31,15 @@ describe('FollowingBadgeComponent', () => {
       schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(FollowingBadgeComponent);
     component = fixture.componentInstance;
     route = TestBed.inject(ActivatedRoute);
   });
 
-  it('should create', () => {
+  it('should render active when following is found', () => {
 
     const userId = "me";
     const followedById = "notme";
@@ -53,6 +55,21 @@ describe('FollowingBadgeComponent', () => {
 
     expect(component).toBeTruthy();
     expect(component.isActive).toBeTrue();
+  });
+
+  it('should render inactive when following is NOT found', () => {
+
+    const { debugElement } = fixture;
+
+    const userId = "me";
+    const followedById = "notme";
+
+    service.findFollowing.and.returnValue(throwError(new Error()));
+    component.paramUserId = followedById;
+    fixture.detectChanges();
+
+    expect(component).toBeTruthy();
+    expect(component.isActive).toBeFalse();
   });
 
   it('should refresh when service onChange is triggered', () => {
@@ -74,7 +91,28 @@ describe('FollowingBadgeComponent', () => {
     expect(service.findFollowing).toHaveBeenCalledTimes(2);
   });
 
-  it('should call follow when clicked and user is not following', fakeAsync(() => {
+  it('should take userid from path', () => {
+
+    const userId = "me";
+    const followedById = "notme";
+    const followsResponse: FollowsResponseModel = {
+      userId: userId,
+      followedById: followedById
+    };
+
+    service.findFollowing.withArgs("", "", followedById).and.returnValue(of(followsResponse));
+
+    component.paramUserId = "thisshouldnotbeused";
+    spyOnProperty(route, "paramMap").and.returnValue(
+      of(convertToParamMap({ userId: followedById }))
+    );
+    fixture.detectChanges();
+
+    expect(component).toBeTruthy();
+    expect(component.isActive).toBeTrue();
+  });
+
+  it('should follow when clicked and user is not following', fakeAsync(() => {
 
     const { debugElement } = fixture;
 
@@ -100,7 +138,7 @@ describe('FollowingBadgeComponent', () => {
     expect(component.isActive).toBeTrue();
   }));
 
-  it('should call unfollow when clicked and user is following', fakeAsync(() => {
+  it('should unfollow when clicked and user is following', fakeAsync(() => {
 
     const { debugElement } = fixture;
 

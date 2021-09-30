@@ -18,7 +18,7 @@
     <utils-search-box (onApplyFilter)="onApplyFilter($event)" *ngIf="enableSearch">
     </utils-search-box>
     <blog-topic-list-view 
-        [topics]="items" 
+        [items]="items" 
         [itemTemplate]="itemTemplate"
         [noContentsTemplate]="noContentsTemplate"
         (onSelectItem)="handleListViewEvent($event)">

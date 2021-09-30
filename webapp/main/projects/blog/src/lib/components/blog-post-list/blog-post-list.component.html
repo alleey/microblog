@@ -22,7 +22,7 @@
 
     <utils-pager [page]="page" (onSelectPage)="gotoPage($event)"></utils-pager>
     <blog-post-list-view
-        [posts]="items"
+        [items]="items"
         [itemTemplate]="itemTemplate"
         [noContentsTemplate]="noContentsTemplate"
         (onSelectItem)="handleListViewEvent($event)">

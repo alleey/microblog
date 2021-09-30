@@ -60,6 +60,6 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
   unfollow(): void {
     this.service
       .unfollow("", "", this.userId!)
-      .subscribe(this.viewModel.expectNothing());
+      .subscribe(this.viewModel.expectUndefined());
   }
 }

@@ -20,7 +20,9 @@ describe('LoginRedirectComponent', () => {
       ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(LoginRedirectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

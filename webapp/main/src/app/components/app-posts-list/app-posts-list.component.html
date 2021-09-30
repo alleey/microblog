@@ -15,7 +15,7 @@
             {{item.text}}
         </p>
         <p>
-            <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
+            <blog-topic-list-view [items]="item.topics"></blog-topic-list-view>
         </p>
         <button class="btn btn-success" (click)="control.selectItem(item, 'select')">Read More...</button>
         <hr class="my-4">

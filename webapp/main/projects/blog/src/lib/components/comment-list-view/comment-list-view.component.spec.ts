@@ -1,6 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { UtilsModule } from 'utils';
 
-import { CommentListViewComponent } from './comment-list-view.component';
+import { CommentListViewComponent, CommentListViewEvent } from './comment-list-view.component';
+import { CommentModel } from '../../models/comment';
 
 describe('CommentListViewComponent', () => {
   let component: CommentListViewComponent;
@@ -8,7 +11,8 @@ describe('CommentListViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CommentListViewComponent ]
+      declarations: [ CommentListViewComponent ],
+      imports: [UtilsModule]
     })
     .compileComponents();
   });
@@ -16,10 +20,36 @@ describe('CommentListViewComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CommentListViewComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+  it('should fire onSelect when clicked', fakeAsync(() => {
+
+    const models: CommentModel[] = [
+      { 
+        id: 1, 
+        text: "text",
+        owner: "me",
+        createdOn: new Date(), 
+        updateOn: new Date() 
+      }
+    ];
+
+    component.items = models;
+    fixture.detectChanges();
+
+    let el = fixture.debugElement.query(By.css('[data-testid="select"]')).nativeElement;
+    let firedEvent: CommentListViewEvent|undefined = undefined;
+
+    component.onSelectItem.subscribe({
+      next: (evt: CommentListViewEvent) => {
+        firedEvent = evt;
+      }
+    });
+    el.click();
+    tick();
+
+    expect(firedEvent).toBeTruthy();
+    expect(firedEvent!.item).toEqual(models[0]);
+  }));
+
 });

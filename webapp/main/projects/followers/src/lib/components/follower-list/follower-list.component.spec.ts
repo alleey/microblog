@@ -7,7 +7,8 @@ import { FollowersListComponent } from './follower-list.component';
 import { FollowsModel, FollowsListResponseModel } from '../../models/follows';
 import { FollowersListViewComponent } from '../follower-list-view/follower-list-view.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('FollowersListComponent', () => {
   let component: FollowersListComponent;
@@ -28,10 +29,13 @@ describe('FollowersListComponent', () => {
       imports: [RouterTestingModule],
       providers: [
         { provide: FollowingService, useValue: service },
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(FollowersListComponent);
     component = fixture.componentInstance;
     route = TestBed.inject(ActivatedRoute);
@@ -57,6 +61,18 @@ describe('FollowersListComponent', () => {
     expect(component.hasItems).toBeTrue();
     expect(component.page?.number).toEqual(0);
     expect(component.items).toEqual(followerListResponse._embedded.follows);
+  });
+
+  it('should NOT render followers list when NOT found', () => {
+
+    const pageable = { page: 0 };
+    service.followers.withArgs("", "", pageable).and.returnValue(throwError(new Error()));
+
+    fixture.detectChanges();
+    expect(component).toBeTruthy();
+    expect(component.hasItems).toBeFalse();
+    expect(component.page?.number).toBeFalsy();
+    expect(component.items).toBeFalsy();
   });
 
   it('should refresh when service onChange is triggered', () => {

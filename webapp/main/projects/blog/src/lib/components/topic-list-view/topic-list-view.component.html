@@ -1,12 +1,12 @@
-<ng-container *ngIf="topics">
-    <ng-container *ngFor="let x of topics; index as i">
+<ng-container *ngIf="items">
+    <ng-container *ngFor="let x of items; index as i">
         <ng-container 
             [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
             [ngTemplateOutletContext]="{ $implicit: x, index: i, list: this }">
         </ng-container>
     </ng-container>
 </ng-container>
-<ng-container *ngIf="!topics">
+<ng-container *ngIf="!items">
     <ng-container 
         [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
@@ -14,7 +14,7 @@
 </ng-container>
 
 <ng-template #defaultItemTemplate let-item let-control="list">
-    <a class="btn btn-danger m-1" role="button" (click)="control.selectItem(item, 'select')">{{item.caption}}</a>
+    <a data-testid="select" class="btn btn-danger m-1" role="button" (click)="control.selectItem(item, 'select')">{{item.caption}}</a>
 </ng-template>
 
 <ng-template #defaultNoContentsTemplate let-item>

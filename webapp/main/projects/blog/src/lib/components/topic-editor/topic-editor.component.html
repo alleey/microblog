@@ -1,4 +1,4 @@
-<div *ngIf="loading; else contents">
+<div *ngIf="viewModel.isLoading; else contents">
     <utils-loader></utils-loader>
 </div>
 
@@ -15,8 +15,8 @@
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
-    <utils-alert *ngIf="errorDesc; else editor" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ errorDesc }}</p>
+    <utils-alert *ngIf="viewModel.isFailure; else editor" [dismissable]="false" [minimal]="false">
+        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 
@@ -38,10 +38,10 @@
 
             </div>
             <div class="mb-3 col-sm-3" *ngIf="!isUpdateMode">
-                <input class="btn btn-primary" type="button" [disabled]="loading || !form.valid" value="Create" (click)="createNewTopic()">
+                <input class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Create" (click)="createNewTopic()">
             </div>
             <div class="mb-3 col-sm-3" *ngIf="isUpdateMode">
-                <input class="btn btn-primary" type="button" [disabled]="loading || !form.valid" value="Update" (click)="updateTopic()">
+                <input class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updateTopic()">
             </div>
         </div>
     </form>

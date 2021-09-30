@@ -45,9 +45,8 @@ describe('FollowingService', () => {
       followedById: followerId
     };
 
-    let apiResponse: FollowsResponseModel|undefined;
-
     authService.userSubject.next({ profile: { sub: userId }} as User);
+    let apiResponse: FollowsResponseModel|undefined;
     service.findFollower("", "", followerId).subscribe({
       next: (res: FollowsResponseModel) => {
         apiResponse = res;
@@ -60,35 +59,61 @@ describe('FollowingService', () => {
     expect(apiResponse).toEqual(followsResponse);
   });
 
+  it('findFollower returns error if no user is logged in and no user is provided', () => {
+
+    const followerId = "notme";
+
+    let apiResponse: Error|undefined;
+    service.findFollower("", "", followerId).subscribe({
+      error: (res: Error) => {
+        apiResponse = res;
+      }
+    });
+
+    expect(apiResponse).toBeTruthy();
+  });
+
   it('returns following record of logged in user', () => {
 
     const userId = "me";
-    const followerById = "notme";
+    const followedById = "notme";
     const followsResponse: FollowsResponseModel = {
       userId: userId,
-      followedById: followerById
+      followedById: followedById
     };
 
-    let apiResponse: FollowsResponseModel|undefined;
-
     authService.userSubject.next({ profile: { sub: userId }} as User);
-    service.findFollowing("", "", followerById).subscribe({
+    let apiResponse: FollowsResponseModel|undefined;
+    service.findFollowing("", "", followedById).subscribe({
       next: (res: FollowsResponseModel) => {
         apiResponse = res;
       }
     });
 
-    controller.expectOne(`http://localhost/users/${userId}/following/${followerById}`).flush(followsResponse);
+    controller.expectOne(`http://localhost/users/${userId}/following/${followedById}`).flush(followsResponse);
     controller.verify();
 
     expect(apiResponse).toEqual(followsResponse);
+  });
+
+  it('findFollowing returns error if no user is logged in and no user is provided', () => {
+
+    const followedById = "notme";
+
+    let apiResponse: Error|undefined;
+    service.findFollowing("", "", followedById).subscribe({
+      error: (res: Error) => {
+        apiResponse = res;
+      }
+    });
+
+    expect(apiResponse).toBeTruthy();
   });
 
   it('returns followers of logged in user with default paging', () => {
 
     const userId = "me";
     const followedById = "notme";
-
     const followerListResponse: FollowsListResponseModel = {
       _embedded: {
         follows: [
@@ -98,9 +123,8 @@ describe('FollowingService', () => {
       page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
     };
 
-    let apiResponse: FollowsListResponseModel|undefined;
-
     authService.userSubject.next({ profile: { sub: userId }} as User);
+    let apiResponse: FollowsListResponseModel|undefined;
     service.followers("", "").subscribe({
       next: (res: FollowsListResponseModel) => {
         apiResponse = res;
@@ -114,26 +138,62 @@ describe('FollowingService', () => {
     expect(apiResponse).toEqual(followerListResponse);
   });
 
-  it('returns following of logged in user with default paging', () => {
+  it('returns followers of logged in user with custom paging', () => {
 
     const userId = "me";
-    const followerById = "notme";
-    const pageable = {
-      page: 0
-    };
-
+    const followedById = "notme";
     const followerListResponse: FollowsListResponseModel = {
       _embedded: {
         follows: [
-          { userId: userId, followedById: followerById }
+          { userId: userId, followedById: followedById }
+        ]
+      },
+      page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
+    };
+    const pageable = { page: 10, limit: 100 };
+
+    authService.userSubject.next({ profile: { sub: userId }} as User);
+    let apiResponse: FollowsListResponseModel|undefined;
+    service.followers("", "", pageable).subscribe({
+      next: (res: FollowsListResponseModel) => {
+        apiResponse = res;
+      }
+    });
+
+    controller.expectOne(`http://localhost/users/${userId}/followers?page=${pageable.page}&size=${pageable.limit}&sort=createdOn,asc`)
+      .flush(followerListResponse);
+    controller.verify();
+
+    expect(apiResponse).toEqual(followerListResponse);
+  });
+
+  it('followers returns error if no user is logged in and no user is provided', () => {
+
+    let apiResponse: Error|undefined;
+    service.followers("", "").subscribe({
+      error: (res: Error) => {
+        apiResponse = res;
+      }
+    });
+
+    expect(apiResponse).toBeTruthy();
+  });
+
+  it('returns following of logged in user with default paging', () => {
+
+    const userId = "me";
+    const followedById = "notme";
+    const followerListResponse: FollowsListResponseModel = {
+      _embedded: {
+        follows: [
+          { userId: userId, followedById: followedById }
         ]
       },
       page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
     };
 
-    let apiResponse: FollowsListResponseModel|undefined;
-
     authService.userSubject.next({ profile: { sub: userId }} as User);
+    let apiResponse: FollowsListResponseModel|undefined;
     service.following("", "").subscribe({
       next: (res: FollowsListResponseModel) => {
         apiResponse = res;
@@ -147,6 +207,47 @@ describe('FollowingService', () => {
     expect(apiResponse).toEqual(followerListResponse);
   });
 
+  it('returns following of logged in user with custom paging', () => {
+
+    const userId = "me";
+    const followedById = "notme";
+    const followerListResponse: FollowsListResponseModel = {
+      _embedded: {
+        follows: [
+          { userId: userId, followedById: followedById }
+        ]
+      },
+      page: { number: 0, size: 1, totalElements:1, totalPages: 1 }
+    };
+    const pageable = { page: 10, limit: 100 };
+
+    authService.userSubject.next({ profile: { sub: userId }} as User);
+    let apiResponse: FollowsListResponseModel|undefined;
+    service.following("", "", pageable).subscribe({
+      next: (res: FollowsListResponseModel) => {
+        apiResponse = res;
+      }
+    });
+
+    controller.expectOne(`http://localhost/users/${userId}/following?page=${pageable.page}&size=${pageable.limit}&sort=createdOn,asc`)
+      .flush(followerListResponse);
+    controller.verify();
+
+    expect(apiResponse).toEqual(followerListResponse);
+  });
+
+  it('following returns error if no user is logged in and no user is provided', () => {
+
+    let apiResponse: Error|undefined;
+    service.following("", "").subscribe({
+      error: (res: Error) => {
+        apiResponse = res;
+      }
+    });
+
+    expect(apiResponse).toBeTruthy();
+  });
+
   it('logged in user is set to follow given user', () => {
 
     const userId = "me";
@@ -156,9 +257,8 @@ describe('FollowingService', () => {
       followedById: userId
     };
 
+    authService.userSubject.next({ profile: { sub: userId } } as User);
     let apiResponse: FollowsResponseModel|undefined;
-
-    authService.userSubject.next({ profile: { sub: userId }} as User);
     service.follow("", "", userToFollow).subscribe({
       next: (res: FollowsResponseModel) => {
         apiResponse = res;
@@ -173,14 +273,27 @@ describe('FollowingService', () => {
     expect(apiResponse).toEqual(followsResponse);
   });
 
+  it('follow returns error if no user is logged in and no user is provided', () => {
+
+    const userToFollow = "notme";
+
+    let apiResponse: Error|undefined;
+    service.follow("", "", userToFollow).subscribe({
+      error: (res: Error) => {
+        apiResponse = res;
+      }
+    });
+
+    expect(apiResponse).toBeTruthy();
+  });
+
   it('logged in user is set to unfollow given user', () => {
 
     const userId = "me";
     const userToUnfollow = "notme";
 
-    let apiResponse = false;
-
     authService.userSubject.next({ profile: { sub: userId }} as User);
+    let apiResponse = false;
     service.unfollow("", "", userToUnfollow).subscribe({
       next: () => {
         apiResponse = true;
@@ -193,6 +306,20 @@ describe('FollowingService', () => {
     controller.verify();
 
     expect(apiResponse).toEqual(true);
+  });
+
+  it('unfollow returns error if no user is logged in and no user is provided', () => {
+
+    const userToUnfollow = "notme";
+
+    let apiResponse: Error|undefined;
+    service.unfollow("", "", userToUnfollow).subscribe({
+      error: (res: Error) => {
+        apiResponse = res;
+      }
+    });
+
+    expect(apiResponse).toBeTruthy();
   });
 
 });

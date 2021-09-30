@@ -12,7 +12,9 @@ describe('SearchBoxComponent', () => {
       declarations: [ SearchBoxComponent ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(SearchBoxComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

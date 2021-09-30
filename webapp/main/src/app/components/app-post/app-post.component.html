@@ -42,7 +42,7 @@
     </p>
 
     <h5>Posted under Topics:</h5>
-    <blog-topic-list-view [topics]="item.topics"></blog-topic-list-view>
+    <blog-topic-list-view [items]="item.topics"></blog-topic-list-view>
 
     <div *ngIf="control.enableComments" class="mt-3">
         <comment-editor [updateMode]="false" *authRequireLogin="'yes'"></comment-editor>

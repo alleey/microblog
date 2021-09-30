@@ -2,7 +2,7 @@
 
 <label class="form-label">Selected Topics:</label>
 <div>
-    <blog-topic-list-view [topics]="selectedTopics"></blog-topic-list-view>
+    <blog-topic-list-view [items]="selectedTopics"></blog-topic-list-view>
     <utils-alert *ngIf="maxTopicsError" [dismissable]="true" [minimal]="true">
         Sorry, cannot select more than {{maxTopics}} topics for a post.
     </utils-alert>

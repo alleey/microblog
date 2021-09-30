@@ -25,7 +25,9 @@ describe('CounterStatsComponent', () => {
       ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(CounterStatsComponent);
     component = fixture.componentInstance;
   });

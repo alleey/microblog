@@ -20,7 +20,9 @@ describe('LoginCallbackComponent', () => {
       ]
     })
     .compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(LoginCallbackComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

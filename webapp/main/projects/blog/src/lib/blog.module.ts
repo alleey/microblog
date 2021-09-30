@@ -5,23 +5,23 @@ import { RouterModule } from '@angular/router';
 import { OidcAuthModule } from 'auth-oidc';
 import { MarkdownModule } from 'ngx-markdown';
 import { UtilsModule } from 'utils';
-import { 
-  BlogPostComponent, 
-  BlogPostEditorComponent, 
-  BlogPostListComponent, 
-  BlogPostListViewComponent, 
+import {
+  BlogPostComponent,
+  BlogPostEditorComponent,
+  BlogPostListComponent,
+  BlogPostListViewComponent,
   BlogPostViewComponent, 
-  TopicListComponent, 
-  TopicListViewComponent 
+  CommentEditorComponent, 
+  CommentListComponent, 
+  CommentListViewComponent, 
+  TopicEditorComponent, 
+  TopicListComponent,
+  TopicListViewComponent, 
+  TopicSelectorComponent
 } from './components/public-api';
 import { BlogModuleConfig, CommentsServiceConfigToken, PostsServiceConfigToken, TopicsServiceConfigToken } from './config/config';
 import { PostsService } from './services/posts.service';
 import { TopicsService } from './services/topics.service';
-import { TopicSelectorComponent } from './components/topic-selector/topic-selector.component';
-import { TopicEditorComponent } from './components/topic-editor/topic-editor.component';
-import { CommentListComponent } from './components/comment-list/comment-list.component';
-import { CommentListViewComponent } from './components/comment-list-view/comment-list-view.component';
-import { CommentEditorComponent } from './components/comment-editor/comment-editor.component';
 
 @NgModule({
   declarations: [

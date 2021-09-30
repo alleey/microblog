@@ -54,6 +54,6 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
   deleteBookmark(): void {
     this.service
       .delete("", this.viewModel.Model!.id)
-      .subscribe(this.viewModel.expectNothing());
+      .subscribe(this.viewModel.expectUndefined());
   }
 }
