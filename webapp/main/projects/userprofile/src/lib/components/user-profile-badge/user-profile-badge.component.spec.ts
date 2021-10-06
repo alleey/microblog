@@ -1,15 +1,14 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { BehaviorSubject, of, throwError } from 'rxjs';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-
-import { UserProfileService } from '../../services/user-profile.service';
-import { UserProfileModel } from '../../models/user-profile';
-import { UserProfileBadgeComponent } from './user-profile-badge.component';
-import { UserProfileResponseModel } from '../../models/user-profile';
-import { UserProfileBadgeViewComponent } from '../user-profile-badge-view/user-profile-badge-view.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng-mocks';
+import { of, throwError } from 'rxjs';
+import { UserProfileModel, UserProfileResponseModel } from '../../models/user-profile';
+import { UserProfileService } from '../../services/user-profile.service';
+import { UserProfileBadgeViewComponent } from '../user-profile-badge-view/user-profile-badge-view.component';
+import { UserProfileBadgeComponent } from './user-profile-badge.component';
+
 
 describe('UserProfileBadgeComponent', () => {
   let component: UserProfileBadgeComponent;
@@ -24,12 +23,14 @@ describe('UserProfileBadgeComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [ UserProfileBadgeComponent, UserProfileBadgeViewComponent ],
+      declarations: [ 
+        UserProfileBadgeComponent, 
+        MockComponent(UserProfileBadgeViewComponent) 
+      ],
       imports: [RouterTestingModule],
       providers: [
         { provide: UserProfileService, useValue: service },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     })
     .compileComponents();
   });
@@ -42,6 +43,8 @@ describe('UserProfileBadgeComponent', () => {
 
   it('should render badge when userprofile is found', () => {
 
+    const { debugElement } = fixture;
+
     const userId = "useruseruser";
     const userProfile: UserProfileResponseModel = {
       id: userId,
@@ -53,7 +56,6 @@ describe('UserProfileBadgeComponent', () => {
     component.paramUserId = userId;
     fixture.detectChanges();
 
-    const { debugElement } = fixture;
     const badge = debugElement.query(By.css('user-profile-badge-view'));
     
     expect(badge).toBeTruthy();
@@ -62,13 +64,14 @@ describe('UserProfileBadgeComponent', () => {
 
   it('should render error if user not found', () => {
 
+    const { debugElement } = fixture;
+
     const userId = "useruseruser";
     service.one.withArgs("", userId).and.returnValue(throwError(new Error()));
     
     component.paramUserId = userId;
     fixture.detectChanges();
 
-    const { debugElement } = fixture;
     const badge = debugElement.query(By.css('user-profile-badge-view'));
     const alert = debugElement.query(By.css('utils-alert'));
     
@@ -109,7 +112,9 @@ describe('UserProfileBadgeComponent', () => {
     expect(service.one).toHaveBeenCalledOnceWith("", userId);
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should invoke onEvent when clicked', () => {
+
+    const { debugElement } = fixture;
 
     const userId = "useruseruser";
     const userProfile: UserProfileResponseModel = {
@@ -121,17 +126,15 @@ describe('UserProfileBadgeComponent', () => {
     component.paramUserId = userId;
     fixture.detectChanges();
 
-    const { debugElement } = fixture;
     const badge = debugElement.query(By.directive(UserProfileBadgeViewComponent)).componentInstance;
 
     let firedEvent: UserProfileModel|undefined = undefined;
-    component.onSelect = (evt: UserProfileModel) => {
+    component.onEvent.subscribe((evt: UserProfileModel) => {
       firedEvent = evt;
-    };
-    badge.onSelectItem.emit({ opcode: 'select', item: userProfile });
-    tick();
+    });
+    badge.onEvent.emit({ opcode: 'select', item: userProfile });
 
     expect(firedEvent).toBeTruthy();
-  }));
+  });
 
 });

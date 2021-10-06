@@ -13,9 +13,9 @@ import { TopicsService } from '../../services/topics.service';
 })
 export class TopicEditorComponent implements OnInit {
 
-  @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input("topicId") paramTopicId?: number;
   @Input() updateMode: boolean = true;
+  @Input() headerTemplate: TemplateRef<any> | undefined;
 
   form!: FormGroup;
   topicId?: number;
@@ -23,7 +23,6 @@ export class TopicEditorComponent implements OnInit {
 
   constructor(
     private topicService: TopicsService,
-    private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
@@ -76,9 +75,5 @@ export class TopicEditorComponent implements OnInit {
     this.topicService
       .update("", this.topicId!, this.caption?.value)
       .subscribe(this.viewModel.expectNothing());
-  }
-
-  cancel(): void {
-    this.location.back();
   }
 }

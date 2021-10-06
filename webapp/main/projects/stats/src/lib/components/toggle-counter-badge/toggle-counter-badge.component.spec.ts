@@ -1,11 +1,12 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { CountersService } from '../../services/counters.service';
-import { UtilsModule } from 'utils';
-
-import { ToggleCounterBadgeComponent } from './toggle-counter-badge.component';
-import { of, Subject } from 'rxjs';
-import { CounterResponseModel } from '../../models/counter';
 import { By } from '@angular/platform-browser';
+import { MockComponent } from 'ng-mocks';
+import { of, Subject } from 'rxjs';
+import { BadgeComponent } from 'utils';
+import { CounterResponseModel } from '../../models/counter';
+import { CountersService } from '../../services/counters.service';
+import { ToggleCounterBadgeComponent } from './toggle-counter-badge.component';
+
 
 describe('ToggleCounterBadgeComponent', () => {
   let component: ToggleCounterBadgeComponent;
@@ -14,15 +15,17 @@ describe('ToggleCounterBadgeComponent', () => {
 
   beforeEach(async () => {
 
-    service = jasmine.createSpyObj<CountersService>('CounterService', 
+    service = jasmine.createSpyObj<CountersService>('CounterService',
       ['getCounter', 'setCounter', 'unsetCounter'], {
         onChange: new Subject()
       }
     );
 
     await TestBed.configureTestingModule({
-      imports: [UtilsModule],
-      declarations: [ToggleCounterBadgeComponent],
+      declarations: [
+        ToggleCounterBadgeComponent,
+        MockComponent(BadgeComponent)
+      ],
       providers: [
         { provide: CountersService, useValue: service }
       ]
@@ -51,7 +54,7 @@ describe('ToggleCounterBadgeComponent', () => {
     fixture.detectChanges();
 
     const { debugElement } = fixture;
-    
+
     expect(component.isPositive).toBeTrue();
     expect(debugElement.nativeElement.innerHTML).toContain(component.activeCaption);
   });
@@ -72,7 +75,7 @@ describe('ToggleCounterBadgeComponent', () => {
     fixture.detectChanges();
 
     const { debugElement } = fixture;
-    
+
     expect(component.isPositive).toBeFalse();
     expect(debugElement.nativeElement.innerHTML).toContain(component.inactiveCaption);
   });

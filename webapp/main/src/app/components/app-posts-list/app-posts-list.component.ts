@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { BlogPostModel } from 'projects/blog/src/public-api';
+import { BlogPostListEvent } from 'blog';
 
 @Component({
   selector: 'app-posts-list',
@@ -11,10 +11,10 @@ export class AppPostsListComponent implements OnInit {
 
   constructor(private router: Router) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
-  navigateToPost(post: BlogPostModel): void {
+  navigateToPost(evt: BlogPostListEvent): void {
+    const post = evt.item;
     this.router.navigate(["/posts", post.id, post.slug]);
   }
 

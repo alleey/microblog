@@ -3,7 +3,7 @@
 </div>
 
 <ng-template #contents>
-    <utils-alert *ngIf="viewModel.hasError; else itemsList" [dismissable]="false" [minimal]="true">
+    <utils-alert *ngIf="viewModel.isFailure; else itemsList" [dismissable]="false" [minimal]="true">
         <p>An error occurred fetching the bookmarks list: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
@@ -16,12 +16,12 @@
     </ng-container>
 
     <div class="py-1">
-        <utils-search-box (onApplyFilter)="onApplyFilter" *ngIf="enableSearch"></utils-search-box>
+        <utils-search-box data-testid="searchbox" (onApplyFilter)="onApplyFilter" *ngIf="enableSearch"></utils-search-box>
         <bookmark-list-view
             [bookmarks]="items"
             [itemTemplate]="itemTemplate"
             [noContentsTemplate]="noContentsTemplate"
-            (onSelectItem)="handleListViewEvent($event)">
+            (onEvent)="handleListViewEvent($event)">
         </bookmark-list-view>
         <utils-pager [page]="page" (onSelectPage)="gotoPage($event)"></utils-pager>
     </div>

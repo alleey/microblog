@@ -1,12 +1,12 @@
 import { Location } from '@angular/common';
 import { Component, Inject, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { ViewModelHolder } from 'utils';
 import { PostsServiceConfig, PostsServiceConfigToken } from '../../config/config';
 import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
 import { TopicModel } from '../../models/topic';
 import { PostsService } from '../../services/posts.service';
-import { TopicsService } from '../../services/topics.service';
 import { uniqueSlugValidator } from '../../validators/unique-slug-validator';
 import { TopicSelectorComponent } from '../topic-selector/topic-selector.component';
 
@@ -34,25 +34,21 @@ function slugify(text: string) {
 })
 export class BlogPostEditorComponent implements OnInit {
 
-  @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input("postId") paramPostId?: number;
   @Input() updateMode: boolean = true;
 
+  @Input() headerTemplate: TemplateRef<any> | undefined;
+
+  @ViewChild('topicSelector') topicSelector!: TopicSelectorComponent;
+
   postId?: number;
-  post : BlogPostModel|null = null;
-
-  successDesc: any = "";
-  errorDesc: any = "";
-  loading: boolean = false;
-
   form!: FormGroup;
-
-  @ViewChild('topicSelector')
-  topicSelector!: TopicSelectorComponent;
+  successDesc: any = "Post updated successfully!";
+  viewModel = new ViewModelHolder<BlogPostResponseModel>();
 
   constructor(
     @Inject(PostsServiceConfigToken) private config: PostsServiceConfig,
-    private postService: PostsService, 
+    private service: PostsService, 
     private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
@@ -69,7 +65,7 @@ export class BlogPostEditorComponent implements OnInit {
           Validators.maxLength(this.config.maxTitleLength),
           Validators.pattern(/^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$/)
         ], 
-        uniqueSlugValidator(this.postService)
+        uniqueSlugValidator(this.service)
       ),
       "text": new FormControl("", [
           Validators.required, 
@@ -97,86 +93,74 @@ export class BlogPostEditorComponent implements OnInit {
   get slug() { return this.form.get('slug'); }
   get text() { return this.form.get('text'); }
 
-  get selectedTopics(): TopicModel[] {
-    return this.post?.topics || [];
-  }
-
-  set blogPost(item: BlogPostModel) {
-    this.post = this.updateMode ? item : null;
-    this.postId = this.updateMode ? this.post?.id : undefined;
-    console.info("Got post id: " + this.postId!);
+  get post(): BlogPostResponseModel|undefined { return this.viewModel.Model; }
+  get postTopics(): TopicModel[] { return this.post?.topics || []; }
+  get topicsSelection(): number[] {
+    return this.topicSelector.selectedTopics.map(i => i.id);
   }
 
   generateSlug(): void {
     this.slug?.setValue(slugify(this.title?.value));
   }
 
-  updateForm(): void {
-    this.title!.setValue (this.post?.title);
-    this.slug!.setValue (this.post?.slug);
-    this.text!.setValue (this.post?.text);
+  updateForm(item: BlogPostResponseModel): void {
+    if(this.isUpdateMode) {
+      this.postId = item.id;
+      this.title!.setValue (item.title);
+      this.slug!.setValue (item.slug);
+      this.text!.setValue (item.text);
+    } 
+    else 
+    {
+    }
   }
 
-  fetchResponseHandler = {
-    next: (result: BlogPostResponseModel) => {
-      this.blogPost = result;
-      this.updateForm();
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      return false;
-    }
-  };
-
-  fetchPost(postId: number): void {
-    this.loading = true;
-    this.postService
-      .one("posts", postId)
-      .subscribe(this.fetchResponseHandler);
+  fetchPost(id: number): void {
+    this.service
+      .one("", id)
+      .subscribe(this.viewModel.expectModel({
+        nextObserver: {
+          next: (i: BlogPostResponseModel) => this.updateForm(i)
+        }
+      }));
   }      
 
-  updateResponseHandler = {
-    next: () => {
-      this.assignTopics();
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      return false;
-    }
-  };
-
   createNewPost(): void {
-    this.postService
-      .create("posts", this.slug?.value, this.title?.value, this.text?.value)
-      .subscribe(this.updateResponseHandler);
+    this.service
+      .create("", this.slug?.value, this.title?.value, this.text?.value)
+      .subscribe(
+        this.viewModel.expectModel({
+          deferReset: true, // because we are going to chain assignTopics, the loading flag shouldnt be reset now
+          nextObserver: {
+            next: (i: BlogPostResponseModel) => this.assignTopics(i, this.topicsSelection)
+          }
+        })
+      );
   }
 
   updatePost(): void {
-    this.postService
-      .update("posts", this.postId!, this.slug?.value, this.title?.value, this.text?.value)
-      .subscribe(this.updateResponseHandler);
+    this.service
+      .update("", this.postId!, this.slug?.value, this.title?.value, this.text?.value)
+      .subscribe(
+        this.viewModel.expectNothing({
+          deferReset: true,
+          nextObserver: {
+            next: () => this.assignTopics(this.viewModel.Model!, this.topicsSelection)
+          }
+        })
+      );
   }
 
-  assignTopics(): void {
-    const selectedTopics = this.topicSelector.selectedTopics.map(i => i.id);
-    console.info(selectedTopics);
-    this.postService
-      .assignTopics("posts", this.postId!, selectedTopics)
-      .subscribe({
-        next: () => {
-          this.updateForm();
-          this.successDesc = "Post updated successfully!";
-          this.loading = false;
-        },
-        error: (err: any) => {
-          this.errorDesc = err.message;
-          this.loading = false;
-          return false;
-        }
-      });
+  assignTopics(post: BlogPostResponseModel, selectedTopics: number[]): void {
+    this.service
+      .assignTopics("", post.id, selectedTopics)
+      .subscribe(
+        this.viewModel.expectNothing({
+          nextObserver: {
+            next: () => this.updateForm(post)
+          }
+        })
+      );
   }
 
   cancel(): void {

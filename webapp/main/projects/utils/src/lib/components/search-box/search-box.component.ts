@@ -9,15 +9,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 })
 export class SearchBoxComponent implements OnInit, OnDestroy {
 
-  @ViewChild('searchBox')
-  searchBox?: ElementRef;
-
   @Input() debounceTime: number = 500;
-
   @Input() context: any;
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   @Output() onApplyFilter = new EventEmitter<string>();
+
+  @ViewChild('searchBox') searchBox?: ElementRef;
 
   filter$ = new Subject<string>();
   subscription!: Subscription;

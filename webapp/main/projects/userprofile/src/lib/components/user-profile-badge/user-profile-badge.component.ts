@@ -1,9 +1,11 @@
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ViewModelHolder } from 'utils';
 import { UserProfileModel, UserProfileResponseModel } from '../../models/user-profile';
 import { UserProfileService } from '../../services/user-profile.service';
 import { UserProfileBadgeViewEvent } from '../user-profile-badge-view/user-profile-badge-view.component';
+
+export type UserProfileBadgeEvent = UserProfileBadgeViewEvent;
 
 @Component({
   selector: 'user-profile-badge',
@@ -14,7 +16,8 @@ export class UserProfileBadgeComponent implements OnInit {
 
   @Input("userid") paramUserId?: string;
   @Input() contentTemplate: TemplateRef<any> | undefined;
-  @Input() onSelect: (topic: UserProfileModel) => void = (item) => {};
+  
+  @Output() onEvent = new EventEmitter<UserProfileBadgeEvent>();
 
   userId?: string;
   viewModel = new ViewModelHolder<UserProfileResponseModel>();
@@ -43,8 +46,6 @@ export class UserProfileBadgeComponent implements OnInit {
   }
 
   handleViewEvent(evt: UserProfileBadgeViewEvent) {
-    switch(evt.opcode) {
-      case 'select': this.onSelect(evt.item); break;
-    }
+    this.onEvent.emit(evt);
   }
 }

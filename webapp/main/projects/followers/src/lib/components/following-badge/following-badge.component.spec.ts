@@ -1,12 +1,14 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { of, Subject, throwError } from 'rxjs';
-
-import { FollowingService } from '../../services/following.service';
-import { FollowingBadgeComponent } from './following-badge.component';
-import { FollowsResponseModel } from '../../models/follows';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng-mocks';
+import { of, Subject, throwError } from 'rxjs';
+import { BadgeComponent } from 'utils';
+import { FollowsResponseModel } from '../../models/follows';
+import { FollowingService } from '../../services/following.service';
+import { FollowingBadgeComponent } from './following-badge.component';
+
 
 describe('FollowingBadgeComponent', () => {
   let component: FollowingBadgeComponent;
@@ -16,19 +18,21 @@ describe('FollowingBadgeComponent', () => {
 
   beforeEach(async () => {
 
-    service = jasmine.createSpyObj<FollowingService>('FollowingService', 
+    service = jasmine.createSpyObj<FollowingService>('FollowingService',
       ['findFollowing', 'follow', 'unfollow'], {
         onChange: new Subject()
       }
     );
 
     await TestBed.configureTestingModule({
-      declarations: [ FollowingBadgeComponent ],
+      declarations: [
+        FollowingBadgeComponent,
+        MockComponent(BadgeComponent)
+      ],
       imports: [RouterTestingModule],
       providers: [
         { provide: FollowingService, useValue: service },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     })
     .compileComponents();
   });
@@ -112,7 +116,7 @@ describe('FollowingBadgeComponent', () => {
     expect(component.isActive).toBeTrue();
   });
 
-  it('should follow when clicked and user is not following', fakeAsync(() => {
+  it('should follow when clicked and user is not following', () => {
 
     const { debugElement } = fixture;
 
@@ -130,15 +134,15 @@ describe('FollowingBadgeComponent', () => {
     fixture.detectChanges();
     expect(component.isActive).toBeFalse();
 
-    component.follow();
-    tick();
+    const badge = debugElement.query(By.css('utils-badge')).componentInstance;
+    badge.onAdd.emit();
     fixture.detectChanges();
 
     expect(service.follow).toHaveBeenCalled();
     expect(component.isActive).toBeTrue();
-  }));
+  });
 
-  it('should unfollow when clicked and user is following', fakeAsync(() => {
+  it('should unfollow when clicked and user is following', () => {
 
     const { debugElement } = fixture;
 
@@ -156,13 +160,13 @@ describe('FollowingBadgeComponent', () => {
     fixture.detectChanges();
     expect(component.isActive).toBeTrue();
 
-    component.unfollow();
-    tick();
+    const badge = debugElement.query(By.css('utils-badge')).componentInstance;
+    badge.onRemove.emit();
     fixture.detectChanges();
 
     expect(service.unfollow).toHaveBeenCalled();
     expect(component.isActive).toBeFalse();
-  }));
+  });
 
 });
 

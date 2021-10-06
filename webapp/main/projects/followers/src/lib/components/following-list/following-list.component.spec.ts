@@ -1,14 +1,14 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { FollowingService } from '../../services/following.service';
-
-import { FollowingListComponent } from './following-list.component';
-import { FollowsModel, FollowsListResponseModel } from '../../models/follows';
-import { FollowingListViewComponent } from '../following-list-view/following-list-view.component';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng-mocks';
 import { of, Subject, throwError } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { PagerComponent } from 'utils';
+import { FollowsListResponseModel } from '../../models/follows';
+import { FollowingService } from '../../services/following.service';
+import { FollowingListViewComponent } from '../following-list-view/following-list-view.component';
+import { FollowingListComponent, FollowingListEvent } from './following-list.component';
 
 describe('FollowingListComponent', () => {
   let component: FollowingListComponent;
@@ -25,12 +25,15 @@ describe('FollowingListComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [ FollowingListComponent, FollowingListViewComponent ],
+      declarations: [ 
+        FollowingListComponent, 
+        MockComponent(FollowingListViewComponent),
+        MockComponent(PagerComponent)
+      ],
       imports: [RouterTestingModule],
       providers: [
         { provide: FollowingService, useValue: service },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     })
     .compileComponents();
   });
@@ -124,6 +127,8 @@ describe('FollowingListComponent', () => {
 
   it('should go to page number selected by pager', () => {
 
+    const { debugElement } = fixture;
+
     const userId = "me";
     const followedById = "notme";
 
@@ -138,13 +143,14 @@ describe('FollowingListComponent', () => {
     fixture.detectChanges();
 
     service.following.withArgs("", "", { page: 1 }).and.returnValue(of(followerListResponse));
-    component.gotoPage(2);
+    const pager = debugElement.query(By.directive(PagerComponent)).componentInstance;
+    pager.onSelectPage.emit(2);
     fixture.detectChanges();
 
     expect(service.following).toHaveBeenCalled();
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should fire onEvent when clicked', () => {
 
     const userId = "me";
     const followedById = "notme";
@@ -165,16 +171,15 @@ describe('FollowingListComponent', () => {
     const { debugElement } = fixture;
     const view = debugElement.query(By.directive(FollowingListViewComponent)).componentInstance;
 
-    let firedEvent: FollowsModel|undefined = undefined;
-    component.onSelect = (evt: FollowsModel) => {
+    let firedEvent: FollowingListEvent|undefined = undefined;
+    component.onEvent.subscribe((evt: FollowingListEvent) => {
       firedEvent = evt;
-    };
-    view.onSelectItem.emit({ opcode: 'select', item: followerListResponse._embedded.follows[0] });
-    tick();
+    });
+    view.onEvent.emit({ opcode: 'select', item: followerListResponse._embedded.follows[0] });
     fixture.detectChanges();
 
     expect(firedEvent).toBeTruthy();
-    expect(firedEvent!).toEqual(followerListResponse._embedded.follows[0]);
-  }));
+    expect(firedEvent!.item).toEqual(followerListResponse._embedded.follows[0]);
+  });
 
 });

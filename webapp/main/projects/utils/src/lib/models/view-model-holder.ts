@@ -1,5 +1,11 @@
 import { PartialObserver } from "rxjs";
 
+export interface ExpectOptions<T> 
+{ 
+  nextObserver?: PartialObserver<T>;
+  deferReset?: boolean;
+};
+
 export class ViewModelHolder<T> {
 
   loading?: boolean = undefined;
@@ -24,14 +30,14 @@ export class ViewModelHolder<T> {
     this.err = e;
   }
 
-  public expectModel(opts? : { nextObserver?: PartialObserver<T> }): PartialObserver<T> 
+  public expectModel(opts? : ExpectOptions<T>): PartialObserver<T> 
   {
     this.loading = true;
     this.err = undefined;
     return {
       next: (result: T) => {
         this.Model = result;
-        this.loading = false;
+        this.loading = (opts?.deferReset === true) || false;
         opts?.nextObserver?.next?.(result);
         //console.log(this.Model);
       },
@@ -44,13 +50,13 @@ export class ViewModelHolder<T> {
     };
   }
 
-  public expectUndefined(opts? : { nextObserver?: PartialObserver<void> }): PartialObserver<void> {
+  public expectUndefined(opts? : ExpectOptions<void>): PartialObserver<void> {
     this.loading = true;
     this.err = undefined;
     return {
       next: () => {
         this.Model = undefined;
-        this.loading = false;
+        this.loading = (opts?.deferReset === true) || false;
         opts?.nextObserver?.next?.();
       },
       error: (err: Error) => {
@@ -61,12 +67,12 @@ export class ViewModelHolder<T> {
     };
   }
 
-  public expectNothing(opts? : { nextObserver?: PartialObserver<void> }): PartialObserver<void> {
+  public expectNothing(opts? : ExpectOptions<void>): PartialObserver<void> {
     this.loading = true;
     this.err = undefined;
     return {
       next: () => {
-        this.loading = false;
+        this.loading = (opts?.deferReset === true) || false;
         opts?.nextObserver?.next?.();
       },
       error: (err: Error) => {

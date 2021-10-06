@@ -22,14 +22,14 @@
     {{item.text}}
   </p>
   <h5>Posted under Topics:</h5>
-  <blog-topic-list-view [items]="topics"></blog-topic-list-view>
+  <topic-list-view [items]="topics"></topic-list-view>
   <hr class="my-4">
   <ng-container *ngIf="control.enableComments">
     <comment-editor [updateMode]="false" *authRequireLogin="'yes'"></comment-editor>
     <hr class="my-4">
     <h5>Comments:</h5>
     <div class="mb-3 col-sm-12">
-      <blog-comment-list [postId]="item.id"></blog-comment-list>
+      <comment-list [postId]="item.id"></comment-list>
     </div>
   </ng-container>
 </ng-template>

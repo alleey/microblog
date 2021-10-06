@@ -4,7 +4,6 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { CountersService } from './counters.service';
 import { CountersServiceConfigToken } from '../config/config';
 import { CounterStatisticsResponseModel } from '../models/counter-statistics';
-import { UtilsModule } from 'utils';
 import { CounterResponseModel } from '../models/counter';
 import { HttpErrorResponse } from '@angular/common/http';
 

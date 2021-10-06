@@ -28,11 +28,11 @@
 
       <div class="tab-content" id="tab1Content">
         <div class="tab-pane fade show active" id="topics" role="tabpanel" aria-labelledby="topics-tab">
-          <blog-topic-list [onSelect]="navigateToTopicPosts">
-          </blog-topic-list>
+          <topic-list (onEvent)="navigateToTopicPosts($event)">
+          </topic-list>
         </div>
         <div class="tab-pane fade" id="bookmarks" role="tabpanel" aria-labelledby="bookmarks-tab" *authRequireLogin="'yes'">
-          <bookmark-list [onSelect]="navigateBookmark">
+          <bookmark-list (onEvent)="navigateBookmark($event)">
           </bookmark-list>
         </div>
       </div>

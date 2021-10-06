@@ -20,7 +20,7 @@ describe('TopicListViewComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should fire onEvent when clicked', fakeAsync(() => {
 
     const models: TopicModel[] = [
       { 
@@ -35,7 +35,7 @@ describe('TopicListViewComponent', () => {
     let el = fixture.debugElement.query(By.css('[data-testid="select"]')).nativeElement;
     let firedEvent: TopicListViewEvent|undefined = undefined;
 
-    component.onSelectItem.subscribe({
+    component.onEvent.subscribe({
       next: (evt: TopicListViewEvent) => {
         firedEvent = evt;
       }

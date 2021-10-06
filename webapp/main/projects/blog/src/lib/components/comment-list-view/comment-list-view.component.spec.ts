@@ -1,9 +1,10 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UtilsModule } from 'utils';
-
-import { CommentListViewComponent, CommentListViewEvent } from './comment-list-view.component';
+import { MockPipe } from 'ng-mocks';
+import { PrettyDatePipe } from 'utils';
 import { CommentModel } from '../../models/comment';
+import { CommentListViewComponent, CommentListViewEvent } from './comment-list-view.component';
+
 
 describe('CommentListViewComponent', () => {
   let component: CommentListViewComponent;
@@ -11,8 +12,10 @@ describe('CommentListViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CommentListViewComponent ],
-      imports: [UtilsModule]
+      declarations: [ 
+        CommentListViewComponent,
+        MockPipe(PrettyDatePipe, value => value.toString()),
+      ]
     })
     .compileComponents();
   });
@@ -22,7 +25,7 @@ describe('CommentListViewComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should fire onEvent when clicked', fakeAsync(() => {
 
     const models: CommentModel[] = [
       { 
@@ -40,7 +43,7 @@ describe('CommentListViewComponent', () => {
     let el = fixture.debugElement.query(By.css('[data-testid="select"]')).nativeElement;
     let firedEvent: CommentListViewEvent|undefined = undefined;
 
-    component.onSelectItem.subscribe({
+    component.onEvent.subscribe({
       next: (evt: CommentListViewEvent) => {
         firedEvent = evt;
       }

@@ -11,16 +11,16 @@ export type BlogPostListViewEvent = ViewEvent<BlogPostModel>;
 })
 export class BlogPostListViewComponent implements OnInit {
 
-  @Input() items!: BlogPostModel[];
+  @Input() items?: BlogPostModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
-  @Output() onSelectItem = new EventEmitter<BlogPostListViewEvent>();
+  @Output() onEvent = new EventEmitter<BlogPostListViewEvent>();
 
   ngOnInit(): void {}
 
   selectItem(item: BlogPostModel, opcode: string): void {
-    this.onSelectItem.emit({
+    this.onEvent.emit({
       opcode: opcode,
       item: item
     });

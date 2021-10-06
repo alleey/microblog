@@ -20,18 +20,14 @@ export class BlogPostViewComponent implements OnInit {
   @Input() contentTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Output() onSelectItem = new EventEmitter<BlogPostViewEvent>();
+  @Output() onEvent = new EventEmitter<BlogPostViewEvent>();
 
   constructor() { }
 
   ngOnInit(): void { }
 
-  get postId(): number {
-    return this.item.id;
-  }
-
   selectItem(item: BlogPostModel, opcode: string): void {
-    this.onSelectItem.emit({
+    this.onEvent.emit({
       opcode: opcode,
       item: item
     });

@@ -15,13 +15,12 @@ export class BookmarkListViewComponent implements OnInit {
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
-  @Output() 
-  onSelectItem = new EventEmitter<BookmarkListViewEvent>();
+  @Output() onEvent = new EventEmitter<BookmarkListViewEvent>();
 
   ngOnInit(): void {}
     
   selectItem(item: BookmarkModel, opcode: string): void {
-    this.onSelectItem.emit({
+    this.onEvent.emit({
       opcode: opcode,
       item: item
     });

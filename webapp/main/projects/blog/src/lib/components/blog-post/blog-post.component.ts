@@ -1,10 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ViewModelHolder } from 'utils';
 import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
-import { TopicModel } from '../../models/topic';
 import { PostsService } from '../../services/posts.service';
 import { BlogPostViewEvent } from '../blog-post-view/blog-post-view.component';
+
+export type BlogPostEvent = BlogPostViewEvent;
 
 @Component({
   selector: 'blog-post',
@@ -18,6 +19,8 @@ export class BlogPostComponent implements OnInit {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() contentTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
+
+  @Output() onEvent = new EventEmitter<BlogPostEvent>();
 
   postId?: number;
   postSlug?: string;
@@ -43,7 +46,7 @@ export class BlogPostComponent implements OnInit {
     this.postId = postId;
     this.postSlug = postSlug;
     this.service
-      .one("posts", this.postId)
+      .one("", this.postId)
       .subscribe(this.viewModel.expectModel({
         nextObserver: {
           next: (i: BlogPostResponseModel) => this.update(i)
@@ -66,6 +69,7 @@ export class BlogPostComponent implements OnInit {
       case 'edit': this.editPost(evt.item); break;
       case 'delete': this.deletePost(evt.item); break;
     }
+    this.onEvent.emit(evt);
   }
 
   editPost(post: BlogPostModel): void {

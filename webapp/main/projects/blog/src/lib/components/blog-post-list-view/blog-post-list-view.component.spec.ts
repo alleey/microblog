@@ -1,10 +1,10 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { UtilsModule } from 'projects/utils/src/public-api';
-
-import { BlogPostListViewComponent, BlogPostListViewEvent } from './blog-post-list-view.component';
+import { MockComponent, MockPipe } from 'ng-mocks';
+import { PrettyDatePipe } from 'utils';
 import { BlogPostModel } from '../../models/blog-post';
+import { BlogPostListViewComponent, BlogPostListViewEvent } from './blog-post-list-view.component';
+import { TopicListViewComponent } from '../topic-list-view/topic-list-view.component';
 
 describe('BlogPostListViewComponent', () => {
   let component: BlogPostListViewComponent;
@@ -12,8 +12,11 @@ describe('BlogPostListViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BlogPostListViewComponent ],
-      imports: [UtilsModule]
+      declarations: [ 
+        BlogPostListViewComponent,
+        MockComponent(TopicListViewComponent),
+        MockPipe(PrettyDatePipe, value => value.toString()),
+      ],
     })
     .compileComponents();
   });
@@ -23,7 +26,7 @@ describe('BlogPostListViewComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should fire onEvent when clicked', fakeAsync(() => {
 
     const models: BlogPostModel[] = [
       { 
@@ -44,7 +47,7 @@ describe('BlogPostListViewComponent', () => {
     let el = fixture.debugElement.query(By.css('[data-testid="select"]')).nativeElement;
     let firedEvent: BlogPostListViewEvent|undefined = undefined;
 
-    component.onSelectItem.subscribe({
+    component.onEvent.subscribe({
       next: (evt: BlogPostListViewEvent) => {
         firedEvent = evt;
       }

@@ -14,7 +14,7 @@ export class UserProfileBadgeViewComponent implements OnInit {
   @Input() userProfile!: UserProfileModel;
   @Input() contentTemplate: TemplateRef<any> | undefined;
 
-  @Output() onSelectItem = new EventEmitter<UserProfileBadgeViewEvent>();
+  @Output() onEvent = new EventEmitter<UserProfileBadgeViewEvent>();
 
   constructor() { }
 
@@ -25,7 +25,7 @@ export class UserProfileBadgeViewComponent implements OnInit {
   }
 
   selectItem(item: UserProfileModel, opcode: string): void {
-    this.onSelectItem.emit({
+    this.onEvent.emit({
       opcode: opcode,
       item: item
     });

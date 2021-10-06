@@ -1,10 +1,12 @@
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { FollowingService } from '../../services/following.service';
 import { FollowsListResponseModel, FollowsModel } from '../../models/follows';
 import { FollowerListViewEvent } from '../follower-list-view/follower-list-view.component';
+
+export type FollowerListEvent = FollowerListViewEvent;
 
 @Component({
   selector: 'follower-list',
@@ -18,7 +20,7 @@ export class FollowersListComponent implements OnInit {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input() onSelect: (topic: FollowsModel) => void = (item) => {};
+  @Output() onEvent = new EventEmitter<FollowerListEvent>();
         
   pageable: Pageable; 
   viewModel = new ViewModelHolder<FollowsListResponseModel>();
@@ -68,9 +70,7 @@ export class FollowersListComponent implements OnInit {
   }
 
   handleListViewEvent(evt: FollowerListViewEvent) {
-    switch(evt.opcode) {
-      case 'select': this.onSelect(evt.item); break;
-    }
+    this.onEvent.emit(evt);
   }
 
   gotoPage(evt:any): void {

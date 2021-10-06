@@ -1,13 +1,15 @@
-import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Pageable, PageModel } from 'utils';
-import { TopicModel, TopicListResponseModel } from '../../models/topic';
+import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { TopicListResponseModel, TopicModel } from '../../models/topic';
 import { TopicsService } from '../../services/topics.service';
 import { TopicListViewEvent } from '../topic-list-view/topic-list-view.component';
 
+export type TopicListEvent = TopicListViewEvent;
+
 @Component({
-  selector: 'blog-topic-list',
+  selector: 'topic-list',
   templateUrl: './topic-list.component.html',
   styleUrls: ['./topic-list.component.scss']
 })
@@ -21,23 +23,18 @@ export class TopicListComponent implements OnInit, OnDestroy {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input() onSelect: (topic: TopicModel) => void = (item) => {};
-      
+  @Output() onEvent = new EventEmitter<TopicListEvent>();
+
+  currentFilter: string = "";
   pageable: Pageable;
-  response : TopicListResponseModel|null;
-  errorDesc: any = "";
-  loading: boolean = false;
-
-  filter: string = "";
-
+  viewModel = new ViewModelHolder<TopicListResponseModel>();
   subscription: Subscription = new Subscription();
-
 
   constructor(
     private topicsService: TopicsService, 
     private activatedRoute: ActivatedRoute) 
   { 
-    this.response = null;
+    this.currentFilter = this.filterText;
     this.pageable = {
       page: 0
     };
@@ -58,18 +55,6 @@ export class TopicListComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  responseHandler = {
-    next: (result: TopicListResponseModel) => {
-      this.response = result;
-      this.loading = false;
-    },
-    error: (err: any) => {
-      this.errorDesc = err.message;
-      this.loading = false;
-      console.log(this.errorDesc);
-    }
-  }
-
   onApplyFilter(text: string): void {
     this.filterText = text;
     this.fetchPage(0);
@@ -78,21 +63,23 @@ export class TopicListComponent implements OnInit, OnDestroy {
   fetchPage(pageNum: number): void {
     this.pageable.page = pageNum;
     if(!!this.filterText) {
-      this.topicsService.findMatchingCaption("", this.filterText, this.pageable).subscribe(this.responseHandler);
+      this.topicsService
+        .findMatchingCaption("", this.filterText, this.pageable)
+        .subscribe(this.viewModel.expectModel());
     }
     else {
-      this.topicsService.all("", this.pageable).subscribe(this.responseHandler);
+      this.topicsService
+        .all("", this.pageable)
+        .subscribe(this.viewModel.expectModel());
     }
   }
 
-  get items(): TopicModel[] {
-    if(!this.response?._embedded.topics)
-      return [];
-    return this.response?._embedded.topics;
+  get items(): TopicModel[]|undefined {
+    return this.viewModel.Model?._embedded.topics;
   }
 
   get page(): PageModel|undefined {
-    return this.response?.page;
+    return this.viewModel.Model?.page;
   }
 
   get hasItems(): boolean {
@@ -100,9 +87,7 @@ export class TopicListComponent implements OnInit, OnDestroy {
   }
 
   handleListViewEvent(evt: TopicListViewEvent) {
-    switch(evt.opcode) {
-      case 'select': this.onSelect(evt.item); break;
-    }
+    this.onEvent.emit(evt);
   }
 
   gotoPage(evt: any): void {

@@ -1,7 +1,7 @@
 <utils-loader *ngIf="viewModel.isLoading; else contents"></utils-loader>
 
 <ng-template #contents>
-    <utils-alert *ngIf="viewModel.hasError; else viewer" [dismissable]="false" [minimal]="false">
+    <utils-alert *ngIf="viewModel.isFailure; else viewer" [dismissable]="false" [minimal]="false">
         <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
@@ -10,6 +10,6 @@
     <user-profile-badge-view
         [userProfile]="userProfileItem" 
         [contentTemplate]="contentTemplate"
-        (onSelectItem)="handleViewEvent($event)">
+        (onEvent)="handleViewEvent($event)">
     </user-profile-badge-view>
 </ng-template>

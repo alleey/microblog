@@ -1,14 +1,15 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { of, Subject, throwError } from 'rxjs';
-
-import { BookmarksService } from '../../services/bookmarks.service';
-import { BookmarkListComponent } from './bookmark-list.component';
-import { BookmarkListViewComponent } from '../bookmark-list-view/bookmark-list-view.component';
-import { BookmarkListResponseModel, BookmarkModel } from '../../models/bookmark';
-import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { By } from '@angular/platform-browser';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng-mocks';
+import { of, Subject, throwError } from 'rxjs';
+import { PagerComponent, SearchBoxComponent } from 'utils';
+import { BookmarkListResponseModel } from '../../models/bookmark';
+import { BookmarksService } from '../../services/bookmarks.service';
+import { BookmarkListViewComponent } from '../bookmark-list-view/bookmark-list-view.component';
+import { BookmarkListComponent, BookmarkListEvent } from './bookmark-list.component';
+
 
 describe('BookmarkListComponent', () => {
   let component: BookmarkListComponent;
@@ -25,12 +26,16 @@ describe('BookmarkListComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [ BookmarkListComponent, BookmarkListViewComponent ],
+      declarations: [
+        BookmarkListComponent,
+        MockComponent(BookmarkListViewComponent),
+        MockComponent(PagerComponent),
+        MockComponent(SearchBoxComponent)
+      ],
       imports: [RouterTestingModule],
       providers: [
         { provide: BookmarksService, useValue: service },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     })
     .compileComponents();
   });
@@ -46,7 +51,7 @@ describe('BookmarkListComponent', () => {
     const pageable = { page: 0 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -79,7 +84,7 @@ describe('BookmarkListComponent', () => {
     const pageable = { page: 0 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -97,10 +102,12 @@ describe('BookmarkListComponent', () => {
 
   it('should requery when filter is applied from search box', () => {
 
+    const { debugElement } = fixture;
+
     const pageable = { page: 0 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -108,15 +115,16 @@ describe('BookmarkListComponent', () => {
     };
 
     service.all.withArgs("", pageable).and.returnValue(of(bookmarksResponse));
-    service.findMatchingCaption.withArgs("", "localhost", pageable).and.returnValue(of(bookmarksResponse));
-
+    service.findMatchingCaption.withArgs("", "findthis", pageable).and.returnValue(of(bookmarksResponse));
     fixture.detectChanges();
-    component.onApplyFilter("localhost");
+
+    const search = debugElement.query(By.directive(SearchBoxComponent)).componentInstance;
+    search.onApplyFilter.emit("findthis");
     fixture.detectChanges();
 
     expect(component.hasItems).toBeTrue();
     expect(component.page?.number).toEqual(0);
-    expect(component.items).toEqual(bookmarksResponse._embedded.bookmarks); 
+    expect(component.items).toEqual(bookmarksResponse._embedded.bookmarks);
   });
 
   it('should refresh when service onChange is triggered', () => {
@@ -124,7 +132,7 @@ describe('BookmarkListComponent', () => {
     const pageable = { page: 0 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -145,7 +153,7 @@ describe('BookmarkListComponent', () => {
     const pageable = { page: 1 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -164,12 +172,11 @@ describe('BookmarkListComponent', () => {
 
   it('should go to page number selected by pager', () => {
 
-    const userId = "me";
-    const followedById = "notme";
+    const { debugElement } = fixture;
 
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -180,18 +187,20 @@ describe('BookmarkListComponent', () => {
     fixture.detectChanges();
 
     service.all.withArgs("", { page: 1 }).and.returnValue(of(bookmarksResponse));
-    component.gotoPage(2);
+
+    const pager = debugElement.query(By.directive(PagerComponent)).componentInstance;
+    pager.onSelectPage.emit(2);
     fixture.detectChanges();
 
     expect(service.all).toHaveBeenCalled();
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should fire onEvent when clicked', fakeAsync(() => {
 
-    const pageable = { page: 0 };   
+    const pageable = { page: 0 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -204,25 +213,25 @@ describe('BookmarkListComponent', () => {
     const { debugElement } = fixture;
     const view = debugElement.query(By.directive(BookmarkListViewComponent)).componentInstance;
 
-    let firedEvent: BookmarkModel|undefined = undefined;
-    component.onSelect = (evt: BookmarkModel) => {
+    let firedEvent: BookmarkListEvent|undefined = undefined;
+    component.onEvent.subscribe((evt: BookmarkListEvent) => {
       firedEvent = evt;
-    };
-    view.onSelectItem.emit({ opcode: 'select', item: bookmarksResponse._embedded.bookmarks[0] });
+    });
+    view.onEvent.emit({ opcode: 'select', item: bookmarksResponse._embedded.bookmarks[0] });
     tick();
     fixture.detectChanges();
 
     expect(firedEvent).toBeTruthy();
-    expect(firedEvent!).toEqual(bookmarksResponse._embedded.bookmarks[0]);
+    expect(firedEvent!.item).toEqual(bookmarksResponse._embedded.bookmarks[0]);
   }));
 
 
-  it('should delete bookmark when clicked', fakeAsync(() => {
+  it('should delete bookmark when delete clicked', fakeAsync(() => {
 
-    const pageable = { page: 0 };   
+    const pageable = { page: 0 };
     const bookmarksResponse: BookmarkListResponseModel = {
       _embedded: {
-        bookmarks: [ 
+        bookmarks: [
           { id: 1,  caption: "localhost",  url: "http://localhost",  createdOn: new Date(),  lastAccessedOn: new Date() }
          ]
       },
@@ -230,12 +239,13 @@ describe('BookmarkListComponent', () => {
     };
 
     service.all.withArgs("", pageable).and.returnValue(of(bookmarksResponse));
+    service.delete.withArgs("", bookmarksResponse._embedded.bookmarks[0].id).and.returnValue(of());
     fixture.detectChanges();
 
     const { debugElement } = fixture;
     const view = debugElement.query(By.directive(BookmarkListViewComponent)).componentInstance;
 
-    view.onSelectItem.emit({ opcode: 'delete', item: bookmarksResponse._embedded.bookmarks[0] });
+    view.onEvent.emit({ opcode: 'delete', item: bookmarksResponse._embedded.bookmarks[0] });
     tick();
     fixture.detectChanges();
 

@@ -1,9 +1,11 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { MockComponent } from 'ng-mocks';
 import { of, Subject, throwError } from 'rxjs';
-
+import { BadgeComponent } from 'utils';
 import { BookmarksService } from '../../services/bookmarks.service';
 import { BookmarkBadgeComponent } from './bookmark-badge.component';
+
 
 describe('BookmarkBadgeComponent', () => {
   let component: BookmarkBadgeComponent;
@@ -19,7 +21,10 @@ describe('BookmarkBadgeComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      declarations: [ BookmarkBadgeComponent ],
+      declarations: [ 
+        BookmarkBadgeComponent,
+        MockComponent(BadgeComponent)
+      ],
       providers: [
         { provide: BookmarksService, useValue: service },
       ]
@@ -81,7 +86,7 @@ describe('BookmarkBadgeComponent', () => {
     expect(service.findByUrl).toHaveBeenCalledTimes(2);
   });
 
-  it('should create bookmark', fakeAsync(() => {
+  it('should create bookmark', () => {
 
     const { debugElement } = fixture;
     const bookmark = { id: 1, caption: "localhost", url: "http://localhost", createdOn: new Date(), lastAccessedOn: new Date() };
@@ -94,15 +99,15 @@ describe('BookmarkBadgeComponent', () => {
 
     fixture.detectChanges();
 
-    component.createBookmark();
-    tick();
+    const badge = debugElement.query(By.css('utils-badge')).componentInstance;
+    badge.onAdd.emit();
     fixture.detectChanges();
 
     expect(service.create).toHaveBeenCalled();
     expect(component.isActive).toBeTrue();
-  }));
+  });
 
-  it('should delete', fakeAsync(() => {
+  it('should delete', () => {
 
     const { debugElement } = fixture;
     const bookmark = { id: 1, caption: "localhost", url: "http://localhost", createdOn: new Date(), lastAccessedOn: new Date() };
@@ -115,12 +120,12 @@ describe('BookmarkBadgeComponent', () => {
 
     fixture.detectChanges();
 
-    component.deleteBookmark();
-    tick();
+    const badge = debugElement.query(By.css('utils-badge')).componentInstance;
+    badge.onRemove.emit();
     fixture.detectChanges();
 
     expect(service.delete).toHaveBeenCalled();
     expect(component.isActive).toBeFalse();
-  }));
+  });
 
 });

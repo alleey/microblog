@@ -1,10 +1,12 @@
-import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BlogPostModel, BlogPostListResponseModel } from '../../models/blog-post';
-import { PostsService } from '../../services/posts.service';
-import { Pageable, PageModel } from 'utils';
-import { BlogPostListViewEvent } from '../blog-post-list-view/blog-post-list-view.component';
 import { Subscription } from 'rxjs';
+import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { BlogPostListResponseModel, BlogPostModel } from '../../models/blog-post';
+import { PostsService } from '../../services/posts.service';
+import { BlogPostListViewEvent } from '../blog-post-list-view/blog-post-list-view.component';
+
+export type BlogPostListEvent = BlogPostListViewEvent;
 
 @Component({
   selector: 'blog-post-list',
@@ -18,14 +20,12 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input() onSelect: (post: BlogPostModel) => void = (item) => {};
+  @Output() onEvent = new EventEmitter<BlogPostListEvent>();
 
   state: any;
 
   pageable: Pageable;
-  response : BlogPostListResponseModel|null;
-  errorDesc: any = "";
-  loading: boolean = false;
+  viewModel = new ViewModelHolder<BlogPostListResponseModel>();
 
   subscription: Subscription = new Subscription();
 
@@ -35,7 +35,6 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute) 
   { 
     this.state = this.router.getCurrentNavigation()?.extras.state;
-    this.response = null;
     this.pageable = {
       page: 0
     };
@@ -60,37 +59,24 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
     //const routeParams = this.route.snapshot.paramMap;
     //this.organizationId = routeParams.get('orgId') as string;  
     this.pageable.page = pageNum;
-    this.loading = true;
-    this.postService.all(this.state?.endpoint, this.pageable)
-      .subscribe(
-      {
-        next: (result: BlogPostListResponseModel) => {
-          this.response = result;
-          this.loading = false;
-        },
-        error: (err: any) => {
-          this.errorDesc = err.message;
-          this.loading = false;
-          console.log(this.errorDesc);
-        }
-      }
-    );
+    this.postService.all(this.state?.endpoint ?? "", this.pageable)
+      .subscribe(this.viewModel.expectModel());
   }
 
-  get items(): BlogPostModel[] {
-    if(!this.response?._embedded.posts)
-      return [];
-    return this.response?._embedded.posts;
+  get items(): BlogPostModel[]|undefined {
+    return this.viewModel.Model?._embedded.posts;
   }
 
   get page(): PageModel|undefined {
-    return this.response?.page;
+    return this.viewModel.Model?.page;
+  }
+
+  get hasItems(): boolean {
+    return !!(this.page?.totalElements);
   }
 
   handleListViewEvent(evt: BlogPostListViewEvent) {
-    switch(evt.opcode) {
-      case 'select': this.onSelect(evt.item); break;
-    }
+    this.onEvent.emit(evt);
   }
 
   gotoPage(evt:any): void {

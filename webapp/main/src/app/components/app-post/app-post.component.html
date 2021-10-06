@@ -42,15 +42,15 @@
     </p>
 
     <h5>Posted under Topics:</h5>
-    <blog-topic-list-view [items]="item.topics"></blog-topic-list-view>
+    <topic-list-view [items]="item.topics"></topic-list-view>
 
     <div *ngIf="control.enableComments" class="mt-3">
         <comment-editor [updateMode]="false" *authRequireLogin="'yes'"></comment-editor>
         <hr class="my-4">
         <h5>Comments:</h5>
         <div class="mb-3 col-sm-12">
-            <blog-comment-list [postId]="item.id" [itemTemplate]="commentContents">
-            </blog-comment-list>
+            <comment-list [postId]="item.id" [itemTemplate]="commentContents">
+            </comment-list>
         </div>
     </div>
 </ng-template>

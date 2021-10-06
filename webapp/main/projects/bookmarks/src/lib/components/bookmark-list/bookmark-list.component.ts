@@ -1,10 +1,12 @@
-import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { BookmarkModel, BookmarkListResponseModel } from '../../models/bookmark';
-import { BookmarksService } from '../../services/bookmarks.service';
 import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { BookmarkListResponseModel, BookmarkModel } from '../../models/bookmark';
+import { BookmarksService } from '../../services/bookmarks.service';
 import { BookmarkListViewEvent } from '../bookmark-list-view/bookmark-list-view.component';
+
+export type BookmarkListEvent = BookmarkListViewEvent;
 
 @Component({
   selector: 'bookmark-list',
@@ -21,8 +23,8 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
 
-  @Input() onSelect: (topic: BookmarkModel) => void = (item) => {};
-        
+  @Output() onEvent = new EventEmitter<BookmarkListEvent>();
+
   pageable: Pageable; 
   viewModel = new ViewModelHolder<BookmarkListResponseModel>();
   subscription: Subscription = new Subscription();
@@ -86,9 +88,9 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
 
   handleListViewEvent(evt: BookmarkListViewEvent) {
     switch(evt.opcode) {
-      case 'select': this.onSelect(evt.item); break;
       case 'delete': this.deleteBookmark(evt.item); break;
     }
+    this.onEvent.emit(evt);
   }
 
   deleteBookmark(bookmark: BookmarkModel): void {

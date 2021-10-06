@@ -1,9 +1,11 @@
-import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, tick } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng-mocks';
 import { of, Subject } from 'rxjs';
+import { AlertComponent, LoaderComponent } from 'utils';
 import { CommentsServiceConfigToken } from '../../config/config';
 import { CommentResponseModel } from '../../models/comment';
 import { CommentsService } from '../../services/comments.service';
@@ -14,6 +16,7 @@ describe('CommentEditorComponent', () => {
   let fixture: ComponentFixture<CommentEditorComponent>;
   let service: jasmine.SpyObj<CommentsService>;
   let route: ActivatedRoute;
+  let location: Location;
 
   beforeEach(async () => {
     service = jasmine.createSpyObj<CommentsService>('CommentsService',
@@ -21,15 +24,20 @@ describe('CommentEditorComponent', () => {
         onChange: new Subject()
       }
     );
+    const locationStub = { back: jasmine.createSpy('back') };
 
     await TestBed.configureTestingModule({
-      declarations: [ CommentEditorComponent ],
-      imports: [RouterTestingModule],
+      declarations: [ 
+        CommentEditorComponent,
+        MockComponent(AlertComponent),
+        MockComponent(LoaderComponent),
+      ],
+      imports: [RouterTestingModule, FormsModule, ReactiveFormsModule],
       providers: [
         { provide: CommentsService, useValue: service },
-        { provide: CommentsServiceConfigToken, useValue: { serviceBaseUrl: "http://localhost", defaultEndpoint: "blog", pageSize: 10 } }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+        { provide: CommentsServiceConfigToken, useValue: { serviceBaseUrl: "http://localhost", defaultEndpoint: "blog", pageSize: 10 } },
+        { provide: Location, useValue: locationStub }
+      ]
     })
     .compileComponents();
   });
@@ -38,6 +46,7 @@ describe('CommentEditorComponent', () => {
     fixture = TestBed.createComponent(CommentEditorComponent);
     component = fixture.componentInstance;
     route = TestBed.inject(ActivatedRoute);
+    location = TestBed.inject(Location);
   });
 
   const postId = 1;
@@ -89,13 +98,14 @@ describe('CommentEditorComponent', () => {
       of(convertToParamMap({ postId: 1, commentId: 1 }))
     );
     
+    service.one.withArgs("", postId, comment.id).and.returnValue(of(comment));
     fixture.detectChanges();
 
     expect(component.postId).toEqual(1);
     expect(component.commentId).toEqual(1);
   });
 
-  it('should create comment', fakeAsync(() => {
+  it('should create comment', () => {
 
     const { debugElement } =  fixture;
 
@@ -109,14 +119,13 @@ describe('CommentEditorComponent', () => {
     const createButton = debugElement.query(By.css("[data-testid='create']"));
 
     createButton.triggerEventHandler('click', {});
-    tick();
     fixture.detectChanges();
 
     expect(component.form.valid).toBeTrue();
     expect(service.create).toHaveBeenCalled();
-  }));
+  });
 
-  it('should create comment', fakeAsync(() => {
+  it('should update comment', () => {
 
     const { debugElement } =  fixture;
 
@@ -130,11 +139,10 @@ describe('CommentEditorComponent', () => {
     const createButton = debugElement.query(By.css("[data-testid='update']"));
 
     createButton.triggerEventHandler('click', {});
-    tick();
     fixture.detectChanges();
 
     expect(component.form.valid).toBeTrue();
     expect(service.update).toHaveBeenCalled();
-  }));
+  });
 
 });

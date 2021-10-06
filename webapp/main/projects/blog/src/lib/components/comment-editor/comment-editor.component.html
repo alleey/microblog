@@ -15,7 +15,7 @@
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
-    <utils-alert data-testid="editorSuccess" *ngIf="successDesc" [dismissable]="false" [minimal]="false">
+    <utils-alert data-testid="editorSuccess" *ngIf="viewModel.isSuccess" [dismissable]="false" [minimal]="false">
         <p>{{ successDesc }}</p>
     </utils-alert>
     <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure; else editor" [dismissable]="false" [minimal]="false">

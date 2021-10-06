@@ -33,7 +33,6 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig,
     private service: CommentsService, 
-    private location: Location,
     private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
@@ -66,7 +65,9 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
     if(this.isUpdateMode) {
       this.commentId = item.id;
       this.text!.setValue (item.text);
-    } else {
+    } 
+    else 
+    {
     }
   }
 
@@ -97,9 +98,5 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
       .update("", this.postId!, this.commentId!, this.text?.value)
       .pipe(takeUntil(this.destory$))
       .subscribe(this.viewModel.expectNothing());
-  }
-
-  cancel(): void {
-    this.location.back();
   }
 }

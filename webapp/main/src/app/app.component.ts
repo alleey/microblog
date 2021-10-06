@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { OidcAuthService } from 'auth-oidc';
-import { TopicModel } from 'projects/blog/src/public-api';
-import { BookmarkModel } from 'projects/bookmarks/src/public-api';
+import { TopicListEvent } from 'blog';
+import { BookmarkListEvent } from 'bookmarks';
 
 @Component({
   selector: 'app-root',
@@ -31,12 +31,14 @@ export class AppComponent {
     });
   }
 
-  navigateBookmark(bookmark: BookmarkModel): void {
+  navigateBookmark(evt: BookmarkListEvent): void {
+    const bookmark = evt.item;
     console.info(`Navigate to ${bookmark.url}`)
     window.location.href = bookmark.url;
   }
 
-  navigateToTopicPosts(topic: TopicModel): void {
+  navigateToTopicPosts(evt: TopicListEvent): void {
+    const topic = evt.item;
     this.router.navigate(['/topics', topic.id, "posts"], 
     { 
       state: { "endpoint": `topics/${topic.id}/posts` }

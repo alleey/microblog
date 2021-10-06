@@ -20,7 +20,7 @@ describe('FollowersListViewComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should fire onSelect when clicked', fakeAsync(() => {
+  it('should fire onEvent when clicked', fakeAsync(() => {
 
     const userId = "me";
     const followedById = "notme";
@@ -34,7 +34,7 @@ describe('FollowersListViewComponent', () => {
     let el = fixture.debugElement.query(By.css('[data-testid="select"]')).nativeElement;
     let firedEvent: FollowerListViewEvent|undefined = undefined;
 
-    component.onSelectItem.subscribe({
+    component.onEvent.subscribe({
       next: (evt: FollowerListViewEvent) => {
         firedEvent = evt;
       }

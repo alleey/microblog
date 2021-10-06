@@ -15,7 +15,7 @@
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
-    <utils-alert *ngIf="viewModel.isFailure; else editor" [dismissable]="false" [minimal]="false">
+    <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure; else editor" [dismissable]="false" [minimal]="false">
         <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
@@ -28,20 +28,20 @@
                     formControlName="caption" required>
 
                 <div *ngIf="caption?.invalid && (caption?.dirty || caption?.touched)">
-                    <utils-alert *ngIf="caption?.errors?.required" [dismissable]="false" [minimal]="true">
+                    <utils-alert data-testid="requiredError" *ngIf="caption?.errors?.required" [dismissable]="false" [minimal]="true">
                         Name is required.
                     </utils-alert>
-                    <utils-alert *ngIf="caption?.errors?.topicExists" [dismissable]="false" [minimal]="true">
+                    <utils-alert data-testid="topicExistsError" *ngIf="caption?.errors?.topicExists" [dismissable]="false" [minimal]="true">
                         Topic name is already taken!
                     </utils-alert>
                 </div>
 
             </div>
             <div class="mb-3 col-sm-3" *ngIf="!isUpdateMode">
-                <input class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Create" (click)="createNewTopic()">
+                <input data-testid="create" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Create" (click)="createNewTopic()">
             </div>
             <div class="mb-3 col-sm-3" *ngIf="isUpdateMode">
-                <input class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updateTopic()">
+                <input data-testid="update" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updateTopic()">
             </div>
         </div>
     </form>

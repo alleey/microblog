@@ -1,12 +1,13 @@
-import { NO_ERRORS_SCHEMA } from '@angular/compiler';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, Subject, throwError } from 'rxjs';
-
-import { FollowingService } from '../../services/following.service';
-import { FollowerBadgeComponent } from './follower-badge.component';
-import { FollowsResponseModel } from '../../models/follows';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MockComponent } from 'ng-mocks';
+import { of, Subject, throwError } from 'rxjs';
+import { BadgeComponent } from 'utils';
+import { FollowsResponseModel } from '../../models/follows';
+import { FollowingService } from '../../services/following.service';
+import { FollowerBadgeComponent } from './follower-badge.component';
+
 
 describe('FollowerBadgeComponent', () => {
   let component: FollowerBadgeComponent;
@@ -16,19 +17,21 @@ describe('FollowerBadgeComponent', () => {
 
   beforeEach(async () => {
 
-    service = jasmine.createSpyObj<FollowingService>('FollowingService', 
+    service = jasmine.createSpyObj<FollowingService>('FollowingService',
       ['findFollower'], {
         onChange: new Subject()
       }
     );
 
     await TestBed.configureTestingModule({
-      declarations: [ FollowerBadgeComponent ],
+      declarations: [
+        FollowerBadgeComponent,
+        MockComponent(BadgeComponent)
+      ],
       imports: [RouterTestingModule],
       providers: [
         { provide: FollowingService, useValue: service },
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      ]
     })
     .compileComponents();
   });
@@ -100,7 +103,7 @@ describe('FollowerBadgeComponent', () => {
       userId: userId,
       followedById: followedById
     };
-  
+
     service.findFollower.withArgs("", "", followedById).and.returnValue(of(followsResponse));
     component.paramUserId = followedById;
     fixture.detectChanges();
@@ -110,5 +113,5 @@ describe('FollowerBadgeComponent', () => {
 
     expect(service.findFollower).toHaveBeenCalledTimes(2);
   });
-  
+
 });

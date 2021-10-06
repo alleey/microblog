@@ -15,13 +15,12 @@ export class FollowingListViewComponent implements OnInit {
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
-  @Output() 
-  onSelectItem = new EventEmitter<FollowingListViewEvent>();
+  @Output() onEvent = new EventEmitter<FollowingListViewEvent>();
 
   ngOnInit(): void {}
     
   selectItem(item: FollowsModel, opcode: string): void {
-    this.onSelectItem.emit({
+    this.onEvent.emit({
       opcode: opcode,
       item: item
     });

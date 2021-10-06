@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { TopicModel } from '../../models/topic';
+import { TopicListEvent } from '../topic-list/topic-list.component';
 
 @Component({
   selector: 'topic-selector',
@@ -8,12 +9,10 @@ import { TopicModel } from '../../models/topic';
 })
 export class TopicSelectorComponent implements OnInit {
 
-  @Input()
-  maxTopics: number = 10;
-  maxTopicsError: boolean = false;
+  @Input() maxTopics: number = 10;
+  @Input() initialTopics: TopicModel[] = [];
 
-  @Input()
-  initialTopics: TopicModel[] = [];
+  maxTopicsError: boolean = false;
   selectedTopics: TopicModel[] = [];
 
   @Input() itemTemplate: TemplateRef<any> | undefined;
@@ -24,14 +23,6 @@ export class TopicSelectorComponent implements OnInit {
   ngOnInit(): void {
     this.selectedTopics = this.initialTopics;
   }
-
-  topicClicked: (topic: TopicModel) => void = 
-    (item) => {
-      if(this.isTopicSelected(item))
-        this.unselectTopic(item);
-      else
-        this.selectTopic(item);
-    }
 
   isTopicSelected(topic: TopicModel): boolean {
     return this.selectedTopics.findIndex(i => i.caption.toUpperCase() === topic.caption.toUpperCase()) > -1;
@@ -54,4 +45,12 @@ export class TopicSelectorComponent implements OnInit {
     this.selectedTopics = this.selectedTopics.filter(i => i.caption.toUpperCase() !== topic.caption.toUpperCase());
     this.maxTopicsError = (!!this.maxTopics && this.selectedTopics.length >= this.maxTopics);
   }
+
+  topicClicked: (evt: TopicListEvent) => void = 
+    (evt) => {
+      if(this.isTopicSelected(evt.item))
+        this.unselectTopic(evt.item);
+      else
+        this.selectTopic(evt.item);
+    }
 }

@@ -1,15 +1,15 @@
-<div *ngIf="loading; else contents">
+<div *ngIf="viewModel.isLoading; else contents">
     <utils-loader></utils-loader>
 </div>
 
 <ng-template #contents>
-    <utils-alert *ngIf="errorDesc;else itemsList" [dismissable]="true">
+    <utils-alert *ngIf="viewModel.isFailure;else itemsList" [dismissable]="true">
         <p>
             The specified request could not be completed!
         </p>
         <hr>
         <p class="mb-0">Error Details: </p>
-        <p>{{ errorDesc }}</p>
+        <p>{{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 
@@ -24,7 +24,9 @@
     <comment-list-view
         [items]="items"
         [itemTemplate]="itemTemplate"
-        [noContentsTemplate]="noContentsTemplate">
+        [noContentsTemplate]="noContentsTemplate"
+        (onEvent)="handleListViewEvent($event)">
+        >
     </comment-list-view>
     <utils-pager [page]="page" (onSelectPage)="gotoPage($event)"></utils-pager>
 

@@ -11,16 +11,16 @@ export type CommentListViewEvent = ViewEvent<CommentModel>;
 })
 export class CommentListViewComponent implements OnInit {
 
-  @Input() items!: CommentModel[];
+  @Input() items?: CommentModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
-  @Output() onSelectItem = new EventEmitter<CommentListViewEvent>();
+  @Output() onEvent = new EventEmitter<CommentListViewEvent>();
 
   ngOnInit(): void {}
 
   selectItem(item: CommentModel, opcode: string): void {
-    this.onSelectItem.emit({
+    this.onEvent.emit({
       opcode: opcode,
       item: item
     });

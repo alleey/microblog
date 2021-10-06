@@ -1,31 +1,28 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-
-import { BlogPostViewComponent, BlogPostViewEvent } from './blog-post-view.component';
+import { RequireOwnerDirective } from 'auth-oidc';
+import { MockBuilder, MockRender, ngMocks } from 'ng-mocks';
+import { PrettyDatePipe } from 'utils';
 import { BlogPostModel } from '../../models/blog-post';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { UtilsModule } from 'utils';
+import { CommentEditorComponent } from '../comment-editor/comment-editor.component';
+import { CommentListComponent } from '../comment-list/comment-list.component';
+import { TopicListViewComponent } from '../topic-list-view/topic-list-view.component';
+import { BlogPostViewComponent, BlogPostViewEvent } from './blog-post-view.component';
 
 describe('BlogPostViewComponent', () => {
-  let component: BlogPostViewComponent;
-  let fixture: ComponentFixture<BlogPostViewComponent>;
-
-  beforeEach(async () => {
-
-    await TestBed.configureTestingModule({
-      declarations: [ BlogPostViewComponent ],
-      imports: [UtilsModule],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-    .compileComponents();
-  });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BlogPostViewComponent);
-    component = fixture.componentInstance;
+    return MockBuilder(BlogPostViewComponent)
+    .mock(TopicListViewComponent)
+    .mock(CommentListComponent)
+    .mock(CommentEditorComponent)
+    .mock(RequireOwnerDirective)
+    .mock(PrettyDatePipe, value => value.toString());
   });
 
-  it('should fire onSelect when edit clicked', fakeAsync(() => {
+  it('should fire onEvent when edit clicked', () => {
+
+    const fixture = MockRender(BlogPostViewComponent);
+    const component = fixture.point.componentInstance;
 
     const model: BlogPostModel = {
         id: 1,
@@ -41,24 +38,28 @@ describe('BlogPostViewComponent', () => {
     component.item = model;
     fixture.detectChanges();
 
-    let editButton = fixture.debugElement.query(By.css('[data-testid="edit"]')).nativeElement;
+    ngMocks.findInstances(RequireOwnerDirective).forEach(i => ngMocks.render(i, i));
+
+    let editButton = fixture.debugElement.query(By.css('[data-testid="edit"]'));
     let firedEvent: BlogPostViewEvent|undefined = undefined;
 
-    component.onSelectItem.subscribe({
+    component.onEvent.subscribe({
       next: (evt: BlogPostViewEvent) => {
         firedEvent = evt;
       }
     });
     editButton.triggerEventHandler('click', {});
-    tick();
     fixture.detectChanges();
 
     expect(firedEvent).toBeTruthy();
     expect(firedEvent!.item).toEqual(model);
     expect(firedEvent!.opcode).toEqual("edit");
-  }));
+  });
 
-  it('should fire onSelect when delete clicked', fakeAsync(() => {
+  it('should fire onEvent when delete clicked', () => {
+
+    const fixture = MockRender(BlogPostViewComponent);
+    const component = fixture.point.componentInstance;
 
     const model: BlogPostModel = {
         id: 1,
@@ -74,21 +75,22 @@ describe('BlogPostViewComponent', () => {
     component.item = model;
     fixture.detectChanges();
 
+    ngMocks.findInstances(RequireOwnerDirective).forEach(i => ngMocks.render(i, i));
+
     let deleteButton = fixture.debugElement.query(By.css('[data-testid="delete"]'));
     let firedEvent: BlogPostViewEvent|undefined = undefined;
 
-    component.onSelectItem.subscribe({
+    component.onEvent.subscribe({
       next: (evt: BlogPostViewEvent) => {
         firedEvent = evt;
       }
     });
     deleteButton.triggerEventHandler('click', {});
-    tick();
     fixture.detectChanges();
 
     expect(firedEvent).toBeTruthy();
     expect(firedEvent!.item).toEqual(model);
     expect(firedEvent!.opcode).toEqual("delete");
-  }));
+  });
 
 });

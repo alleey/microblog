@@ -1,10 +1,10 @@
-<div *ngIf="loading; else contents">
+<div *ngIf="viewModel.isLoading; else contents">
     <utils-loader></utils-loader>
 </div>
 
 <ng-template #contents>
-    <utils-alert *ngIf="errorDesc;else itemsList" [dismissable]="false" [minimal]="true">
-        <p>An error occurred fetching the topics list: {{ errorDesc }}</p>
+    <utils-alert *ngIf="viewModel.isFailure;else itemsList" [dismissable]="false" [minimal]="true">
+        <p>An error occurred fetching the topics list: {{ viewModel.Error }}</p>
     </utils-alert>
 </ng-template>
 
@@ -17,12 +17,12 @@
 
     <utils-search-box (onApplyFilter)="onApplyFilter($event)" *ngIf="enableSearch">
     </utils-search-box>
-    <blog-topic-list-view 
+    <topic-list-view 
         [items]="items" 
         [itemTemplate]="itemTemplate"
         [noContentsTemplate]="noContentsTemplate"
-        (onSelectItem)="handleListViewEvent($event)">
-    </blog-topic-list-view>
+        (onEvent)="handleListViewEvent($event)">
+    </topic-list-view>
     <utils-pager [page]="page" (onSelectPage)="gotoPage($event)">
     </utils-pager>
 
