@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>gateway-service</artifactId>
-	<name>PrettyUseless Gateway Service</name>
+	<name>Zabardast Gateway Service</name>
 	<description>API Gateway</description>
 
 	<properties>
@@ -24,6 +24,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>

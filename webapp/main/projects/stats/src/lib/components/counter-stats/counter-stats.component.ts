@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
-import { Subscription } from 'rxjs';
 import { CounterStatisticsResponseModel } from '../../models/counter-statistics';
 import { CountersService } from '../../services/counters.service';
 
@@ -20,6 +21,7 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   viewModel = new ViewModelHolder<CounterStatisticsResponseModel>();
+  destroyed$ = new Subject();
   subscription = new Subscription();
 
   constructor(private service: CountersService) { }
@@ -34,6 +36,8 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get hasValue() { return this.viewModel.hasValue; }
@@ -41,6 +45,7 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
   checkStatus() {
     this.service
       .getCounterStatistics("", this.counterId)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 }

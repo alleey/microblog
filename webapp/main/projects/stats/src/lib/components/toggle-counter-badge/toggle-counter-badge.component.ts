@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, TemplateRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { CounterResponseModel } from '../../models/counter';
 import { CountersService } from '../../services/counters.service';
@@ -9,7 +10,7 @@ import { CountersService } from '../../services/counters.service';
   templateUrl: './toggle-counter-badge.component.html',
   styleUrls: ['./toggle-counter-badge.component.css']
 })
-export class ToggleCounterBadgeComponent implements OnInit {
+export class ToggleCounterBadgeComponent implements OnInit, OnDestroy {
 
   @Input() counterId: string = "";
   @Input() counterValue: number = 1;
@@ -22,6 +23,7 @@ export class ToggleCounterBadgeComponent implements OnInit {
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
   viewModel = new ViewModelHolder<CounterResponseModel>();
+  destroyed$ = new Subject();
   subscription = new Subscription();
 
   constructor(private service: CountersService) { }
@@ -36,6 +38,8 @@ export class ToggleCounterBadgeComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get isPositive(): boolean {
@@ -45,18 +49,21 @@ export class ToggleCounterBadgeComponent implements OnInit {
   checkStatus() {
     this.service
       .getCounter("", this.counterId)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 
   public set(): void {
     this.service
       .setCounter("", this.counterId, this.counterValue)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 
   public unset(): void {
     this.service
       .unsetCounter("", this.counterId)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectUndefined());
   }
 

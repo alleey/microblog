@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { FollowsResponseModel } from '../../models/follows';
 import { FollowingService } from '../../services/following.service';
@@ -18,6 +19,7 @@ export class FollowerBadgeComponent implements OnInit, OnDestroy {
 
   userId?: string;
   viewModel = new ViewModelHolder<FollowsResponseModel>();
+  destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(
@@ -38,6 +40,8 @@ export class FollowerBadgeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get isActive(): boolean {
@@ -47,6 +51,7 @@ export class FollowerBadgeComponent implements OnInit, OnDestroy {
   checkStatus() {
     this.service
       .findFollower("", "", this.userId!)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 }

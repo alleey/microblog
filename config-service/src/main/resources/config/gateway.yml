@@ -1,11 +1,17 @@
 server:
-  port: ${GATEWAY_PORT:9000}
+  port: ${GATEWAY_SERVICE_PORT:9000}
   ssl:
-    enabled: false
-    key-alias: zabardast
-    key-store-type: PKCS12
-    key-store: classpath:keystore/zabardast.p12
+    enabled: ${GATEWAY_SERVICE_SSL_ENABLED:false}
+    client-auth: ${GATEWAY_SERVICE_SSL_CLIENT_AUTH:none}
+    #    protocol: TLS
+    #    enabled-protocols: TLSv1.2
+    key-store: classpath:keystore/server.jks
+    key-alias: server
+    key-store-type: JKS
     key-store-password: zabardast
+    trust-store: classpath:keystore/server.jks
+    trust-store-type: JKS
+    trust-store-password: zabardast
 
 management:
   endpoint:

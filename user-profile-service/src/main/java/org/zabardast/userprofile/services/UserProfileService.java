@@ -8,12 +8,13 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
@@ -29,6 +30,7 @@ import org.zabardast.userprofile.services.exceptions.UserProfileNotFoundExceptio
 public class UserProfileService
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
@@ -81,20 +83,24 @@ public class UserProfileService
     }
 
     @Transactional
-    public UserProfileResponseRepresentation newUserProfile(@NotNull UserProfileRequestRepresentation userProfileRequestRepresentation) {
+    public UserProfileResponseRepresentation newUserProfile(@NotNull UserProfileRequestRepresentation userProfileRequestRepresentation)
+    {
         UserProfile userProfile = modelMapper.map(userProfileRequestRepresentation, UserProfile.class);
         userProfile.setCreatedOn(new Date());
         userProfile.setSyncedOn(userProfile.getCreatedOn());
 
         UserProfile saved = userProfileRepository.save(userProfile);
-        eventPublisher.publishEvent(new UserProfileCreatedEvent(this, saved));
+        eventPublisher.publishEvent(
+            new UserProfileCreatedEvent(this, saved.getId())
+        );
         return modelMapper.map(saved, UserProfileResponseRepresentation.class);
     }
 
     @Transactional
     public UserProfileResponseRepresentation updateUserProfile(@NotNull String userProfileId,
-                                         @NotNull UserProfileRequestRepresentation userProfile,
-                                         boolean setSync) {
+                                                               @NotNull UserProfileRequestRepresentation userProfile,
+                                                               boolean setSync)
+    {
         return userProfileRepository.findById(userProfileId)
             .map(found -> {
                 found.setUsername(userProfile.getUsername());
@@ -105,7 +111,9 @@ public class UserProfileService
                     found.setSyncedOn(new Date());
 
                 UserProfile saved =  userProfileRepository.save(found);
-                eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, saved));
+                eventPublisher.publishEvent(
+                    new UserProfileUpdatedEvent(this, saved.getId())
+                );
                 return modelMapper.map(saved, UserProfileResponseRepresentation.class);
             })
             .orElseThrow(() -> {
@@ -117,7 +125,9 @@ public class UserProfileService
     public void deleteUserProfile(@NotNull String userProfileId) {
         if(userProfileRepository.existsById(userProfileId)) {
             userProfileRepository.deleteById(userProfileId);
-            eventPublisher.publishEvent(new UserProfileDeletedEvent(this, userProfileId));
+            eventPublisher.publishEvent(
+                new UserProfileDeletedEvent(this, userProfileId)
+            );
         }
     }
 

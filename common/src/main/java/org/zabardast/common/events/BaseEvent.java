@@ -4,18 +4,27 @@ import org.springframework.context.ApplicationEvent;
 
 public abstract class BaseEvent<T> extends ApplicationEvent {
 
-    protected T data;
+    private final T data;
+    private String principal;
 
     public BaseEvent(Object source, T data) {
         super(source);
         this.data = data;
+        this.principal = null;
     }
 
-    public BaseEvent(T data){
-        super(data);
+    public BaseEvent(Object source, T data, String principal) {
+        super(source);
+        this.data = data;
+        this.principal = principal;
     }
 
-    public T getData() {
+    public final T getData() {
         return data;
     }
+
+    public final String getPrincipal() {
+        return principal;
+    }
+    public final void setPrincipal(String principal) { this.principal = principal; }
 }

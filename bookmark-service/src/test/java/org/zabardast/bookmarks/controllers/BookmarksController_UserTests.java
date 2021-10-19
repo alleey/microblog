@@ -189,7 +189,8 @@ class BookmarksController_UserTests {
 		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(bookmark, BookmarkRequestRepresentation.class);
 
 		Mockito.when(bookmarkService.getBookmark(bookmark.getId())).then(r -> bookmark);
-		Mockito.when(bookmarkService.updateBookmark(bookmark.getId(), bookmarkRequestRepresentation)).then(r -> bookmark);
+		Mockito.when(bookmarkService.updateBookmark(bookmark.getId(), bookmarkRequestRepresentation))
+				.then(r -> bookmark);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(
 					String.format("/api/v1/bookmarks/%d", bookmark.getId()))
 				.accept(MediaType.APPLICATION_JSON)

@@ -1,5 +1,17 @@
 server:
   port: ${BOOKMARK_SERVICE_PORT:9080}
+  ssl:
+    enabled: ${BOOKMARK_SERVICE_SSL_ENABLED:false}
+    client-auth: ${BOOKMARK_SERVICE_SSL_CLIENT_AUTH:none}
+    #    protocol: TLS
+    #    enabled-protocols: TLSv1.2
+    key-store: classpath:keystore/server.jks
+    key-alias: server
+    key-store-type: JKS
+    key-store-password: zabardast
+    trust-store: classpath:keystore/server.jks
+    trust-store-type: JKS
+    trust-store-password: zabardast
 
 management:
   endpoints:

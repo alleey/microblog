@@ -4,6 +4,7 @@ package org.zabardast.userprofile.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.Principal;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,8 @@ public class UserProfilesController {
 	@PutMapping(value = "{userProfileId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @userProfileOwnership.require(#userProfileId, authentication)")
 	public ResponseEntity<?> updateUserProfile(@PathVariable String userProfileId,
-											@NotNull @RequestBody UserProfileRequestRepresentation userProfile) {
+											   @NotNull @RequestBody UserProfileRequestRepresentation userProfile,
+											   Principal principal) {
 		EntityModel<?> entity = assembler.toModel(
 			userProfileService.updateUserProfile(userProfileId, userProfile, false)
 		);
@@ -103,7 +105,7 @@ public class UserProfilesController {
 
 	@DeleteMapping(value = "{userProfileId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @userProfileOwnership.require(#userProfileId, authentication)")
-	public ResponseEntity<?> deleteUserProfile(@PathVariable String userProfileId) {
+	public ResponseEntity<?> deleteUserProfile(@PathVariable String userProfileId, Principal principal) {
 		userProfileService.deleteUserProfile(userProfileId);
 		return ResponseEntity.noContent().build();
 	}

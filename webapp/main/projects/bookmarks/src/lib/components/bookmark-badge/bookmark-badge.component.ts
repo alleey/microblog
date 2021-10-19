@@ -1,8 +1,8 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
-import { BookmarkModel, BookmarkResponseModel } from '../../models/bookmark';
+import { BookmarkResponseModel } from '../../models/bookmark';
 import { BookmarksService } from '../../services/bookmarks.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
   viewModel = new ViewModelHolder<BookmarkResponseModel>();
+  destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(private service: BookmarksService) { }
@@ -33,6 +34,8 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get isActive(): boolean {
@@ -42,18 +45,21 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
   checkStatus() {
     this.service
       .findByUrl("", this.url)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 
   createBookmark(): void {
     this.service
       .create("", this.caption, this.url)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 
   deleteBookmark(): void {
     this.service
       .delete("", this.viewModel.Model!.id)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectUndefined());
   }
 }

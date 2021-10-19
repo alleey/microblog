@@ -3,9 +3,11 @@ package org.zabardast.bookmarks.config;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
 @Configuration
+@EnableScheduling
 public class ApplicationConfig {
     @Bean
     ForwardedHeaderFilter forwardedHeaderFilter() { return new ForwardedHeaderFilter(); }

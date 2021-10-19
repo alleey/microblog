@@ -14,7 +14,7 @@
     <artifactId>zabardast-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-	<name>PrettyUseless Parent POM</name>
+	<name>Zabardast Parent POM</name>
 
 	<properties>
 		<revision>0.0.1-SNAPSHOT</revision>

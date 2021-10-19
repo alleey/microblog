@@ -12,7 +12,7 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>bookmark-service</artifactId>
-	<name>PrettyUseless Bookmark Service</name>
+	<name>Zabardast Bookmark Service</name>
 	<description>Bookmark Service</description>
 
 	<properties>
@@ -145,6 +145,16 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-kafka</artifactId>
 		</dependency>
 
 		<dependency>

@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.CommentResponseRepresentation;
-import org.zabardast.blog.model.Comment;
 import org.zabardast.blog.dto.assemblers.CommentResponseRepresentationAssembler;
 import org.zabardast.blog.services.CommentService;
 
@@ -67,7 +66,8 @@ public class PostCommentsController {
 	@PostMapping()
 	public ResponseEntity<?> newComment(@PathVariable("postId") Long postId,
 										@RequestBody CommentRequestRepresentation blogComment,
-										@NotNull Authentication authentication) {
+										@NotNull Authentication authentication)
+	{
 		EntityModel<?> entity = assembler.toModel(
 			commentService.newComment(postId, authentication.getName(), blogComment)
 		);
@@ -78,7 +78,8 @@ public class PostCommentsController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
 	public ResponseEntity<?> updateComment(@PathVariable("postId") Long postId,
 										   @PathVariable Long commentId,
-										   @RequestBody CommentRequestRepresentation blogComment) {
+										   @RequestBody CommentRequestRepresentation blogComment)
+	{
 		EntityModel<?> entity = assembler.toModel(
 			commentService.updateComment(postId, commentId, blogComment)
 		);
@@ -87,7 +88,8 @@ public class PostCommentsController {
 
 	@DeleteMapping(value = "{commentId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
-	public ResponseEntity<?> deleteComment(@PathVariable("postId") Long postId, @PathVariable Long commentId) {
+	public ResponseEntity<?> deleteComment(@PathVariable("postId") Long postId,
+										   @PathVariable Long commentId) {
 		commentService.deleteComment(postId, commentId);
 		return ResponseEntity.noContent().build();
 	}

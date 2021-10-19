@@ -5,8 +5,11 @@ spring:
 service:
   keycloak:
     realm: zabardast
-    profiles-url: "${KEYCLOCK_URL:http://localhost:8080}/auth/admin/realms/${KEYCLOCK_REALM:zabardast}"
+    profiles-url: "${KEYCLOCK_URL:https://localhost:8443}/auth/admin/realms/${KEYCLOCK_REALM:zabardast}"
   tasks:
     userprofilessync:
       fixedDelay: 180000
       batchSize: 1
+    flushoutbox:
+      fixedDelay: 180000
+      batchSize: 100

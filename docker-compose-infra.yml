@@ -1,0 +1,76 @@
+version: "3.7"
+
+networks:
+  default:
+    name: zabardast.net
+    ipam:
+      config:
+      - subnet: 172.33.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  kafka_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  zookeeper_conf:
+    driver: local
+
+services:
+  # Infrastructure
+  database:
+    image: postgres:9.5
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "zabardast"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9094:9094"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://127.0.0.1:9094
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://127.0.0.1:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+    volumes:
+      - kafka_data:/kafka
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=zookeeper
+    volumes:
+      - zookeeper_data:/opt/zookeeper-3.4.13/data
+      - zookeeper_conf:/opt/zookeeper-3.4.13/conf
+
+  keycloak:
+    image: zabardast/keycloak
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "8080:8080"
+       - "8443:8443"
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: database
+      DB_DATABASE: zabardast
+      DB_SCHEMA: public
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin

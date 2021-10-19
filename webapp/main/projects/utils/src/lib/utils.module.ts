@@ -1,12 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';  
-import { PrettyDatePipe } from './pipes/pretty-date.pipe';
-import { PagerComponent } from './components/pager/pager.component';
 import { AlertComponent } from './components/alert/alert.component';
-import { SearchBoxComponent } from './components/search-box/search-box.component';
-import { LoaderComponent } from './components/loader/loader.component';
 import { BadgeComponent } from './components/badge/badge.component';
+import { LoaderComponent } from './components/loader/loader.component';
+import { PagerComponent } from './components/pager/pager.component';
+import { SearchBoxComponent } from './components/search-box/search-box.component';
 import { UtilsModuleConfig, UtilsModuleConfigToken } from './config/config';
+import { PrettyDatePipe } from './pipes/pretty-date.pipe';
 
 
 
@@ -17,7 +17,7 @@ import { UtilsModuleConfig, UtilsModuleConfigToken } from './config/config';
     AlertComponent,
     SearchBoxComponent,
     LoaderComponent,
-    BadgeComponent
+    BadgeComponent,
   ],
   imports: [
     CommonModule
@@ -28,7 +28,7 @@ import { UtilsModuleConfig, UtilsModuleConfigToken } from './config/config';
     AlertComponent,
     SearchBoxComponent,
     LoaderComponent,
-    BadgeComponent
+    BadgeComponent,
   ]
 })
 export class UtilsModule { 

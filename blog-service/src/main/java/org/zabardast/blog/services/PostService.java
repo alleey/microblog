@@ -1,16 +1,13 @@
 package org.zabardast.blog.services;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +19,12 @@ import org.zabardast.blog.events.PostCreatedEvent;
 import org.zabardast.blog.events.PostDeletedEvent;
 import org.zabardast.blog.events.PostUpdatedEvent;
 import org.zabardast.blog.model.Post;
-import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.repository.PostRepository;
 import org.zabardast.blog.repository.TopicRepository;
 import org.zabardast.blog.services.exceptions.PostAlreadyExistsException;
 import org.zabardast.blog.services.exceptions.PostNotFoundException;
 import org.zabardast.blog.services.exceptions.TopicNotFoundException;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 
@@ -36,6 +32,7 @@ import org.zabardast.common.filtering.FilterPredicateConverter;
 public class PostService
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
@@ -62,9 +59,9 @@ public class PostService
     }
 
     @Transactional
-    public Page<PostResponseRepresentation> getOwnerPosts(@NotNull String ownerId, @NotNull Pageable page) {
+    public Page<PostResponseRepresentation> getOwnerPosts(@NotNull String principal, @NotNull Pageable page) {
         return postRepository
-                .findByOwner(ownerId, page)
+                .findByOwner(principal, page)
                 .map(i -> modelMapper.map(i, PostResponseRepresentation.class));
     }
 
@@ -117,12 +114,14 @@ public class PostService
         post.setCreatedOn(new Date());
         Post saved = postRepository.save(post);
 
-        eventPublisher.publishEvent(new PostCreatedEvent(this, saved));
+        eventPublisher.publishEvent(new PostCreatedEvent(this, saved.getId()));
         return modelMapper.map(saved, PostResponseRepresentation.class);
     }
 
     @Transactional
-    public PostResponseRepresentation updatePost(@NotNull Long postId, @NotNull PostRequestRepresentation postRequestRepresentation) {
+    public PostResponseRepresentation updatePost(@NotNull Long postId,
+                                                 @NotNull PostRequestRepresentation postRequestRepresentation)
+    {
         return postRepository.findById(postId)
             .map(found -> {
                 found.setUpdatedOn(new Date());
@@ -131,7 +130,7 @@ public class PostService
                 found.setText(postRequestRepresentation.getText());
                 Post saved = postRepository.save(found);
 
-                eventPublisher.publishEvent(new PostUpdatedEvent(this, saved));
+                eventPublisher.publishEvent(new PostUpdatedEvent(this, saved.getId()));
                 return modelMapper.map(saved, PostResponseRepresentation.class);
             })
             .orElseThrow(() -> {

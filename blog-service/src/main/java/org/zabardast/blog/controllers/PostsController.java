@@ -102,7 +102,8 @@ public class PostsController {
 
 	@PutMapping(value = "{postId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> updatePost(@PathVariable long postId, @RequestBody PostRequestRepresentation blogPost) {
+	public ResponseEntity<?> updatePost(@PathVariable long postId, @RequestBody PostRequestRepresentation blogPost,
+										@NotNull Authentication authentication) {
 		EntityModel<?> entity = assembler.toModel(
 			postService.updatePost(postId, blogPost)
 		);
@@ -111,7 +112,8 @@ public class PostsController {
 
 	@DeleteMapping(value = "{postId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> deletePost(@PathVariable long postId) {
+	public ResponseEntity<?> deletePost(@PathVariable long postId,
+										@NotNull Authentication authentication) {
 		postService.deletePost(postId);
 		return ResponseEntity.noContent().build();
 	}

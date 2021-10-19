@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { BookmarkListResponseModel, BookmarkModel } from '../../models/bookmark';
 import { BookmarksService } from '../../services/bookmarks.service';
@@ -27,6 +28,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
 
   pageable: Pageable; 
   viewModel = new ViewModelHolder<BookmarkListResponseModel>();
+  destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(
@@ -51,6 +53,8 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   onApplyFilter(text: string): void {
@@ -64,12 +68,14 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
     {
       this.service
         .findMatchingCaption("", this.filterText, this.pageable)
+        .pipe(takeUntil(this.destroyed$))
         .subscribe(this.viewModel.expectModel());
     }
     else
     {
       this.service
         .all("", this.pageable)
+        .pipe(takeUntil(this.destroyed$))
         .subscribe(this.viewModel.expectModel());
     }
   }
@@ -96,6 +102,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   deleteBookmark(bookmark: BookmarkModel): void {
     this.service
       .delete("", bookmark.id)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectUndefined());
   }
 

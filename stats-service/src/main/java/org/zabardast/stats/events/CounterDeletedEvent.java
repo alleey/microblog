@@ -8,7 +8,4 @@ public class CounterDeletedEvent extends BaseEvent<CounterKey> {
     public CounterDeletedEvent(Object source, @NotNull CounterKey data) {
         super(source, data);
     }
-    public CounterDeletedEvent(@NotNull CounterKey data) {
-        super(data);
-    }
 }

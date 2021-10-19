@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
 import { PostsService } from '../../services/posts.service';
@@ -12,7 +14,7 @@ export type BlogPostEvent = BlogPostViewEvent;
   templateUrl: './blog-post.component.html',
   styleUrls: ['./blog-post.component.scss']
 })
-export class BlogPostComponent implements OnInit {
+export class BlogPostComponent implements OnInit, OnDestroy {
 
   @Input("postId") paramPostId?: number;
 
@@ -27,6 +29,7 @@ export class BlogPostComponent implements OnInit {
   permalink: string = "";
 
   viewModel = new ViewModelHolder<BlogPostResponseModel>();
+  destroyed$ = new Subject();
 
   constructor(
     private service: PostsService, 
@@ -42,11 +45,17 @@ export class BlogPostComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
   fetchPost(postId: number, postSlug?: string): void {
     this.postId = postId;
     this.postSlug = postSlug;
     this.service
       .one("", this.postId)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel({
         nextObserver: {
           next: (i: BlogPostResponseModel) => this.update(i)

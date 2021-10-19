@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { BlogPostListResponseModel, BlogPostModel } from '../../models/blog-post';
 import { PostsService } from '../../services/posts.service';
@@ -26,11 +27,12 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
 
   pageable: Pageable;
   viewModel = new ViewModelHolder<BlogPostListResponseModel>();
+  destroyed$ = new Subject();
 
   subscription: Subscription = new Subscription();
 
   constructor(
-    private postService: PostsService, 
+    private service: PostsService, 
     private router: Router, 
     private activatedRoute: ActivatedRoute) 
   { 
@@ -47,19 +49,23 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
     });
     // Requery when the backend data changes
     this.subscription.add(
-      this.postService.onChange.subscribe({ next: () => this.fetchPage(0) })
+      this.service.onChange.subscribe({ next: () => this.fetchPage(0) })
     );
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   fetchPage(pageNum: number): void {
     //const routeParams = this.route.snapshot.paramMap;
     //this.organizationId = routeParams.get('orgId') as string;  
     this.pageable.page = pageNum;
-    this.postService.all(this.state?.endpoint ?? "", this.pageable)
+    this.service
+      .all(this.state?.endpoint ?? "", this.pageable)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 

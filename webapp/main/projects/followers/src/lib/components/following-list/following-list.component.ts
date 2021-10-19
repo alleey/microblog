@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { FollowsListResponseModel, FollowsModel } from '../../models/follows';
 import { FollowingService } from '../../services/following.service';
@@ -13,7 +14,7 @@ export type FollowingListEvent = FollowingListViewEvent;
   templateUrl: './following-list.component.html',
   styleUrls: ['./following-list.component.css']
 })
-export class FollowingListComponent implements OnInit {
+export class FollowingListComponent implements OnInit, OnDestroy {
 
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
@@ -24,6 +25,7 @@ export class FollowingListComponent implements OnInit {
         
   pageable: Pageable; 
   viewModel = new ViewModelHolder<FollowsListResponseModel>();
+  destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(
@@ -48,12 +50,15 @@ export class FollowingListComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   fetchPage(pageNum: number): void {
     this.pageable.page = pageNum;
     this.service
       .following("", "", this.pageable)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 

@@ -1,6 +1,18 @@
 
 server:
-  port: ${PORT:8888}
+  port: ${CONFIG_SERVICE_PORT:8888}
+  ssl:
+    enabled: ${CONFIG_SERVICE_SSL_ENABLED:false}
+    client-auth: ${CONFIG_SERVICE_SSL_CLIENT_AUTH:none}
+    #    protocol: TLS
+    #    enabled-protocols: TLSv1.2
+    key-store: classpath:keystore/server.jks
+    key-alias: server
+    key-store-type: JKS
+    key-store-password: zabardast
+    trust-store: classpath:keystore/server.jks
+    trust-store-type: JKS
+    trust-store-password: zabardast
 
 encrypt:
   key: "345345fsdfsf5345"

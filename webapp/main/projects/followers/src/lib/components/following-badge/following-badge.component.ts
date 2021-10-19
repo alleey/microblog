@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { OidcAuthService } from 'auth-oidc';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { FollowsResponseModel } from '../../models/follows';
 import { FollowingService } from '../../services/following.service';
@@ -19,6 +19,7 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
 
   userId?: string;
   viewModel = new ViewModelHolder<FollowsResponseModel>();
+  destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(
@@ -39,6 +40,8 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get isActive(): boolean {
@@ -48,18 +51,21 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
   checkStatus() {
     this.service
       .findFollowing("", "", this.userId!)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 
   follow(): void {
     this.service
       .follow("", "", this.userId!)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 
   unfollow(): void {
     this.service
       .unfollow("", "", this.userId!)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectUndefined());
   }
 }

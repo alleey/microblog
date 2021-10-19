@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ import org.zabardast.bookmarks.events.BookmarkDeletedEvent;
 import org.zabardast.bookmarks.model.Bookmark;
 import org.zabardast.bookmarks.repository.BookmarkRepository;
 import org.zabardast.bookmarks.services.exceptions.BookmarkNotFoundException;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.Condition;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
@@ -31,6 +32,7 @@ import org.zabardast.common.filtering.Operator;
 public class BookmarkService 
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
@@ -98,7 +100,7 @@ public class BookmarkService
         bookmark.setOwner(ownerId);
 
         Bookmark saved = bookmarkRepository.save(bookmark);
-        eventPublisher.publishEvent(new BookmarkCreatedEvent(this, saved));
+        eventPublisher.publishEvent(new BookmarkCreatedEvent(this, saved.getId()));
         return modelMapper.map(saved, BookmarkResponseRepresentation.class);
     }
 
@@ -110,7 +112,7 @@ public class BookmarkService
                     found.setUrl(bookmark.getUrl());
 
                     Bookmark saved = bookmarkRepository.save(found);
-                    eventPublisher.publishEvent(new BookmarkCreatedEvent(this, saved));
+                    eventPublisher.publishEvent(new BookmarkCreatedEvent(this, saved.getId()));
                     return modelMapper.map(saved, BookmarkResponseRepresentation.class);
                 })
                 .orElseThrow(() -> {

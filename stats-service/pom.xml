@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>stats-service</artifactId>
-	<name>PrettyUseless Ststistics Service</name>
-	<description>Ststistics Service</description>
+	<name>Zabardast Statistics Service</name>
+	<description>Statistics Service</description>
 
 	<properties>
 		<container.expose>8888</container.expose>
@@ -150,6 +150,16 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-kafka</artifactId>
 		</dependency>
 
 		<dependency>

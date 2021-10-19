@@ -8,5 +8,4 @@ public class CounterUpdatedEvent extends BaseEvent<Counter> {
     public CounterUpdatedEvent(Object source, @NotNull Counter data) {
         super(source, data);
     }
-    public CounterUpdatedEvent(@NotNull Counter data) { super(data); }
 }

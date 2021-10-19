@@ -12,12 +12,13 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.Condition;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
@@ -36,6 +37,7 @@ import org.zabardast.followers.services.exceptions.FollowingNotFoundException;
 public class FollowingService
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
@@ -152,7 +154,7 @@ public class FollowingService
                 .createdOn(new Date())
                 .build();
         Following saved = followingRepository.save(following);
-        eventPublisher.publishEvent(new FollowingCreatedEvent(this, saved));
+        eventPublisher.publishEvent(new FollowingCreatedEvent(this, saved, userId));
         return modelMapper.map(saved, FollowResponseRepresentation.class);
     }
 
@@ -162,7 +164,7 @@ public class FollowingService
         FollowingKey key = new FollowingKey(followedId, userId);
         if(followingRepository.existsById(key)) {
             followingRepository.deleteById(key);
-            eventPublisher.publishEvent(new FollowingDeletedEvent(this, key));
+            eventPublisher.publishEvent(new FollowingDeletedEvent(this, key, userId));
         }
     }
 }

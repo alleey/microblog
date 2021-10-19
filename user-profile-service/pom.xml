@@ -12,7 +12,7 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>user-profile-service</artifactId>
-	<name>PrettyUseless User Profile Service</name>
+	<name>Zabardast User Profile Service</name>
 	<description>User Profile Service</description>
 
 	<properties>
@@ -145,6 +145,16 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-kafka</artifactId>
 		</dependency>
 
 		<dependency>

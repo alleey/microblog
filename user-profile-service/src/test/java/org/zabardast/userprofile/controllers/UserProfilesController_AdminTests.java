@@ -3,6 +3,7 @@ package org.zabardast.userprofile.controllers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.security.Principal;
 import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -50,7 +52,8 @@ class UserProfilesController_AdminTests {
 		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
 		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
-		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false)).then(r -> userProfile);
+		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false))
+				.then(r -> userProfile);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/users/%s", userProfile.getId()))
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +70,7 @@ class UserProfilesController_AdminTests {
 		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
 		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
-		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false))
+		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation,false))
 				.thenThrow(new UserProfileNotFoundException(userProfile.getId()));
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put(String.format("/api/v1/users/%s", userProfile.getId()))
 				.accept(MediaType.APPLICATION_JSON)
@@ -83,6 +86,7 @@ class UserProfilesController_AdminTests {
 	void adminCanDeleteAnyUserProfile() throws Exception {
 
 		UserProfileResponseRepresentation userProfile = blogData.AllUserProfiles.get(0);
+
 		Mockito.doNothing().when(userProfileService).deleteUserProfile(userProfile.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete(String.format("/api/v1/users/%s", userProfile.getId()))
 				.accept(MediaType.APPLICATION_JSON)

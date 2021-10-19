@@ -12,7 +12,7 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>eureka-service</artifactId>
-	<name>PrettyUseless Eureka Service</name>
+	<name>Zabardast Eureka Service</name>
 	<description>Eureka Service</description>
 
 	<dependencies>

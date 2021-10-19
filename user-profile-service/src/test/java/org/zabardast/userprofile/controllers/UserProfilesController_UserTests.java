@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.security.Principal;
 import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -165,7 +167,8 @@ class UserProfilesController_UserTests {
 		UserProfileRequestRepresentation userProfileRequestRepresentation = modelMapper.map(userProfile, UserProfileRequestRepresentation.class);
 
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
-		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false)).then(r -> userProfile);
+		Mockito.when(userProfileService.updateUserProfile(userProfile.getId(), userProfileRequestRepresentation, false))
+				.then(r -> userProfile);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
 				.put("/api/v1/users/{id}", userProfile.getId())
 				.accept(MediaType.APPLICATION_JSON)
@@ -221,6 +224,7 @@ class UserProfilesController_UserTests {
 	void userCanDeleteOwnedUserProfile() throws Exception {
 
 		UserProfileResponseRepresentation userProfile = blogData.AlLNonAdminProfiles.get(0);
+
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
 		Mockito.doNothing().when(userProfileService).deleteUserProfile(userProfile.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -258,7 +262,7 @@ class UserProfilesController_UserTests {
 	void userCannotDeleteOthersUserProfile() throws Exception {
 
 		UserProfileResponseRepresentation userProfile = blogData.AllAdminUserProfiles.get(0);
-		
+
 		Mockito.when(userProfileService.getUserProfile(userProfile.getId())).then(r -> userProfile);
 		Mockito.doNothing().when(userProfileService).deleteUserProfile(userProfile.getId());
 		RequestBuilder requestBuilder = MockMvcRequestBuilders

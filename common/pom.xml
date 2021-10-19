@@ -12,7 +12,7 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>common</artifactId>
-	<name>PrettyUseless Common</name>
+	<name>Zabardast Common</name>
 	<description>common</description>
 
 	<dependencies>

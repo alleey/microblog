@@ -27,8 +27,7 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
   commentId?: number;
   successDesc: any = "";
   viewModel = new ViewModelHolder<CommentResponseModel>();
-
-  destory$ = new Subject();
+  destroyed$ = new Subject();
 
   constructor(
     @Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig,
@@ -53,8 +52,8 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destory$.next();
-    this.destory$.complete();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get isUpdateMode(): boolean { return this.updateMode && this.commentId !== undefined; }
@@ -74,7 +73,7 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
   fetchComment(postId: number, commentId: number): void {
     this.service
       .one("", postId, commentId)
-      .pipe(takeUntil(this.destory$))
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel({
         nextObserver: {
           next: (i: CommentResponseModel) => this.updateForm(i)
@@ -85,7 +84,7 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
   createNewComment(): void {
     this.service
       .create("", this.postId!, this.text?.value)
-      .pipe(takeUntil(this.destory$))
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel({
         nextObserver: {
           next: (i: CommentResponseModel) => this.updateForm(i)
@@ -96,7 +95,7 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
   updateComment(): void {
     this.service
       .update("", this.postId!, this.commentId!, this.text?.value)
-      .pipe(takeUntil(this.destory$))
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectNothing());
   }
 }

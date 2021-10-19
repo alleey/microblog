@@ -4,9 +4,8 @@ import javax.validation.constraints.NotNull;
 import org.zabardast.blog.model.Post;
 import org.zabardast.common.events.BaseEvent;
 
-public class PostCreatedEvent extends BaseEvent<Post> {
-    public PostCreatedEvent(Object source, @NotNull Post data) {
-        super(source, data);
+public class PostCreatedEvent extends BaseEvent<Long> {
+    public PostCreatedEvent(Object source, @NotNull Long postId) {
+        super(source, postId);
     }
-    public PostCreatedEvent(@NotNull Post data) { super(data); }
 }

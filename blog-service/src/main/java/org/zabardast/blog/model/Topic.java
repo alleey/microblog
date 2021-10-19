@@ -1,9 +1,9 @@
 package org.zabardast.blog.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.server.core.Relation;
 
 @Entity
 @Table(name = "topics", schema="blog")
@@ -32,6 +31,6 @@ public class Topic {
     @Column(name = "caption", nullable = false, unique = true)
     private String caption;
 
-    @ManyToMany(mappedBy = "topics")
+    @ManyToMany(mappedBy = "topics", fetch = FetchType.LAZY)
     List<Post> posts;
 }

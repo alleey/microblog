@@ -3,10 +3,12 @@ package org.zabardast.blog.config;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.zabardast.common.feign.PropagatingCredentialsFeignRequestInterceptor;
 
 @Configuration
+@EnableScheduling
 public class ApplicationConfig {
     @Bean
     public PropagatingCredentialsFeignRequestInterceptor requestInterceptor() {

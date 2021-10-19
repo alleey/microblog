@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Pageable, PageModel, ViewModelHolder } from 'utils';
 import { TopicListResponseModel, TopicModel } from '../../models/topic';
 import { TopicsService } from '../../services/topics.service';
@@ -28,10 +29,11 @@ export class TopicListComponent implements OnInit, OnDestroy {
   currentFilter: string = "";
   pageable: Pageable;
   viewModel = new ViewModelHolder<TopicListResponseModel>();
+  destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(
-    private topicsService: TopicsService, 
+    private service: TopicsService, 
     private activatedRoute: ActivatedRoute) 
   { 
     this.currentFilter = this.filterText;
@@ -47,12 +49,14 @@ export class TopicListComponent implements OnInit, OnDestroy {
     }); 
     // Requery when the backend data changes
     this.subscription.add(
-      this.topicsService.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
+      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
     );
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   onApplyFilter(text: string): void {
@@ -63,13 +67,15 @@ export class TopicListComponent implements OnInit, OnDestroy {
   fetchPage(pageNum: number): void {
     this.pageable.page = pageNum;
     if(!!this.filterText) {
-      this.topicsService
+      this.service
         .findMatchingCaption("", this.filterText, this.pageable)
+        .pipe(takeUntil(this.destroyed$))
         .subscribe(this.viewModel.expectModel());
     }
     else {
-      this.topicsService
+      this.service
         .all("", this.pageable)
+        .pipe(takeUntil(this.destroyed$))
         .subscribe(this.viewModel.expectModel());
     }
   }

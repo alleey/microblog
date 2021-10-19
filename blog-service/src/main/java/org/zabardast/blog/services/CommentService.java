@@ -2,6 +2,7 @@ package org.zabardast.blog.services;
 
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.CommentResponseRepresentation;
 import org.zabardast.blog.events.CommentCreatedEvent;
@@ -19,12 +20,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 
 @Service
 public class CommentService
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
@@ -56,7 +58,9 @@ public class CommentService
     }
 
     @Transactional
-    public CommentResponseRepresentation newComment(@NotNull Long postId, @NotNull String ownerId, @NotNull CommentRequestRepresentation commentRequestRepresentation) {
+    public CommentResponseRepresentation newComment(@NotNull Long postId,
+                                                    @NotNull String ownerId,
+                                                    @NotNull CommentRequestRepresentation commentRequestRepresentation) {
         return postRepository.findById(postId)
             .map(post -> {
                 Comment comment = modelMapper.map(commentRequestRepresentation, Comment.class);
@@ -67,7 +71,7 @@ public class CommentService
                 post.getComments().add(comment);
 
                 Comment saved = commentRepository.save(comment);
-                eventPublisher.publishEvent(new CommentCreatedEvent(this, saved));
+                eventPublisher.publishEvent(new CommentCreatedEvent(this, saved.getId()));
                 return convert(saved, postId);
             })
             .orElseThrow(() -> {
@@ -76,13 +80,16 @@ public class CommentService
     }
 
     @Transactional
-    public CommentResponseRepresentation updateComment(@NotNull Long postId, @NotNull Long commentId, @NotNull CommentRequestRepresentation commentRequestRepresentation) {
+    public CommentResponseRepresentation updateComment(@NotNull Long postId,
+                                                       @NotNull Long commentId,
+                                                       @NotNull CommentRequestRepresentation commentRequestRepresentation)
+    {
         Comment found = getPostCommentInternal(postId, commentId);
         found.setUpdatedOn(new Date());
         found.setText(commentRequestRepresentation.getText());
 
         Comment saved = commentRepository.save(found);
-        eventPublisher.publishEvent(new CommentUpdatedEvent(this, saved));
+        eventPublisher.publishEvent(new CommentUpdatedEvent(this, saved.getId()));
         return convert(saved, postId);
     }
 

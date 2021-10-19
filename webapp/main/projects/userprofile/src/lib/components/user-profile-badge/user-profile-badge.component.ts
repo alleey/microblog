@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { UserProfileModel, UserProfileResponseModel } from '../../models/user-profile';
 import { UserProfileService } from '../../services/user-profile.service';
@@ -12,7 +14,7 @@ export type UserProfileBadgeEvent = UserProfileBadgeViewEvent;
   templateUrl: './user-profile-badge.component.html',
   styleUrls: ['./user-profile-badge.component.css']
 })
-export class UserProfileBadgeComponent implements OnInit {
+export class UserProfileBadgeComponent implements OnInit, OnDestroy {
 
   @Input("userid") paramUserId?: string;
   @Input() contentTemplate: TemplateRef<any> | undefined;
@@ -21,6 +23,7 @@ export class UserProfileBadgeComponent implements OnInit {
 
   userId?: string;
   viewModel = new ViewModelHolder<UserProfileResponseModel>();
+  destroyed$ = new Subject();
 
   constructor(
     private userProfileService: UserProfileService, 
@@ -34,10 +37,16 @@ export class UserProfileBadgeComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
   fetchUserProfile(userId: string): void {
     this.userId = userId;
     this.userProfileService
       .one("", this.userId)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }
 

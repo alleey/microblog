@@ -5,6 +5,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageImpl;
 import org.zabardast.blog.dto.TopicRequestRepresentation;
 import org.zabardast.blog.dto.TopicResponseRepresentation;
@@ -20,7 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 
@@ -28,6 +29,7 @@ import org.zabardast.common.filtering.FilterPredicateConverter;
 public class TopicService
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
@@ -82,17 +84,19 @@ public class TopicService
         Topic topic = modelMapper.map(topicRequestRepresentation, Topic.class);
         Topic saved = topicRepository.save(topic);
 
-        eventPublisher.publishEvent(new TopicCreatedEvent(this, saved));
+        eventPublisher.publishEvent(new TopicCreatedEvent(this, saved.getId()));
         return modelMapper.map(saved, TopicResponseRepresentation.class);
     }
 
     @Transactional
-    public TopicResponseRepresentation updateTopic(@NotNull Long topicId, @NotNull TopicRequestRepresentation blogTopic) {
+    public TopicResponseRepresentation updateTopic(@NotNull Long topicId,
+                                                   @NotNull TopicRequestRepresentation blogTopic)
+    {
         return topicRepository.findById(topicId)
             .map(found -> {
                 found.setCaption(blogTopic.getCaption());
                 Topic saved = topicRepository.save(found);
-                eventPublisher.publishEvent(new TopicUpdatedEvent(this, saved));
+                eventPublisher.publishEvent(new TopicUpdatedEvent(this, saved.getId()));
                 return modelMapper.map(saved, TopicResponseRepresentation.class);
             })
             .orElseThrow(() -> {

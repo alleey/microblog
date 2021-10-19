@@ -114,7 +114,7 @@ public class BookmarksController {
 
 	@DeleteMapping(value = "{bookmarkId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
-	public ResponseEntity<?> deleteBookmark(@PathVariable Long bookmarkId) {
+	public ResponseEntity<?> deleteBookmark(@PathVariable Long bookmarkId, @NotNull Authentication authentication) {
 		bookmarkService.deleteBookmark(bookmarkId);
 		return ResponseEntity.noContent().build();
 	}

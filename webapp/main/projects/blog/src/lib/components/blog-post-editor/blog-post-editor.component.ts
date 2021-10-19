@@ -1,10 +1,12 @@
 import { Location } from '@angular/common';
-import { Component, Inject, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Inject, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { PostsServiceConfig, PostsServiceConfigToken } from '../../config/config';
-import { BlogPostModel, BlogPostResponseModel } from '../../models/blog-post';
+import { BlogPostResponseModel } from '../../models/blog-post';
 import { TopicModel } from '../../models/topic';
 import { PostsService } from '../../services/posts.service';
 import { uniqueSlugValidator } from '../../validators/unique-slug-validator';
@@ -32,7 +34,7 @@ function slugify(text: string) {
   templateUrl: './blog-post-editor.component.html',
   styleUrls: ['./blog-post-editor.component.scss']
 })
-export class BlogPostEditorComponent implements OnInit {
+export class BlogPostEditorComponent implements OnInit, OnDestroy {
 
   @Input("postId") paramPostId?: number;
   @Input() updateMode: boolean = true;
@@ -45,6 +47,7 @@ export class BlogPostEditorComponent implements OnInit {
   form!: FormGroup;
   successDesc: any = "Post updated successfully!";
   viewModel = new ViewModelHolder<BlogPostResponseModel>();
+  destroyed$ = new Subject();
 
   constructor(
     @Inject(PostsServiceConfigToken) private config: PostsServiceConfig,
@@ -86,6 +89,11 @@ export class BlogPostEditorComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
+
   get isUpdateMode(): boolean { 
     return this.updateMode && this.postId !== undefined; 
   }
@@ -118,6 +126,7 @@ export class BlogPostEditorComponent implements OnInit {
   fetchPost(id: number): void {
     this.service
       .one("", id)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel({
         nextObserver: {
           next: (i: BlogPostResponseModel) => this.updateForm(i)
@@ -128,6 +137,7 @@ export class BlogPostEditorComponent implements OnInit {
   createNewPost(): void {
     this.service
       .create("", this.slug?.value, this.title?.value, this.text?.value)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(
         this.viewModel.expectModel({
           deferReset: true, // because we are going to chain assignTopics, the loading flag shouldnt be reset now
@@ -141,6 +151,7 @@ export class BlogPostEditorComponent implements OnInit {
   updatePost(): void {
     this.service
       .update("", this.postId!, this.slug?.value, this.title?.value, this.text?.value)
+      .pipe(takeUntil(this.destroyed$))
       .subscribe(
         this.viewModel.expectNothing({
           deferReset: true,

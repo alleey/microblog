@@ -1,3 +1,9 @@
 spring:
   application:
     name: bookmark-service
+
+service:
+  tasks:
+    flushoutbox:
+      fixedDelay: 300
+      batchSize: 100

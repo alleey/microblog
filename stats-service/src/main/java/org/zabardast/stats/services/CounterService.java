@@ -1,18 +1,18 @@
 package org.zabardast.stats.services;
 
 import java.util.Date;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.common.events.EventPublisher;
+import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.events.CounterCreatedEvent;
@@ -29,6 +29,7 @@ import org.zabardast.stats.services.exceptions.CounterNotFoundException;
 public class CounterService
 {
     @Autowired
+    @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
 
     @Autowired
