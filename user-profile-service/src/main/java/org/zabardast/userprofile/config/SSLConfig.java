@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 
 //@Slf4j
@@ -47,6 +48,7 @@ import org.springframework.core.io.Resource;
 
 @Slf4j
 @Configuration
+@Profile("!test")
 public class SSLConfig {
 
     @Value("${server.ssl.trust-store}") Resource trustStore;

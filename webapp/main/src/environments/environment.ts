@@ -32,26 +32,26 @@ export const environment = {
 
   services: {
     posts: {
-      serviceBaseUrl: "http://localhost:9081/api/v1",
+      serviceBaseUrl: "http://localhost:9080/api/v1",
       defaultEndpoint: "posts",
       pageSize: 10,
       maxTitleLength: 256,
       maxContentLength: 4096,
     },
     comments: {
-      serviceBaseUrl: "http://localhost:9081/api/v1",
+      serviceBaseUrl: "http://localhost:9080/api/v1",
       defaultEndpoint: "posts",
       pageSize: 25,
       maxContentLength: 1024,
     },
     topics: {
-      serviceBaseUrl: "http://localhost:9081/api/v1",
+      serviceBaseUrl: "http://localhost:9080/api/v1",
       defaultEndpoint: "topics",
       pageSize: 25,
     },
     bookmarks: {
-      serviceBaseUrl: "http://localhost:9080/api/v1",
-      defaultEndpoint: "bookmarks",
+      serviceBaseUrl: "http://localhost:9081/api/v1",
+      defaultEndpoint: "bookmark",
       pageSize: 25,
     },
     userProfiles: {

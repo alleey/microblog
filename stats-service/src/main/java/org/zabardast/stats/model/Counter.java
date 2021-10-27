@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @IdClass(CounterKey.class)
-@Table(name = "counters", schema="stats")
+@Table(name = "counters", schema="statsservice")
 @Data
 @Builder
 @NoArgsConstructor

@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @IdClass(FollowingKey.class)
-@Table(name = "followers", schema="followers")
+@Table(name = "followers", schema="followersservice")
 @Data
 @Builder
 @NoArgsConstructor

@@ -1,4 +1,4 @@
-package org.zabardast.stats.model;
+package org.zabardast.bookmarks.events;
 
 import lombok.Getter;
 import lombok.Setter;

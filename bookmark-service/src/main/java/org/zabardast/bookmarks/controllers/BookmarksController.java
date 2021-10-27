@@ -71,7 +71,7 @@ public class BookmarksController {
 			Filter filter = mapper.readValue(criteria, Filter.class);
 
 			PagedModel<?> entities = pagedAssembler.toModel(
-				bookmarkService.getAllFiltered(authentication.getName(), filter, page),
+				bookmarkService.findAllFiltered(authentication.getName(), filter, page),
 				assembler
 			);
 			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);

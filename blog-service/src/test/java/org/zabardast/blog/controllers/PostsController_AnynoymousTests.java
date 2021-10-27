@@ -11,9 +11,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.zabardast.blog.MockBlogData;
 import org.zabardast.blog.dto.PostResponseRepresentation;
+import org.zabardast.blog.events.publishers.DomainEventPublisher;
 import org.zabardast.blog.services.PostService;
 import org.zabardast.blog.services.exceptions.PostNotFoundException;
 import java.util.Arrays;

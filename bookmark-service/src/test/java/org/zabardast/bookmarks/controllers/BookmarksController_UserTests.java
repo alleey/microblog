@@ -32,7 +32,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.bookmarks.MockBookmarkData;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
-import org.zabardast.bookmarks.model.Bookmark;
 import org.zabardast.bookmarks.services.BookmarkService;
 import org.zabardast.bookmarks.services.exceptions.BookmarkAlreadyExistsException;
 import org.zabardast.bookmarks.services.exceptions.BookmarkNotFoundException;
@@ -106,7 +105,7 @@ class BookmarksController_UserTests {
 			Arrays.asList(Condition.builder().attribute("caption").operator(Operator.EQ).value("something").build())
 		).build();
 
-		Mockito.when(bookmarkService.getAllFiltered(MockBookmarkData.UserIdGuest, critera, pageable)).then(r -> page);
+		Mockito.when(bookmarkService.findAllFiltered(MockBookmarkData.UserIdGuest, critera, pageable)).then(r -> page);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/bookmarks/search?q={json}", MockBookmarkData.objectToJson(critera))
 				.accept(MediaType.APPLICATION_JSON);
 

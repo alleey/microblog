@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.zabardast.common.events.BaseEvent;
 import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.followers.model.Event;
-import org.zabardast.followers.model.OutboxEvent;
+import org.zabardast.followers.events.OutboxEvent;
 import org.zabardast.followers.repository.EventRepository;
 
 @Slf4j

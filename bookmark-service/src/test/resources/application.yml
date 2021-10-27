@@ -1,9 +1,9 @@
 spring:
   config:
-    import: "optional:configserver:${CONFIG_URI:http://localhost:8888/config}"
+    import: "optional:configserver:"
   datasource:
     driver-class-name: org.h2.Driver
-    url: "jdbc:h2:mem:bookmarks;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS bookmark"
+    url: "jdbc:h2:mem:bookmarkservice;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS bookmarkservice"
     username: sa
     password: sa
   security:

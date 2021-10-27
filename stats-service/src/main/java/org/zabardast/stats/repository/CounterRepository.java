@@ -26,6 +26,6 @@ public interface CounterRepository extends PagingAndSortingRepository<Counter, C
     public Optional<CounterStatistics> getCounterStatistics(@Param("counterId") String counterId);
 
     public Counter findByCounterAndOwner(String counterId, String ownerId);
-
+    public Page<Counter> findByOwner(String ownerId, Pageable page);
     public Page<Counter> findByCounter(String counterId, Pageable page);
 }

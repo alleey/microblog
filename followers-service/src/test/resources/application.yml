@@ -1,9 +1,9 @@
 spring:
   config:
-    import: "optional:configserver:${CONFIG_URI:http://localhost:8888/config}"
+    import: "optional:configserver:"
   datasource:
     driver-class-name: org.h2.Driver
-    url: "jdbc:h2:mem:followers;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS followers"
+    url: "jdbc:h2:mem:followersservice;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS followersservice"
     username: sa
     password: sa
   security:

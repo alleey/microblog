@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.zabardast.bookmarks.model.Event;
-import org.zabardast.bookmarks.model.OutboxEvent;
+import org.zabardast.bookmarks.events.OutboxEvent;
 import org.zabardast.bookmarks.repository.EventRepository;
 import org.zabardast.common.events.BaseEvent;
 import org.zabardast.common.events.publishers.EventPublisher;

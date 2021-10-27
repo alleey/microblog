@@ -31,10 +31,10 @@ class SeedDatabaseRunner implements CommandLineRunner {
     public static final String UserIdService = "2c21ad8e-2d19-4033-bd54-2cb778cd3eb7";
 
     public static final String[] TopicNames = {
-            "General", "Politics", "Religion", "Philosophy", "Science", "Sports", "Technology",
-            "Cooking", "Gardening", "Programming", "Electronics", "Art", "History", "Falconry",
-            "E-Sports", "Mysticism", "Graphics Design", "Aviation", "Drugs", "International Relations",
-            "Defense", "Foreign Affairs", "War Studies"
+        "General", "Politics", "Religion", "Philosophy", "Science", "Sports", "Technology",
+        "Cooking", "Gardening", "Programming", "Electronics", "Art", "History", "Falconry",
+        "E-Sports", "Mysticism", "Graphics Design", "Aviation", "Drugs", "International Relations",
+        "Defense", "Foreign Affairs", "War Studies"
     };
 
     @Autowired

@@ -3,16 +3,20 @@ package org.zabardast.stats.services;
 import java.util.Date;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.common.events.publishers.EventPublisher;
+import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.events.CounterCreatedEvent;
@@ -61,10 +65,34 @@ public class CounterService
     }
 
     @Transactional
-    public Page<CounterResponseRepresentation> getAllCounters(@NotNull String counterId, @NotNull Pageable pageable) {
+    public Page<CounterResponseRepresentation> findAllByCounter(@NotNull String counterId, @NotNull Pageable pageable) {
         return counterRepository
                 .findByCounter(counterId, pageable)
                 .map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
+    }
+
+    @Transactional
+    public Page<CounterResponseRepresentation> findAllByOwner(@NotNull String ownerId, @NotNull Pageable pageable) {
+        return counterRepository
+                .findByOwner(ownerId, pageable)
+                .map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
+    }
+
+    @Transactional
+    public Page<CounterResponseRepresentation> findAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
+
+        CriteriaQuery<Counter> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
+                Counter.class,
+                criteria,
+                pageable.getSort());
+        TypedQuery<Counter> query = entityManager.createQuery(criteriaQuery);
+
+        int totalRows = query.getResultList().size();
+        query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+        query.setMaxResults(pageable.getPageSize());
+
+        Page<Counter> result = new PageImpl<>(query.getResultList(), pageable, totalRows);
+        return result.map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
     }
 
     @Transactional

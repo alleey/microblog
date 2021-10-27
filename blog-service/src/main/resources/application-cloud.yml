@@ -1,12 +1,6 @@
 spring:
   config:
-    import: "configserver:${CONFIG_URI:http://localhostx:8888/config}"
-    fail-fast: true
-    retry:
-      initial-interval: 3000
-      multiplier: 1.3
-      max-interval: 10000
-      max-attempts: 1000
+    import: "configserver:${CONFIG_URI:http://localhost:8888/config}?fail-fast=true&max-attempts=${CONFIG_RETRY_MAX_ATTEMPTS:15}&max-interval=${CONFIG_RETRY_MAX_INTERVAL:15000}&multiplier=${CONFIG_RETRY_MULTIPLIER:1.2}&initial-interval=${CONFIG_RETRY_INITIAL_INTERVAL:3000}"
   cloud:
     loadbalancer:
       ribbon:

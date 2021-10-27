@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "events", schema="userprofiles")
+@Table(name = "events", schema="statsservice")
 @Data
 @Builder
 @NoArgsConstructor
@@ -40,6 +41,7 @@ public class Event {
     @Column(name = "principal", nullable = true)
     private String principal;
 
-    @Column(name = "payload", nullable = false, columnDefinition="CLOB")
+    @Lob
+    @Column(name = "payload", nullable = false)
     private String payload;
 }

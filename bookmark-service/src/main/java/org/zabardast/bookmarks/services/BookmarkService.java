@@ -74,14 +74,11 @@ public class BookmarkService
     }
 
     @Transactional
-    public Page<BookmarkResponseRepresentation> getAllFiltered(@NotNull String ownerId, @NotNull Filter criteria, @NotNull Pageable pageable) {
+    public Page<BookmarkResponseRepresentation> findAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<Bookmark> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
                 Bookmark.class,
-                Filter.builder().conditions(Arrays.asList(
-                    Condition.builder().attribute("owner").operator(Operator.EQ).value(ownerId).build(),
-                    criteria
-                )).build(),
+                criteria,
                 pageable.getSort());
         TypedQuery<Bookmark> query = entityManager.createQuery(criteriaQuery);
 
@@ -91,6 +88,20 @@ public class BookmarkService
 
         Page<Bookmark> result = new PageImpl<>(query.getResultList(), pageable, totalRows);
         return result.map(i -> modelMapper.map(i, BookmarkResponseRepresentation.class));
+    }
+
+    @Transactional
+    public Page<BookmarkResponseRepresentation> findAllFiltered(@NotNull String ownerId, @NotNull Filter criteria, @NotNull Pageable pageable) {
+
+        return findAllFiltered(Filter.builder()
+                .conditions(Arrays.asList(
+                    Condition.builder()
+                            .attribute("owner")
+                            .operator(Operator.EQ)
+                            .value(ownerId)
+                            .build(),
+                    criteria))
+                .build(), pageable);
     }
 
     @Transactional

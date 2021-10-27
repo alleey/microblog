@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -24,7 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "posts", schema="blog")
+@Table(name = "posts", schema="blogservice")
 @Data
 @Builder
 @NoArgsConstructor
@@ -41,8 +42,9 @@ public class Post {
 
     @Column(name = "title", nullable = false, length = 512)
     private String title;
-  
-    @Column(name = "text", nullable = false, columnDefinition="CLOB")
+
+    @Lob
+    @Column(name = "text", nullable = false)
     private String text;
 
     @Column(name = "owner_id", nullable = false)
@@ -60,7 +62,7 @@ public class Post {
     List<Comment> comments;
 
     @ManyToMany
-    @JoinTable(name = "posts_topics", schema = "blog",
+    @JoinTable(name = "posts_topics", schema = "blogservice",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id"))
     Set<Topic> topics;

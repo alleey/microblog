@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.bookmarks.model.Event;
-import org.zabardast.bookmarks.model.OutboxEvent;
+import org.zabardast.bookmarks.events.OutboxEvent;
 import org.zabardast.bookmarks.repository.EventRepository;
 import org.zabardast.common.events.publishers.EventPublisher;
 

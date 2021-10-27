@@ -1,17 +1,8 @@
-server:
-  port: ${BOOKMARK_SERVICE_PORT:9080}
-  ssl:
-    enabled: ${BOOKMARK_SERVICE_SSL_ENABLED:false}
-    client-auth: ${BOOKMARK_SERVICE_SSL_CLIENT_AUTH:none}
-    #    protocol: TLS
-    #    enabled-protocols: TLSv1.2
-    key-store: classpath:keystore/server.jks
-    key-alias: server
-    key-store-type: JKS
-    key-store-password: zabardast
-    trust-store: classpath:keystore/server.jks
-    trust-store-type: JKS
-    trust-store-password: zabardast
+service:
+  tasks:
+    flushoutbox:
+      fixedDelay: ${EVENT_FLUSH_INTERVAL:180000}
+      batchSize: ${EVENT_FLUSH_BATCHSIZE:100}
 
 management:
   endpoints:
@@ -20,12 +11,44 @@ management:
         include: env,health,metrics
 
 spring:
+  cloud:
+    config:
+      allowOverride: true
+      overrideNone: true
+      overrideSystemProperties: false
+    stream:
+      source: domainEvents
+      kafka:
+        binder:
+          brokers: "${KAFKA_BROKERS:localhost:9092}"
+          zkNodes: "${ZOOKEEPER_NODES:localhost:2181}"
+      bindings:
+        domainEvents-out-0:
+          destination: bookmark.zabardast
+          producer:
+            partition-key-expression: headers['Service']
+        userProfileEvents-in-0:
+          group: bookmark-service
+          destination: userprofile.zabardast
+          enableDlq: true
+          dlqName: userprofile.zabardast.bookmark.dlq
+          dlqProducerProperties:
+            configuration:
+              value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        blogEvents-in-0:
+          group: bookmark-service
+          destination: blog.zabardast
+          enableDlq: true
+          dlqName: blog.zabardast.bookmark.dlq
+          dlqProducerProperties:
+            configuration:
+              value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
     platform: "postgres"
     driver-class-name: "org.postgresql.Driver"
-    url: "jdbc:postgresql://database:5432/bookmarks_local"
-    username: "postgres"
-    password: "{cipher}23764ab05adf12c10e97ea9321690d67e7b8259a46b7baab75d802b7a506c4eb"
+    url: "jdbc:postgresql://${DB_ADDR:database:5432}/${DB_DATABASE:bookmarkservice}"
+    username: "${DB_USER:bookmarkservice}"
+    password: "${DB_PASSWORD:bookmarkservice}"
     test-while-idle: "true"
     validation-query: "SELECT 1"
   jpa:
@@ -51,4 +74,13 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_URI:http://localhost:9001/eureka}
+      defaultZone: "${EUREKA_URI:http://localhost:9001/eureka}"
+    tls:
+      enabled: false
+      key-store: classpath:keystore/server.jks
+      key-alias: server
+      key-store-type: JKS
+      key-store-password: zabardast
+      trust-store: classpath:keystore/server.jks
+      trust-store-type: JKS
+      trust-store-password: zabardast

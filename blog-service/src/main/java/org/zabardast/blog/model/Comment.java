@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -19,7 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comments", schema="blog")
+@Table(name = "comments", schema="blogservice")
 @Data
 @Builder
 @NoArgsConstructor
@@ -34,7 +35,8 @@ public class Comment {
     @Column(name = "owner_id", nullable = false)
     private String owner;
 
-    @Column(name = "text", nullable = false, columnDefinition="CLOB")
+    @Lob
+    @Column(name = "text", nullable = false)
     private String text;
   
     @Column(name = "created_on", nullable = false)

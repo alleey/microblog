@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "bookmarks", schema="bookmark")
+@Table(name = "bookmarks", schema="bookmarkservice")
 @Data
 @Builder
 @NoArgsConstructor

@@ -1,40 +1,37 @@
-#logging:
-#  level:
-#    root: debug
-
-server:
-  port: ${BOOKMARK_SERVICE_PORT:9080}
-  ssl:
-    enabled: ${BOOKMARK_SERVICE_SSL_ENABLED:false}
-    client-auth: ${BOOKMARK_SERVICE_SSL_CLIENT_AUTH:none}
-    #    protocol: TLS
-    #    enabled-protocols: TLSv1.2
-    key-store: classpath:keystore/server.jks
-    key-alias: server
-    key-store-type: JKS
-    key-store-password: zabardast
-    trust-store: classpath:keystore/server.jks
-    trust-store-type: JKS
-    trust-store-password: zabardast
-
 spring:
   cloud:
     config:
       enabled: false
     stream:
-      source: producer
+      source: domainEvents
       kafka:
         binder:
-          brokers: "${KAFKA_BROKERS:localhost:9094}"
+          brokers: "${KAFKA_BROKERS:localhost:9092}"
           zkNodes: "${ZOOKEEPER_NODES:localhost:2181}"
       bindings:
-        producer-out-0:
-          destination: domain-events
-        consumer-in-0:
-          destination: domain-events
+        domainEvents-out-0:
+          destination: bookmark.zabardast
+          producer:
+            partition-key-expression: headers['Service']
+        userProfileEvents-in-0:
+          group: bookmark-service
+          destination: userprofile.zabardast
+          enableDlq: true
+          dlqName: userprofile.zabardast.bookmark.dlq
+          dlqProducerProperties:
+            configuration:
+              value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        blogEvents-in-0:
+          group: bookmark-service
+          destination: blog.zabardast
+          enableDlq: true
+          dlqName: blog.zabardast.bookmark.dlq
+          dlqProducerProperties:
+            configuration:
+              value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
     driver-class-name: org.h2.Driver
-    url: "jdbc:h2:mem:bookmarks;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS bookmark"
+    url: "jdbc:h2:mem:bookmarkservice;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS bookmarkservice"
     username: sa
     password: sa
   security:

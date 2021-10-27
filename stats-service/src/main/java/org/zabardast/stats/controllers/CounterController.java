@@ -19,12 +19,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zabardast.stats.dto.BatchCounterRequestRepresentation;
-import org.zabardast.stats.dto.CounterRequestRepresentation;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
 import org.zabardast.stats.dto.CounterStatisticsResponseRepresentation;
 import org.zabardast.stats.dto.assemblers.CounterResponseRepresentationAssembler;
@@ -67,7 +65,7 @@ public class CounterController {
 	public ResponseEntity<?> getCounterOwners(@PathVariable String counter, final Pageable page) {
 
 		PagedModel<?> entities = pagedAssembler.toModel(
-			counterService.getAllCounters(counter, page),
+			counterService.findAllByCounter(counter, page),
 			counterResponseRepresentationAssembler
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);

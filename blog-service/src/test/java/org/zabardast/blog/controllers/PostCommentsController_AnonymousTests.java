@@ -9,11 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.zabardast.blog.MockBlogData;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.CommentResponseRepresentation;
+import org.zabardast.blog.events.publishers.DomainEventPublisher;
 import org.zabardast.blog.model.Comment;
 import org.zabardast.blog.services.CommentService;
 import org.zabardast.blog.services.exceptions.CommentNotFoundException;

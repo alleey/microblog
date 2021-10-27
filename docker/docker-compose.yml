@@ -20,7 +20,10 @@ volumes:
 services:
   # Infrastructure
   database:
-    image: postgres:9.5
+    image: zabardast/postgres
+    build:
+      context: ./infra/postgres
+      dockerfile: Dockerfile
     ports:
       - "5432:5432"
     environment:
@@ -33,13 +36,13 @@ services:
   kafka:
     image: wurstmeister/kafka
     ports:
-      - "9094:9094"
+      - "9092:9092"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://127.0.0.1:9094
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://127.0.0.1:9094
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_LISTENERS: INTERNAL://:9094,EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://:9094,EXTERNAL://127.0.0.1:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
     volumes:
       - kafka_data:/kafka
     depends_on:
@@ -50,7 +53,7 @@ services:
     ports:
       - "2181:2181"
     environment:
-      - KAFKA_ADVERTISED_HOST_NAME=zookeeper
+      KAFKA_ADVERTISED_HOST_NAME: 'zookeeper'
     volumes:
       - zookeeper_data:/opt/zookeeper-3.4.13/data
       - zookeeper_conf:/opt/zookeeper-3.4.13/conf
@@ -58,22 +61,24 @@ services:
   keycloak:
     image: zabardast/keycloak
     build:
-      context: ./keycloak
+      context: ./infra/keycloak
       dockerfile: Dockerfile
       args:
         user: service
     ports:
-       - "8080:8080"
-       - "8443:8443"
+      - "8080:8080"
+      - "8443:8443"
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: database
       DB_DATABASE: zabardast
-      DB_SCHEMA: public
-      DB_USER: postgres
-      DB_PASSWORD: postgres
+      DB_SCHEMA: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
+    depends_on:
+      - database
 
   eurekaserver:
     image: zabardast/eureka-service

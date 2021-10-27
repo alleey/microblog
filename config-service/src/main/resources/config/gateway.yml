@@ -1,17 +1,3 @@
-server:
-  port: ${GATEWAY_SERVICE_PORT:9000}
-  ssl:
-    enabled: ${GATEWAY_SERVICE_SSL_ENABLED:false}
-    client-auth: ${GATEWAY_SERVICE_SSL_CLIENT_AUTH:none}
-    #    protocol: TLS
-    #    enabled-protocols: TLSv1.2
-    key-store: classpath:keystore/server.jks
-    key-alias: server
-    key-store-type: JKS
-    key-store-password: zabardast
-    trust-store: classpath:keystore/server.jks
-    trust-store-type: JKS
-    trust-store-password: zabardast
 
 management:
   endpoint:
@@ -29,10 +15,23 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_URI:http://localhost:9001}/eureka
+      defaultZone: "${EUREKA_URI:http://localhost:9001/eureka}"
+    tls:
+      enabled: false
+      key-store: classpath:keystore/server.jks
+      key-alias: server
+      key-store-type: JKS
+      key-store-password: zabardast
+      trust-store: classpath:keystore/server.jks
+      trust-store-type: JKS
+      trust-store-password: zabardast
 
 spring:
   cloud:
+    config:
+      allowOverride: true
+      overrideNone: true
+      overrideSystemProperties: false
     loadbalancer:
       ribbon:
         enabled: false
@@ -57,10 +56,10 @@ spring:
             - name: Retry
               args:
                 retries: 3
-        - id: bookmarks
-          uri: lb://bookmarks-service
+        - id: bookmark
+          uri: lb://bookmark-service
           predicates:
-            - Path=/bookmarks/**
+            - Path=/bookmark/**
           filters:
             - TokenRelay=
             - StripPrefix=1
@@ -97,13 +96,15 @@ spring:
             - name: Retry
               args:
                 retries: 3
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       globalcors:
         corsConfigurations:
           '[/**]':
             allowCredentials: true
             allowedOriginPatterns:
-              - https://localhost:*
-              - http://localhost:*
+              - https://*
+              - http://*
             allowedMethods: "*"
             allowedHeaders: "*"
   security:

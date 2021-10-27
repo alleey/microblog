@@ -1,0 +1,290 @@
+version: "3.7"
+
+networks:
+  default:
+    name: zabardast.net
+    ipam:
+      config:
+      - subnet: 172.33.0.0/16
+
+services:
+  configservice:
+    image: zabardast/config-service
+    build:
+      context: ../config-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9003:9003"
+    restart: on-failure:30
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9003
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+
+  eurekaservice:
+    image: zabardast/eurekaservice
+    build:
+      context: ../eureka-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9001:9001"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9001
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+
+  # App services
+  gateway:
+    image: zabardast/gateway
+    build:
+      context: ../gateway-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9000:9000"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9000
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+
+  blogservice:
+    image: zabardast/blog-service
+    build:
+      context: ../blog-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9080:9080"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9080
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: blogservice
+      DB_USER: blogservice
+      DB_PASSWORD: 'blogservice'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      PRUNE_ORPHANED_POSTS: 'true'
+
+  bookmarkservice:
+    image: zabardast/bookmark-service
+    build:
+      context: ../bookmark-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9081:9081"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9081
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: bookmarkservice
+      DB_USER: bookmarkservice
+      DB_PASSWORD: 'bookmarkservice'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      
+  userprofileservice:
+    image: zabardast/user-profile-service
+    build:
+      context: ../user-profile-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9082:9082"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9082
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: userprofileservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      PROFILE_SYNC_INTERVAL: 180000
+      PROFILE_SYNC_BATCHSIZE: 1000
+
+  followersservice:
+    image: zabardast/followers-service
+    build:
+      context: ../followers-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9083:9083"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9083
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: followersservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_BROKERS: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+
+  statsservice:
+    image: zabardast/stats-service
+    build:
+      context: ../stats-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9084:9084"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9084
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: statsservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+
+  webapp:
+    image: zabardast/webapp
+    build:
+      context: ../webapp/main
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "4200:80"
+    restart: on-failure:30
+    environment:
+      NGINX_PORT: 80
+    depends_on:
+      - blogservice
+      - bookmarkservice
+      - followersservice
+      - statsservice
+      - userprofileservice

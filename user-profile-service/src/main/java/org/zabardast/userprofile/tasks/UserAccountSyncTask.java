@@ -1,6 +1,6 @@
 package org.zabardast.userprofile.tasks;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.zabardast.userprofile.dto.keycloak.KeycloakUserRepresentation;
 import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
 import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
+import org.zabardast.userprofile.dto.keycloak.KeycloakUserRepresentation;
 import org.zabardast.userprofile.services.KeycloakService;
 import org.zabardast.userprofile.services.UserProfileService;
 import org.zabardast.userprofile.services.exceptions.UserProfileNotFoundException;
@@ -38,7 +38,7 @@ public class UserAccountSyncTask {
     public void syncKeycloakUsers() {
 
         long now = System.currentTimeMillis() / 1000;
-        log.info("Started keycloak user account sync process - {}", LocalDate.now());
+        log.info("Started keycloak user account sync process - {}", LocalDateTime.now());
 
         int usercount = keycloakService.usersCount();
         int processed = 0;
@@ -57,7 +57,7 @@ public class UserAccountSyncTask {
 
         deleteOrphanedProfiles();
 
-        log.info("Finished keycloak user account sync process - {}", LocalDate.now());
+        log.info("Finished keycloak user account sync process - {}", LocalDateTime.now());
     }
 
     void updateLocalProfile(@NotNull  KeycloakUserRepresentation keycloakUserRepresentation) {

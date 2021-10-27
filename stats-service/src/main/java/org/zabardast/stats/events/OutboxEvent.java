@@ -1,4 +1,4 @@
-package org.zabardast.followers.model;
+package org.zabardast.stats.events;
 
 import lombok.Getter;
 import lombok.Setter;

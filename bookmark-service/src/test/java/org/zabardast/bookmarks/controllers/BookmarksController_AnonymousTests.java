@@ -6,6 +6,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.bookmarks.MockBookmarkData;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
-import org.zabardast.bookmarks.model.Bookmark;
+import org.zabardast.bookmarks.events.publishers.DomainEventPublisher;
 import org.zabardast.bookmarks.services.BookmarkService;
 
 @SpringBootTest()
