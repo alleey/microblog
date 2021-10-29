@@ -28,7 +28,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
-    if(!!this.user) {
+    if(!!this.user && !this.user.expired) {
       //console.log("Adding authentication header");
       request = request.clone({
         setHeaders: {

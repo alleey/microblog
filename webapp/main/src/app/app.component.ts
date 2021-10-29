@@ -16,8 +16,8 @@ export class AppComponent {
 
   constructor(private router: Router, private authService: OidcAuthService) {
     this.authService.userSubject
-      .subscribe(profile => {
-        this.userProfile = profile;
+      .subscribe(user => {
+        this.userProfile = user?.profile;
       });
   }
 
@@ -25,6 +25,7 @@ export class AppComponent {
   get userName(): string { return this.userProfile?.name; }
 
   userPosts() : void {
+    console.log(this.userProfile);
     this.router.navigate(['user', this.userId, 'posts'], 
     { 
       state: { "endpoint": `users/${this.userId}/posts` }

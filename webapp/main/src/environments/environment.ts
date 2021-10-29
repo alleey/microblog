@@ -8,7 +8,7 @@ export const environment = {
   oidc: {
     clientId: 'zabardast-public-client',
     filterProtocolClaims: true,
-    issuer: 'http://localhost:8080/auth/realms/zabardast',
+    issuer: 'https://localhost:8443/auth/realms/zabardast',
     loadUserInfo: true,
     redirectUri: 'http://localhost:4200/oidc-auth/login-callback',
     postLogoutRedirectUri: 'http://localhost:4200/oidc-auth/logout-callback',

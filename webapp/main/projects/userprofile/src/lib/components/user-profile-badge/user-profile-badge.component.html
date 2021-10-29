@@ -1,15 +1,6 @@
-<utils-loader *ngIf="viewModel.isLoading; else contents"></utils-loader>
-
-<ng-template #contents>
-    <utils-alert *ngIf="viewModel.isFailure; else viewer" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
-    </utils-alert>
-</ng-template>
-
-<ng-template #viewer>
-    <user-profile-badge-view
-        [userProfile]="userProfileItem" 
-        [contentTemplate]="contentTemplate"
-        (onEvent)="handleViewEvent($event)">
-    </user-profile-badge-view>
-</ng-template>
+<user-profile-badge-view
+    [userProfile]="userProfile" 
+    [contentTemplate]="contentTemplate"
+    [noContentTemplate]="noContentTemplate"
+    (onEvent)="handleViewEvent($event)">
+</user-profile-badge-view>

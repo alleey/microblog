@@ -11,8 +11,9 @@ export type UserProfileBadgeViewEvent = ViewEvent<UserProfileModel>;
 })
 export class UserProfileBadgeViewComponent implements OnInit {
 
-  @Input() userProfile!: UserProfileModel;
+  @Input() userProfile?: UserProfileModel;
   @Input() contentTemplate: TemplateRef<any> | undefined;
+  @Input() noContentTemplate: TemplateRef<any> | undefined;
 
   @Output() onEvent = new EventEmitter<UserProfileBadgeViewEvent>();
 
@@ -20,8 +21,8 @@ export class UserProfileBadgeViewComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  get userId(): string {
-    return this.userProfile.id;
+  get userId(): string | undefined {
+    return this.userProfile?.id;
   }
 
   selectItem(item: UserProfileModel, opcode: string): void {

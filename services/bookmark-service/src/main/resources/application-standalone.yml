@@ -1,0 +1,44 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+    stream:
+      source: domainEvents
+      kafka:
+        binder:
+          brokers: "${KAFKA_BROKERS:localhost:9092}"
+          zkNodes: "${ZOOKEEPER_NODES:localhost:2181}"
+      bindings:
+        domainEvents-out-0:
+          destination: bookmark.zabardast
+          producer:
+            partition-key-expression: headers['Service']
+        userProfileEvents-in-0:
+          group: bookmark-service
+          destination: userprofile.zabardast
+          enableDlq: true
+          dlqName: userprofile.zabardast.bookmark.dlq
+          dlqProducerProperties:
+            configuration:
+              value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        blogEvents-in-0:
+          group: bookmark-service
+          destination: blog.zabardast
+          enableDlq: true
+          dlqName: blog.zabardast.bookmark.dlq
+          dlqProducerProperties:
+            configuration:
+              value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:bookmarkservice;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS bookmarkservice"
+    username: sa
+    password: sa
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:https://localhost:8443}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+eureka:
+  client:
+    enabled: false

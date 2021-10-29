@@ -1,0 +1,126 @@
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: env,health,metrics,gateway
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: "${EUREKA_URI:http://localhost:9001/eureka}"
+    tls:
+      enabled: false
+      key-store: classpath:keystore/server.jks
+      key-alias: server
+      key-store-type: JKS
+      key-store-password: zabardast
+      trust-store: classpath:keystore/server.jks
+      trust-store-type: JKS
+      trust-store-password: zabardast
+
+spring:
+  cloud:
+    config:
+      allowOverride: true
+      overrideNone: true
+      overrideSystemProperties: false
+    loadbalancer:
+      ribbon:
+        enabled: false
+    gateway:
+      x-forwarded:
+        for.enabled: true
+        host.enabled: true
+        port.enabled: true
+        proto.enabled: true
+        prefix.enabled: true
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: blog
+          uri: lb://blog-service
+          predicates:
+            - Path=/blog/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: bookmark
+          uri: lb://bookmark-service
+          predicates:
+            - Path=/bookmark/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: userprofile
+          uri: lb://user-profile-service
+          predicates:
+            - Path=/userprofile/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: followers
+          uri: lb://followers-service
+          predicates:
+            - Path=/followers/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: stats
+          uri: lb://stats-service
+          predicates:
+            - Path=/stats/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowCredentials: true
+            allowedOriginPatterns:
+              - https://*
+              - http://*
+            allowedMethods: "*"
+            allowedHeaders: "*"
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            token-uri: "${KEYCLOCK_URL:https://localhost:8443}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/token"
+            authorization-uri: "${KEYCLOCK_URL:https://localhost:8443}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/auth"
+            userinfo-uri: "${KEYCLOCK_URL:https://localhost:8443}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/userinfo"
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: zabardast-service-client
+            client-secret: "c2ac53d1-1179-4fca-bd6e-c421d1a37e59"
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/zabardast-service-client"
+

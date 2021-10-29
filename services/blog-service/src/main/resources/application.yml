@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: blog-service
+
+server:
+  port: 9080
+  ssl:
+    enabled: false
+    client-auth: none
+    #    protocol: TLS
+    #    enabled-protocols: TLSv1.2
+    key-store: classpath:keystore/server.jks
+    key-alias: server
+    key-store-type: JKS
+    key-store-password: zabardast
+    trust-store: classpath:keystore/server.jks
+    trust-store-type: JKS
+    trust-store-password: zabardast
+
+service:
+  tasks:
+    flushoutbox:
+      fixedDelay: ${EVENT_FLUSH_INTERVAL:180000}
+      batchSize: ${EVENT_FLUSH_BATCHSIZE:100}
+  listeners:
+    userprofiledomainevents:
+      pruneOrphanedPosts: ${PRUNE_ORPHANED_POSTS:true}

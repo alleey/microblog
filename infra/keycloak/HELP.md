@@ -1,3 +1,15 @@
+# Exporting Realm Data
+
+```
+docker exec -it keycloak /opt/jboss/keycloak/bin/standalone.sh \
+-Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \
+-Dkeycloak.migration.provider=singleFile \
+-Dkeycloak.migration.realmName=zabardast \
+-Dkeycloak.migration.usersExportStrategy=REALM_FILE \
+-Dkeycloak.migration.file=/tmp/realm.json &> /tmp/export.log
+```
+
+# Managing Certificates
 
 ## Generate Keycloak keystores and certificates
 ```
@@ -16,3 +28,4 @@ chmod 644 zabardast-keycloak.*
 
 ## Import client/server certificates into services' trustStores
 keytool -import -alias keycloak -file zabardast-keycloak.crt -keystore server.jks -keypass zabardast -storepass zabardast
+

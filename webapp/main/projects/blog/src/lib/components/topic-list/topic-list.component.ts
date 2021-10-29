@@ -81,7 +81,7 @@ export class TopicListComponent implements OnInit, OnDestroy {
   }
 
   get items(): TopicModel[]|undefined {
-    return this.viewModel.Model?._embedded.topics;
+    return this.viewModel.Model?._embedded?.topics;
   }
 
   get page(): PageModel|undefined {

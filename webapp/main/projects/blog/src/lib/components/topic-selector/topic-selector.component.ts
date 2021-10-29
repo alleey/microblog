@@ -12,11 +12,11 @@ export class TopicSelectorComponent implements OnInit {
   @Input() maxTopics: number = 10;
   @Input() initialTopics: TopicModel[] = [];
 
-  maxTopicsError: boolean = false;
-  selectedTopics: TopicModel[] = [];
-
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
+
+  maxTopicsError: boolean = false;
+  selectedTopics: TopicModel[] = [];
 
   constructor() { }
 
@@ -24,7 +24,7 @@ export class TopicSelectorComponent implements OnInit {
     this.selectedTopics = this.initialTopics;
   }
 
-  isTopicSelected(topic: TopicModel): boolean {
+  public isTopicSelected(topic: TopicModel): boolean {
     return this.selectedTopics.findIndex(i => i.caption.toUpperCase() === topic.caption.toUpperCase()) > -1;
   }
 

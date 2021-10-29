@@ -18,7 +18,8 @@ export class UserProfileBadgeComponent implements OnInit, OnDestroy {
 
   @Input("userid") paramUserId?: string;
   @Input() contentTemplate: TemplateRef<any> | undefined;
-  
+  @Input() noContentTemplate: TemplateRef<any> | undefined;
+
   @Output() onEvent = new EventEmitter<UserProfileBadgeEvent>();
 
   userId?: string;
@@ -32,7 +33,7 @@ export class UserProfileBadgeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
-      this.userId = params.get("userId") ?? this.paramUserId;
+      this.userId = this.paramUserId! ?? params.get("userId");
       this.fetchUserProfile(this.userId!);
     });
   }
@@ -50,8 +51,8 @@ export class UserProfileBadgeComponent implements OnInit, OnDestroy {
       .subscribe(this.viewModel.expectModel());
   }
 
-  get userProfileItem(): UserProfileModel {
-    return this.viewModel.Model!;
+  get userProfile(): UserProfileModel | undefined {
+    return this.viewModel.Model;
   }
 
   handleViewEvent(evt: UserProfileBadgeViewEvent) {

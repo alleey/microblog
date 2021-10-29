@@ -1,6 +1,3 @@
-<div *ngIf="viewModel.isLoading; else contents">
-    <utils-loader></utils-loader>
-</div>
 
 <ng-template #defaultTitleTemplate let-item>
     <div class="d-flex justify-content-between">
@@ -12,20 +9,24 @@
     <hr class="my-4">
 </ng-template>
 
-<ng-template #contents>
+<div>
     <ng-container 
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
-    <utils-alert data-testid="editorSuccess" *ngIf="viewModel.isSuccess" [dismissable]="true" [minimal]="false" [kind]="'success'" [title]="'Congratulations!'">
-        <p>{{ successDesc }}</p>
-    </utils-alert>
-    <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure; else editor" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
-    </utils-alert>
-</ng-template>
 
-<ng-template #editor>
+    <div *ngIf="viewModel.isLoading">
+        <utils-loader></utils-loader>
+    </div>
+    <div *ngIf="!viewModel.isLoading">
+        <utils-alert data-testid="editorSuccess" *ngIf="viewModel.isSuccess" [dismissable]="true" [minimal]="false" [kind]="'success'" [title]="'Congratulations!'">
+            <p>{{ successDesc }}</p>
+        </utils-alert>
+        <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure" [dismissable]="false" [minimal]="false">
+            <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
+        </utils-alert>
+    </div>
+    
     <form [formGroup]="form" novalidate onSubmit="return false;">
         <div class="row">
             <div class="mb-3 col-sm-12">
@@ -105,7 +106,7 @@
             <input data-testid="update" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updatePost()">
         </div>
     </form>
-</ng-template>
+</div>
 
 <ng-template #topicsNotFoundTemplate let-item>
     No topic found!

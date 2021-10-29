@@ -1,41 +1,37 @@
-<div *ngIf="viewModel.isLoading; else contents">
-    <utils-loader></utils-loader>
-</div>
+<ng-container>
 
-<ng-template #contents>
-    <utils-alert *ngIf="viewModel.isFailure;else itemsList" [dismissable]="false" [minimal]="true">
-        <p>An error occurred fetching the topics list: {{ viewModel.Error }}</p>
-    </utils-alert>
-</ng-template>
-
-<ng-template #itemsList>
-
-    <ng-container
+    <ng-container 
         [ngTemplateOutlet]="headerTemplate || defaultHeaderTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
 
     <utils-search-box (onApplyFilter)="onApplyFilter($event)" *ngIf="enableSearch">
     </utils-search-box>
-    <topic-list-view 
-        [items]="items" 
-        [itemTemplate]="itemTemplate"
-        [noContentsTemplate]="noContentsTemplate"
+
+    <ng-container *ngIf="viewModel.isLoading">
+        <utils-loader></utils-loader>
+    </ng-container>
+    <ng-container *ngIf="!viewModel.isLoading">
+        <utils-alert *ngIf="viewModel.isFailure" [dismissable]="false" [minimal]="true">
+            <p>An error occurred fetching the topics list: {{ viewModel.Error }}</p>
+        </utils-alert>
+    </ng-container>
+
+    <topic-list-view [items]="items" [itemTemplate]="itemTemplate" [noContentsTemplate]="noContentsTemplate"
         (onEvent)="handleListViewEvent($event)">
     </topic-list-view>
     <utils-pager [page]="page" (onSelectPage)="gotoPage($event)">
     </utils-pager>
 
-    <ng-container
+    <ng-container 
         [ngTemplateOutlet]="footerTemplate || defaultFooterTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
 
-</ng-template>
+</ng-container>
 
 <ng-template #defaultHeaderTemplate>
 </ng-template>
-  
+
 <ng-template #defaultFooterTemplate>
 </ng-template>
-  

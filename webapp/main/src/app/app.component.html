@@ -1,5 +1,6 @@
 <div class="container-fluid">
-  <div class="row content">
+
+  <div class="row">
     <div class="col-sm-2 sidenav py-3">
 
       <h2>Zabardast microblog</h2>
@@ -8,7 +9,7 @@
         <a class="btn btn-primary mr-1" role="button" (click)="userPosts()" *authRequireLogin="'yes'">My Posts</a>
       </p>
 
-      <div class="input-group mb-3">
+      <!-- <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Search Blog..">
         <span class="input-group-btn">
           <button class="btn btn-default" type="button">
@@ -16,7 +17,7 @@
           </button>
         </span>
       </div>
-
+      -->
       <ul class="nav nav-tabs" id="tab1" role="tablist">
         <li class="nav-item">
           <a class="nav-link active" id="topics-tab" data-toggle="tab" href="#topics" role="tab" aria-controls="topics" aria-selected>Topics</a>
@@ -87,4 +88,5 @@
       This is a footer
     </div>
   </div>
+
 </div>
