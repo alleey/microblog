@@ -1,18 +1,17 @@
-<div *ngIf="viewModel.isLoading; else contents">
-    <utils-loader></utils-loader>
-</div>
-
-<ng-template #contents>
-    <utils-alert *ngIf="viewModel.isFailure;else itemsList" [dismissable]="false" [minimal]="true">
-        <p>An error occurred fetching the bookmarks list: {{ viewModel.Error }}</p>
-    </utils-alert>
-</ng-template>
-
-<ng-template #itemsList>
+<ng-container>
 
     <ng-container
         [ngTemplateOutlet]="headerTemplate || defaultHeaderTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+
+    <ng-container *ngIf="viewModel.isLoading">
+        <utils-loader></utils-loader>
+    </ng-container>
+    <ng-container *ngIf="!viewModel.isLoading">
+        <utils-alert *ngIf="viewModel.isFailure" [dismissable]="false" [minimal]="true">
+            <p>An error occurred fetching following list: {{ viewModel.Error.message }}</p>
+        </utils-alert>
     </ng-container>
 
     <div class="py-1">
@@ -30,7 +29,7 @@
         [ngTemplateOutletContext]="{ $implicit: this }">
     </ng-container>
 
-</ng-template>
+</ng-container>
 
 <ng-template #defaultHeaderTemplate>
 </ng-template>

@@ -78,8 +78,12 @@ public class FilterPredicateConverter
         switch(condition.getOperator()) {
             case EQ:
                 return builder.equal(attr, condition.getValue());
+            case IEQ:
+                return builder.equal(builder.lower(attr), condition.getValue().toLowerCase());
             case NEQ:
                 return builder.notEqual(attr, condition.getValue());
+            case NIEQ:
+                return builder.notEqual(builder.lower(attr), condition.getValue().toLowerCase());
             case LT:
                 return builder.lessThan(attr, condition.getValue());
             case LTE:
@@ -90,8 +94,12 @@ public class FilterPredicateConverter
                 return builder.greaterThanOrEqualTo(attr, condition.getValue());
             case LIKE:
                 return builder.like(attr, condition.getValue());
+            case ILIKE:
+                return builder.like(builder.lower(attr), condition.getValue().toLowerCase());
             case NOT_LIKE:
                 return builder.notLike(attr, condition.getValue());
+            case NOT_ILIKE:
+                return builder.notLike(builder.lower(attr), condition.getValue().toLowerCase());
             case NULL:
                 return builder.isNull(attr);
             case NOT_NULL:

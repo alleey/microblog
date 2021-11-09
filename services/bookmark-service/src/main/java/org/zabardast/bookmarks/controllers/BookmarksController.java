@@ -17,7 +17,6 @@ import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +34,6 @@ import org.zabardast.bookmarks.services.BookmarkService;
 import org.zabardast.common.filtering.Filter;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/bookmarks")
 @ExposesResourceFor(Bookmark.class)
@@ -60,6 +58,7 @@ public class BookmarksController {
 	}
 
 	@GetMapping("search")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<?> search(@NotNull @RequestParam("q")  final String criteria,
 																			final Pageable page,
 																			@NotNull Authentication authentication)
@@ -84,6 +83,7 @@ public class BookmarksController {
 	}
 
 	@GetMapping(value = "{bookmarkId}")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<?> getBookmarkById(@PathVariable("bookmarkId") Long bookmarkId,
 																 @NotNull Authentication authentication) {
 		return ResponseEntity
@@ -93,6 +93,7 @@ public class BookmarksController {
 	}
 
 	@PostMapping()
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<?> newBookmark(@NotNull @RequestBody BookmarkRequestRepresentation bookmark, @NotNull Authentication authentication) {
 		EntityModel<?> entity = assembler.toModel(
 			bookmarkService.newBookmark(authentication.getName(), bookmark)

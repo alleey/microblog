@@ -2,7 +2,7 @@
     <ng-container *ngFor="let x of items; index as i">
         <ng-container 
             [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
-            [ngTemplateOutletContext]="{ $implicit: x, index: i, list: this }">
+            [ngTemplateOutletContext]="{ $implicit: x, index: i, control: this }">
         </ng-container>
     </ng-container>
 </ng-container>
@@ -13,7 +13,7 @@
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item let-control="list">
+<ng-template #defaultItemTemplate let-item let-control="control">
     <a data-testid="select" class="btn btn-danger m-1" role="button" (click)="control.selectItem(item, 'select')">{{item.caption}}</a>
 </ng-template>
 

@@ -1,12 +1,20 @@
-<blog-post [headerTemplate]="postHeader" [contentTemplate]="postContents" [footerTemplate]="postFooter">
+<blog-post 
+    [headerTemplate]="postHeader" 
+    [contentTemplate]="postContents" 
+    [footerTemplate]="postFooter"
+    (onEvent)="handleBlogPostEvent($event)">
 </blog-post>
 
-<ng-template #postHeader let-item let-control="list">
+<ng-template #postHeader let-item let-control="control">
+    <utils-alert *ngIf="viewModel.isFailure" [dismissable]="true" [minimal]="false">
+        <p>An error occurred accessing the post: {{ viewModel.Error.message }}</p>
+    </utils-alert>
+
     <div class="d-flex justify-content-between">
-        <div>
+        <div [statsSetCounter]="'post.views:' + item.id" [counterSetMode]="'inc'" [counterSetValue]="1">
             <h2 class="blog-post-list-post-title">{{item.title}}</h2>
             <div class="created my-2">
-                <user-profile-badge [userid]="item.owner"></user-profile-badge>
+                <user-profile-badge [userid]="item.owner" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
                 <span *authRequireOwner="item.owner different 'yes'" class="mx-1">
                     <follower-badge [userid]="item.owner" class="mx-1"></follower-badge>
                     <following-badge [userid]="item.owner" class="mx-1"></following-badge>
@@ -15,30 +23,45 @@
                 {{item.createdOn | prettyDate}}.
             </div>
             <div class="d-flex">
-                <counter-stats [caption]="'Views'" [counterId]="'post.views:' + item.id"></counter-stats>
+                <counter-stats [caption]="'Views'" [counterId]="'post.views:' + item.id" [displayStats]="'sum'"></counter-stats>
                 <counter-stats class="ml-1" [caption]="'Likes'" [counterId]="'post.likes:' + item.id"></counter-stats>
             </div>
         </div>
         <div class="d-flex justify-content-between">
+
             <div class="ml-1" *authRequireOwner="item.owner different 'yes'">
-                <toggle-counter-badge [activeCaption]="'Like'" [counterId]="'post.likes:' + item.id"></toggle-counter-badge>
+                <toggle-counter [activeCaption]="'Like'" [counterId]="'post.likes:' + item.id"></toggle-counter>
             </div>
+
             <div class="ml-1">
                 <bookmark-badge [url]="item.permalink" [caption]="item.title" *authRequireLogin="'yes'"></bookmark-badge>
             </div>
-            <div class="ml-1" *authRequireOwner="item.owner">
+
+            <div class="ml-1" *authRequireRole="'admin' allowOwner item.owner">
                 <a class="btn btn-success" role="button" (click)="control.selectItem(item, 'edit')">Edit</a>
             </div>
-            <div class="ml-1" *authRequireOwner="item.owner">
-                <a class="btn btn-success" role="button" (click)="control.selectItem(item, 'delete')">Delete</a>
+
+            <div class="ml-1" *authRequireRole="'admin' allowOwner item.owner">
+                <a class="btn btn-primary mx-1" role="button" data-toggle="collapse" href="#confirmDeletion"  aria-expanded="false" aria-controls="confirmDeletion">Delete
+                <div class="collapse mt-3" id="confirmDeletion">
+                    <div class="card-body">
+                        <p>There is no going back if you delete a post.</p>
+                        Confirm Deletion? 
+                        <a class="btn btn-danger" role="button" (click)="control.selectItem(item, 'delete')">Yes!</a>
+                        <a class="btn btn-success mx-1" role="button" >Cancel</a>
+                    </div>
+                </div>
+                </a>
             </div>
+
         </div>
+
     </div>
 </ng-template>
 
-<ng-template #postContents let-item let-control="list">
+<ng-template #postContents let-item let-control="control">
     <p class="posttext py-2">
-        {{item.text}}
+        <markdown class="variable-binding" [data]="item.text"></markdown>
     </p>
 
     <h5>Posted under Topics:</h5>
@@ -55,12 +78,12 @@
     </div>
 </ng-template>
 
-<ng-template #postFooter let-item let-control="list">
+<ng-template #postFooter let-item let-control="control">
 </ng-template>
 
 <ng-template #commentContents let-item>
     <div class="created">
-        <user-profile-badge [userid]="item.owner"></user-profile-badge>
+        <user-profile-badge [userid]="item.owner" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
         commented on {{ item.createdOn | prettyDate }}.
     </div>
     <p class="posttext ">
@@ -68,3 +91,8 @@
     </p>
     <hr class="my-4">
 </ng-template>
+
+<ng-template #userProfileBadgeTemplate let-badge let-profile="context">
+    <a [routerLink]="['/users', profile.id]"><b>{{badge.activeCaption}}</b></a>
+  </ng-template>
+  

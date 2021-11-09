@@ -4,9 +4,9 @@
 </ng-container>
 
 <ng-template #defaultControlTemplate let-control let-vm="vm">
-    <button type="button" [ngClass]="['btn', 'btn-' + control.kind]">
+    <button type="button" [ngClass]="['btn', 'btn-' + control.displayKind]">
         {{control.caption}}
-        <span class="ml-2 badge badge-light" *ngIf="vm.hasValue">{{vm.model.statistics.count}}</span>
+        <span class="ml-2 badge badge-light" *ngIf="vm.hasValue">{{control.value}}</span>
         <span class="ml-2 badge badge-light" *ngIf="vm.hasError">UNK</span>
     </button>
 </ng-template>

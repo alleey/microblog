@@ -3,7 +3,7 @@
         <li class="list-group-item" *ngFor="let x of bookmarks; index as i">
             <ng-container 
                 [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
-                [ngTemplateOutletContext]="{ $implicit: x, index: i, list: this }">
+                [ngTemplateOutletContext]="{ $implicit: x, index: i, control: this }">
             </ng-container>
         </li>
     </ul>
@@ -15,7 +15,7 @@
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item let-control="list">
+<ng-template #defaultItemTemplate let-item let-control="control">
     <i data-testid="delete" class="fa fa-times" (click)="control.selectItem(item, 'delete')"></i>
     <a data-testid="select" class="ml-2" class="ml-1 bookmark-list-bookmark-title" (click)="control.selectItem(item, 'select')">{{item.caption}}</a>
 </ng-template>

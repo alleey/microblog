@@ -1,0 +1,18 @@
+
+<ng-container 
+    *ngIf="isActive" 
+    [ngTemplateOutlet]="activeControlTemplate || defaultActiveControlTemplate"
+    [ngTemplateOutletContext]="{ $implicit: this }">
+</ng-container>
+<ng-container 
+    *ngIf="!isActive" 
+    [ngTemplateOutlet]="inactiveControlTemplate || defaultInactiveControlTemplate"
+    [ngTemplateOutletContext]="{ $implicit: this }">
+</ng-container>
+
+<ng-template #defaultActiveControlTemplate let-item>
+</ng-template>
+
+<ng-template #defaultInactiveControlTemplate let-item>
+</ng-template>
+

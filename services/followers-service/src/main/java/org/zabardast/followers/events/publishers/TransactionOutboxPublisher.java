@@ -38,16 +38,17 @@ public class TransactionOutboxPublisher implements EventPublisher<BaseEvent> {
                 .principal(event.getPrincipal())
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
-        try {
+        try
+        {
             String serialized = objectMapper.writeValueAsString(event.getData());
             entity.setPayload(serialized);
             eventRepository.save(entity);
+            applicationEventPublisher.publishEvent(new OutboxEvent(this));
         }
         catch (JsonProcessingException e)
         {
             log.error(e.toString());
             throw new RuntimeException(e.getMessage(), e);
         }
-        applicationEventPublisher.publishEvent(new OutboxEvent(this));
     }
 }

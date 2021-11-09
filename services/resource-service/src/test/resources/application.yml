@@ -1,0 +1,16 @@
+spring:
+  config:
+    import: "optional:configserver:"
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:resourceservice;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS resourceservice"
+    username: sa
+    password: sa
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "${KEYCLOCK_URL:https://localhost:8443}/auth/realms/${KEYCLOCK_REALM:zabardast}/protocol/openid-connect/certs"
+eureka:
+  client:
+    enabled: false

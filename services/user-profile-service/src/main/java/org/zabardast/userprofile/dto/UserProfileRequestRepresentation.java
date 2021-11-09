@@ -17,4 +17,5 @@ public class UserProfileRequestRepresentation {
     String firstName;
     String lastName;
     String email;
+    String about;
 }

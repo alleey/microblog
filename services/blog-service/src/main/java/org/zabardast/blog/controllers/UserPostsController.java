@@ -10,7 +10,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,6 @@ import org.zabardast.blog.dto.assemblers.PostResponseRepresentationAssembler;
 import org.zabardast.blog.services.PostService;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/users/{userId}")
 @Relation(collectionRelation = "posts")

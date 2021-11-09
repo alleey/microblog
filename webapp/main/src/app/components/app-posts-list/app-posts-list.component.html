@@ -1,37 +1,51 @@
-<blog-post-list 
-    [headerTemplate]="header" 
-    [itemTemplate]="postSummary"
+<blog-post-list
+    [headerTemplate]="headerTemplate || header"
+    [itemTemplate]="itemTemplate || postSummary"
+    [footerTemplate]="footerTemplate || footer"
     (onEvent)="navigateToPost($event)">
 </blog-post-list>
 
-<ng-template #postSummary let-item let-control="list">
+<ng-template #header>
+    <div class="d-flex justify-content-between">
+
+        <div>
+            <div #title><ng-content></ng-content></div>
+            <div *ngIf="!title.innerHTML.trim()">
+                <h5>RECENT POSTS</h5>
+            </div>
+        </div>
+
+        <div>
+            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']">New Post</a>
+            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']" *authRequireRole="'admin'">New Topic</a>
+        </div>
+
+    </div>
+    <hr class="my-4">
+</ng-template>
+
+<ng-template #postSummary let-item let-control="control">
     <div class="p-1">
         <a (click)="control.selectItem(item, 'select')" class="posttitle">{{item.title}}</a>
         <div class="created">
-            <user-profile-badge [userid]="item.owner"></user-profile-badge>
-             posted {{item.createdOn | prettyDate}}.
+            <user-profile-badge [userid]="item.owner" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
+            posted {{item.createdOn | prettyDate}}.
         </div>
         <p class="posttext ">
-            {{item.text}}
+            <markdown class="variable-binding" [data]="item.text"></markdown>
         </p>
         <p>
             <topic-list-view [items]="item.topics"></topic-list-view>
         </p>
-        <button class="btn btn-success" (click)="control.selectItem(item, 'select')">Read More...</button>
+        <button class="btn btn-info btn-sm" (click)="control.selectItem(item, 'select')">Read More...</button>
         <hr class="my-4">
     </div>
 </ng-template>
 
-<ng-template #header>
-    <div class="d-flex justify-content-between">
-        <div>
-            <h5>RECENT POSTS</h5>
-        </div>
-        <div>
-            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']">New Post</a>
-            <a class="btn btn-success mx-1" role="button" [routerLink]="['/posts', 'new']"
-                *authRequireRole="'admin'">New Topic</a>
-        </div>
-    </div>
-    <hr class="my-4">
+<ng-template #footer>
 </ng-template>
+
+<ng-template #userProfileBadgeTemplate let-badge let-profile="context">
+    <a [routerLink]="['/users', profile.id]"><b>{{badge.activeCaption}}</b></a>
+</ng-template>
+  

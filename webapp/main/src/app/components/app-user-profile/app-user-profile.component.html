@@ -1,0 +1,38 @@
+<user-profile [contentTemplate]="defaultContentTemplate">
+</user-profile>
+
+<ng-template #defaultContentTemplate let-item>
+    <h4>User Profile</h4>
+    <div class="d-flex">
+        <counter-stats [caption]="'Views'" [counterId]="'userprofile.views:' + item.id" [displayStats]="'sum'"></counter-stats>
+    </div>
+    <hr/>
+    <dl>
+        <dt>Userid:</dt>
+        <dd>{{ item.id }}</dd>
+
+        <dt>Username:</dt>
+        <dd>{{ item.username }}</dd>
+
+        <dt>Name:</dt>
+        <dd>{{ item.firstName }} {{ item.lastName }}</dd>
+
+        <dt>Email:</dt>
+        <dd>{{ item.email }}</dd>
+
+        <dt>Member since:</dt>
+        <dd>{{ item.createdOn | prettyDate }}</dd>
+    </dl>
+    <hr/>
+    <div class="my-3">
+        <a class="btn btn-primary mr-1" role="button" (click)="userPosts(item)">Posts by {{ item.username }}</a>
+        <a class="btn btn-success" role="button" (click)="editUserProfile(item)" *authRequireRole="'admin' allowOwner item.id">Edit</a>
+    </div>
+    <hr/>
+    <div>
+        <h4>About:</h4>
+        <markdown class="variable-binding" [data]="item.about"></markdown>
+    </div>
+    <div [statsSetCounter]="'userprofile.views:' + item.id" [counterSetMode]="'inc'" [counterSetValue]="1"></div>
+    <hr/>
+</ng-template>

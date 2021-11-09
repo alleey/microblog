@@ -5,6 +5,9 @@ export interface UserProfileModel {
     firstName: string;
     lastName: string;
     username: string;
+    email: string;
+    about: string;
+    createdOn: Date;
 }
 
 export interface UserProfileResponseModel extends UserProfileModel {

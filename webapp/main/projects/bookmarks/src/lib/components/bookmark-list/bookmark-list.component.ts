@@ -93,17 +93,7 @@ export class BookmarkListComponent implements OnInit, OnDestroy {
   }
 
   handleListViewEvent(evt: BookmarkListViewEvent) {
-    switch(evt.opcode) {
-      case 'delete': this.deleteBookmark(evt.item); break;
-    }
     this.onEvent.emit(evt);
-  }
-
-  deleteBookmark(bookmark: BookmarkModel): void {
-    this.service
-      .delete("", bookmark.id)
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(this.viewModel.expectUndefined());
   }
 
   gotoPage(evt:any): void {

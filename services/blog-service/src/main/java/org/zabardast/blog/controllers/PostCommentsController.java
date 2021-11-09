@@ -14,7 +14,6 @@ import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,6 @@ import org.zabardast.blog.dto.assemblers.CommentResponseRepresentationAssembler;
 import org.zabardast.blog.services.CommentService;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/posts/{postId}/comments")
 @Relation(collectionRelation = "comments")

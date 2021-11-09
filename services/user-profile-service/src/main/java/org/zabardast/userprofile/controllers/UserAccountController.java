@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,6 @@ import org.zabardast.userprofile.model.UserProfile;
 import org.zabardast.userprofile.services.UserAccountService;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/users/accounts")
 @ExposesResourceFor(UserProfile.class)

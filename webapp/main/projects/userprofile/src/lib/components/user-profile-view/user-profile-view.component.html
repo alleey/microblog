@@ -1,0 +1,36 @@
+<ng-container 
+    *ngIf="!userProfile" 
+    [ngTemplateOutlet]="noContentTemplate || defaultNoContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: this }">
+</ng-container>
+<ng-container 
+    *ngIf="!!userProfile" 
+    [ngTemplateOutlet]="contentTemplate || defaultContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: userProfile, control: this }">
+</ng-container>
+
+<ng-template #defaultContentTemplate let-item>
+    <h4>User Profile</h4>
+    <dl>
+        <dt>Userid:</dt>
+        <dd>{{ item.id }}</dd>
+
+        <dt>Username:</dt>
+        <dd>{{ item.username }}</dd>
+
+        <dt>Name:</dt>
+        <dd>{{ item.firstName }} {{ item.lastName }}</dd>
+
+        <dt>Email:</dt>
+        <dd>{{ item.email }}</dd>
+
+        <dt>Member since:</dt>
+        <dd>{{ item.createdOn | prettyDate }}</dd>
+    </dl>
+    <p>About:</p>
+    <p>{{ item.about }}</p>
+</ng-template>
+
+<ng-template #defaultNoContentTemplate let-item>
+    User profile could not be located.
+</ng-template>

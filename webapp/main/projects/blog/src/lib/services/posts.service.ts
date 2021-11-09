@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { tap } from "rxjs/operators";
 import { Pageable } from 'utils';
-import { Observable, of, Subject, throwError } from 'rxjs';
-import { catchError, map, tap } from "rxjs/operators";
-import { BlogPostResponseModel, BlogPostListResponseModel } from '../models/blog-post';
 import { PostsServiceConfig, PostsServiceConfigToken } from '../config/config';
+import { BlogPostListResponseModel, BlogPostResponseModel } from '../models/blog-post';
 
 @Injectable({
   providedIn: 'root'

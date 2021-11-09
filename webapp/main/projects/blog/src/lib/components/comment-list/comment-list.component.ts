@@ -70,7 +70,7 @@ export class CommentListComponent implements OnInit, OnDestroy {
   }
 
   get items(): CommentModel[]|undefined {
-    return this.viewModel.Model?._embedded.comments;
+    return this.viewModel.Model?._embedded?.comments;
   }
 
   get page(): PageModel|undefined {

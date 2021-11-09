@@ -3,7 +3,7 @@
         <li class="list-group-item" *ngFor="let x of items; index as i">
             <ng-container 
                 [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
-                [ngTemplateOutletContext]="{ $implicit: x, index: i, list: this }">
+                [ngTemplateOutletContext]="{ $implicit: x, index: i, control: this }">
             </ng-container>
         </li>
     </ul>
@@ -15,7 +15,7 @@
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item let-control="list">
+<ng-template #defaultItemTemplate let-item let-control="control">
     <span data-testid="select" class="ml-2" (click)="control.selectItem(item, 'select')">{{item.userId}}</span>
 </ng-template>
 

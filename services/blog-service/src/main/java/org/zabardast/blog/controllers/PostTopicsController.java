@@ -1,27 +1,22 @@
 
 package org.zabardast.blog.controllers;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.server.core.Relation;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.zabardast.blog.dto.assemblers.TopicResponseRepresentationAssembler;
-import org.zabardast.blog.services.PostTopicService;
-import org.zabardast.blog.services.TopicService;
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.zabardast.blog.services.PostTopicService;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/posts/{postId}/topics")
 @Relation(collectionRelation = "topics")

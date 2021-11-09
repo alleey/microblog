@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.zabardast.common.events.BaseEvent;
 import org.zabardast.common.events.publishers.EventPublisher;
+import org.zabardast.common.services.ServiceSecurityContextProvider;
 import org.zabardast.stats.model.Event;
 import org.zabardast.stats.events.OutboxEvent;
 import org.zabardast.stats.repository.EventRepository;
@@ -21,26 +22,33 @@ public class TransactionOutboxPublisher implements EventPublisher<BaseEvent> {
     ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
+    ServiceSecurityContextProvider serviceSecurityContextProvider;
+
+    @Autowired
     EventRepository eventRepository;
 
     @Override
     public void publishEvent(BaseEvent event) {
+
+        if(event.getPrincipal() == null)
+            event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
         Event entity = Event.builder()
                 .instant(new Date())
                 .name(event.getClass().getName())
                 .principal(event.getPrincipal())
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
-        try {
+        try
+        {
             String serialized = objectMapper.writeValueAsString(event.getData());
             entity.setPayload(serialized);
             eventRepository.save(entity);
+            applicationEventPublisher.publishEvent(new OutboxEvent(this));
         }
         catch (JsonProcessingException e)
         {
             log.error(e.toString());
             throw new RuntimeException(e.getMessage(), e);
         }
-        applicationEventPublisher.publishEvent(new OutboxEvent(this));
     }
 }

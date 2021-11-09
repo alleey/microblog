@@ -14,7 +14,6 @@ import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +30,6 @@ import org.zabardast.stats.model.Counter;
 import org.zabardast.stats.services.CounterService;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/counters")
 @ExposesResourceFor(Counter.class)
@@ -80,6 +78,16 @@ public class CounterController {
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
 	}
 
+	@PostMapping("{counter}/increment")
+	public ResponseEntity<?> increment(@PathVariable String counter, @RequestBody double value, Authentication authentication) {
+
+		String ownerId = authentication == null ? Counter.AnonymousOwner :authentication.getName();
+		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
+			counterService.increment(counter, ownerId, value)
+		);
+		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
+	}
+
 	@PostMapping("batch")
 	@PreAuthorize("isAuthenticated")
 	public ResponseEntity<?> batchUpdate(@RequestBody List<BatchCounterRequestRepresentation> counters, Authentication authentication) {
@@ -101,16 +109,6 @@ public class CounterController {
 
 		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
 			counterService.setCounter(counter, authentication.getName(), value)
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
-	}
-
-	@PostMapping("{counter}/increment")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> increment(@PathVariable String counter, @RequestBody double value, Authentication authentication) {
-
-		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
-			counterService.increment(counter, authentication.getName(), value)
 		);
 		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
 	}

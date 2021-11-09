@@ -10,6 +10,7 @@ export class RequireRoleDirective {
   private thenRef: TemplateRef<any>|undefined;
   private elseRef: TemplateRef<any>|undefined;
   private matchingRoles: boolean = false;
+  private sameOwner: boolean = false;
   private invert: 'yes' | 'no' = 'no';
 
   constructor(private authService: OidcAuthService,
@@ -37,6 +38,12 @@ export class RequireRoleDirective {
   }
 
   @Input()
+  set authRequireRoleAllowOwner(ownerId: string) {
+    this.sameOwner = (ownerId.toLowerCase() === this.profile?.sub.toLowerCase());
+    this.updateView();
+  }
+
+  @Input()
   set authRequireRoleElse(ref: TemplateRef<any>) {
     this.elseRef = ref;
     this.updateView();
@@ -50,12 +57,14 @@ export class RequireRoleDirective {
 
   updateView() : void {
 
-    const show = (this.matchingRoles && this.invert === 'no') || 
+    const show = this.sameOwner || 
+                 (this.matchingRoles && this.invert === 'no') || 
                  (!this.matchingRoles && this.invert === 'yes');
+    const loggedin = !!this.profile;
 
     this.viewContainer.clear();
 
-    if (show) {
+    if (loggedin && show) {
       this.viewContainer.createEmbeddedView(
         !!this.thenRef ? this.thenRef : this.templateRef, { $implicit: this.profile });
     } 

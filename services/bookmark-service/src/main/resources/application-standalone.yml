@@ -1,3 +1,14 @@
+server:
+  cors:
+    '[/**]':
+      allowCredentials: true
+      allowedOriginPatterns:
+        - https://*
+        - http://*
+      allowedMethods: "*"
+      allowedHeaders: "*"
+      maxAge: -1
+
 spring:
   cloud:
     config:

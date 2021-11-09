@@ -5,14 +5,16 @@ import { UtilsModule } from 'utils';
 import { CountersServiceConfigToken, StatsModuleConfig } from './config/config';
 import { CounterStatsComponent } from './components/counter-stats/counter-stats.component';
 import { CountersService } from './services/counters.service';
-import { ToggleCounterBadgeComponent } from './components/toggle-counter-badge/toggle-counter-badge.component';
+import { ToggleCounterComponent } from './components/toggle-counter/toggle-counter.component';
 import { SetCounterDirective } from './directives/set-counter.directive';
+import { RatingCounterComponent } from './components/rating-counter/rating-counter.component';
 
 @NgModule({
   declarations: [
     CounterStatsComponent,
-    ToggleCounterBadgeComponent,
-    SetCounterDirective
+    ToggleCounterComponent,
+    RatingCounterComponent,
+    SetCounterDirective,
   ],
   imports: [
     CommonModule,
@@ -21,7 +23,8 @@ import { SetCounterDirective } from './directives/set-counter.directive';
   ],
   exports: [
     CounterStatsComponent,
-    ToggleCounterBadgeComponent,
+    ToggleCounterComponent,
+    RatingCounterComponent,
     SetCounterDirective
   ]
 })

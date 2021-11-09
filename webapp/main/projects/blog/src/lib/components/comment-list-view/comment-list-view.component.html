@@ -2,7 +2,7 @@
     <div *ngFor="let x of items" class="bg-light">
         <ng-container 
             [ngTemplateOutlet]="itemTemplate || defaultItemTemplate"
-            [ngTemplateOutletContext]="{ $implicit: x, list: this }">
+            [ngTemplateOutletContext]="{ $implicit: x, control: this }">
         </ng-container>
     </div>
 </ng-container>
@@ -13,7 +13,7 @@
     </ng-container>
 </ng-container>
 
-<ng-template #defaultItemTemplate let-item let-control="list">
+<ng-template #defaultItemTemplate let-item let-control="control">
     <span data-testid="select" (click)="control.selectItem(item, 'select')">
     <div class="created"> {{item.owner}} commented on {{ item.createdOn | prettyDate }}.</div>
     <p class="posttext ">

@@ -16,6 +16,15 @@ server:
     trust-store: classpath:keystore/server.jks
     trust-store-type: JKS
     trust-store-password: zabardast
+  cors:
+    '[/**]':
+      allowCredentials: true
+      allowedOriginPatterns:
+        - https://*
+        - http://*
+      allowedMethods: "*"
+      allowedHeaders: "*"
+      maxAge: -1
 
 service:
   tasks:

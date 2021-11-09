@@ -35,11 +35,12 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
     private service: PostsService, 
     private router: Router, 
     private activatedRoute: ActivatedRoute) 
-  { 
+  {
     this.state = this.router.getCurrentNavigation()?.extras.state;
     this.pageable = {
       page: 0
     };
+    //console.log(this.state);
   }
 
   ngOnInit(): void {
@@ -70,7 +71,7 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
   }
 
   get items(): BlogPostModel[]|undefined {
-    return this.viewModel.Model?._embedded.posts;
+    return this.viewModel.Model?._embedded?.posts;
   }
 
   get page(): PageModel|undefined {

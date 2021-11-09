@@ -45,7 +45,6 @@ export class BlogPostEditorComponent implements OnInit, OnDestroy {
 
   postId?: number;
   form!: FormGroup;
-  successDesc: any = "Post updated successfully!";
   viewModel = new ViewModelHolder<BlogPostResponseModel>();
   destroyed$ = new Subject();
 

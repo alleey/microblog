@@ -15,8 +15,10 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
 
   @Input() counterId: string = "";
   @Input() counterValue: number = 1;
+
   @Input() caption: string = "";
-  @Input() kind: string = "primary";
+  @Input() displayKind: string = "primary";
+  @Input() displayStats: 'count' | 'sum' | 'avg' | 'min' | 'max' = 'count';
 
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
@@ -41,6 +43,17 @@ export class CounterStatsComponent implements OnInit, OnDestroy {
   }
 
   get hasValue() { return this.viewModel.hasValue; }
+
+  get value() {
+    switch(this.displayStats) {
+      case 'count': return this.viewModel.Model!.statistics.count;
+      case 'sum': return this.viewModel.Model!.statistics.sum;
+      case 'avg': return this.viewModel.Model!.statistics.avg;
+      case 'min': return this.viewModel.Model!.statistics.min;
+      case 'max': return this.viewModel.Model!.statistics.max;
+    }
+    return "";
+  }
 
   checkStatus() {
     this.service

@@ -16,7 +16,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,13 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.zabardast.blog.dto.TopicRequestRepresentation;
 import org.zabardast.blog.dto.TopicResponseRepresentation;
-import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.dto.assemblers.TopicResponseRepresentationAssembler;
 import org.zabardast.blog.services.TopicService;
 import org.zabardast.common.filtering.Filter;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/topics")
 @Relation(collectionRelation = "topics")

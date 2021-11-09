@@ -52,8 +52,9 @@ export class RequireOwnerDirective {
 
     const show = (this.sameOwner && this.invert === 'no') || 
                  (!this.sameOwner && this.invert === 'yes');
+    const loggedin = !!this.profile;
                  
-    if (show) {
+    if (loggedin && show) {
       this.viewContainer.createEmbeddedView(
         !!this.thenRef ? this.thenRef : this.templateRef, { $implicit: this.profile }
       );

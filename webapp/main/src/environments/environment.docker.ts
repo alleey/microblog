@@ -41,6 +41,7 @@ export const environment = {
       serviceBaseUrl: "http://localhost:9000/userprofile/api/v1",
       defaultEndpoint: "users",
       pageSize: 10,
+      maxAboutLength: 4096,
     },
     followers: {
       serviceBaseUrl: "http://localhost:9000/followers/api/v1",

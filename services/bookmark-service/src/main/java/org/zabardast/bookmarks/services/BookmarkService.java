@@ -14,7 +14,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.bookmarks.config.ServiceConfig;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
 import org.zabardast.bookmarks.events.BookmarkCreatedEvent;
@@ -46,9 +45,6 @@ public class BookmarkService
 
     @Autowired
     ModelMapper modelMapper;
-
-    @Autowired
-    private ServiceConfig serviceConfig;
 
     @Transactional
     public BookmarkResponseRepresentation getBookmark(@NotNull String ownerId, @NotNull Long bookmarkId) {

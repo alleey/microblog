@@ -31,8 +31,10 @@
 		<module>config-service</module>
 		<module>blog-service</module>
 		<module>bookmark-service</module>
+		<module>resource-service</module>
 		<module>followers-service</module>
 		<module>user-profile-service</module>
+		<module>stats-service</module>
 	</modules>
 
 	<repositories>

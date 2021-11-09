@@ -25,7 +25,6 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
 
   postId?: number;
   commentId?: number;
-  successDesc: any = "";
   viewModel = new ViewModelHolder<CommentResponseModel>();
   destroyed$ = new Subject();
 

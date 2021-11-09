@@ -26,6 +26,8 @@ export class PagerComponent implements OnInit {
     //console.info("Current page " + this.currentPage);
   }
 
+  ngOnInit(): void { }
+
   get page(): PageModel | undefined {
     return this.currentPage;
   }
@@ -45,8 +47,6 @@ export class PagerComponent implements OnInit {
       return -1;
     return (this.currentPage.number + 1);
   }
-
-  ngOnInit(): void { }
 
   selectItem(page: number): void {
     this.onSelectPage.emit(page);

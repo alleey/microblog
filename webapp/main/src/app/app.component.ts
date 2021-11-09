@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { OidcAuthService } from 'auth-oidc';
 import { TopicListEvent } from 'blog';
-import { BookmarkListEvent } from 'bookmarks';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +10,6 @@ import { BookmarkListEvent } from 'bookmarks';
 })
 export class AppComponent {
   title = 'Pretty Useless Webapp';
-  links = ['Blog Posts', 'Bookmarks'];
   userProfile: any;
 
   constructor(private router: Router, private authService: OidcAuthService) {
@@ -25,24 +23,17 @@ export class AppComponent {
   get userName(): string { return this.userProfile?.name; }
 
   userPosts() : void {
-    console.log(this.userProfile);
-    this.router.navigate(['user', this.userId, 'posts'], 
-    { 
-      state: { "endpoint": `users/${this.userId}/posts` }
+    this.router.navigate(['users', this.userId, 'posts'],
+    {
+      state: { "endpoint": `users/${this.userId}/posts`, userId: this.userId, userName: this.userName }
     });
   }
 
-  navigateBookmark(evt: BookmarkListEvent): void {
-    const bookmark = evt.item;
-    console.info(`Navigate to ${bookmark.url}`)
-    window.location.href = bookmark.url;
-  }
-
-  navigateToTopicPosts(evt: TopicListEvent): void {
+  topicPosts(evt: TopicListEvent): void {
     const topic = evt.item;
-    this.router.navigate(['/topics', topic.id, "posts"], 
-    { 
-      state: { "endpoint": `topics/${topic.id}/posts` }
+    this.router.navigate(['/topics', topic.id, "posts"],
+    {
+      state: { "endpoint": `topics/${topic.id}/posts`, topic: topic }
     });
   }
 }

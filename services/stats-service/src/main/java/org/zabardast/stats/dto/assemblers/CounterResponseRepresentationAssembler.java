@@ -6,7 +6,6 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 import org.zabardast.stats.controllers.CounterController;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
-import org.zabardast.stats.dto.CounterStatisticsResponseRepresentation;
 
 @Component
 public class CounterResponseRepresentationAssembler implements

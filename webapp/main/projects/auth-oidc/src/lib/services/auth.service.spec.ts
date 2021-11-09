@@ -1,12 +1,22 @@
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
-import { OidcAuthService } from './auth.service';
+import { OidcAuthConfigToken, OidcAuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: OidcAuthService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule],
+      providers: [OidcAuthService, 
+        {
+          provide: OidcAuthConfigToken,
+          useValue: { 
+            clientId: '',
+          }
+        }]
+    });
     service = TestBed.inject(OidcAuthService);
   });
 

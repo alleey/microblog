@@ -10,7 +10,7 @@ export class AlertComponent implements OnInit {
   @Input() minimal: boolean = false;
   @Input() dismissable: boolean = false;
   @Input() title: string = "Oops!";
-  @Input() kind: string = "danger";
+  @Input() displayKind: string = "danger";
 
   @Input() context: any;
   @Input() controlTemplate: TemplateRef<any> | undefined;

@@ -103,12 +103,15 @@ public class UserProfileService
     {
         return userProfileRepository.findById(userProfileId)
             .map(found -> {
-                found.setUsername(userProfile.getUsername());
-                found.setFirstName(userProfile.getFirstName());
-                found.setLastName(userProfile.getLastName());
-                found.setEmail(userProfile.getEmail());
-                if(setSync)
+                found.setAbout(userProfile.getAbout());
+                // Only update if coming from Keycloak
+                if(setSync) {
+                    found.setUsername(userProfile.getUsername());
+                    found.setFirstName(userProfile.getFirstName());
+                    found.setLastName(userProfile.getLastName());
+                    found.setEmail(userProfile.getEmail());
                     found.setSyncedOn(new Date());
+                }
 
                 UserProfile saved =  userProfileRepository.save(found);
                 eventPublisher.publishEvent(

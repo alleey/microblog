@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
 import { UserProfileModel, UserProfileResponseModel } from '../../models/user-profile';
@@ -26,8 +26,10 @@ export class UserProfileBadgeComponent implements OnInit, OnDestroy {
   viewModel = new ViewModelHolder<UserProfileResponseModel>();
   destroyed$ = new Subject();
 
+  subscription: Subscription = new Subscription();
+
   constructor(
-    private userProfileService: UserProfileService, 
+    private service: UserProfileService, 
     private activatedRoute: ActivatedRoute) 
   { }
 
@@ -36,16 +38,21 @@ export class UserProfileBadgeComponent implements OnInit, OnDestroy {
       this.userId = this.paramUserId! ?? params.get("userId");
       this.fetchUserProfile(this.userId!);
     });
+    // Requery when the backend data changes
+    this.subscription.add(
+      this.service.onChange.subscribe({ next: () => this.fetchUserProfile(this.userId!) })
+    );
   }
 
   ngOnDestroy(): void {
+    this.subscription.unsubscribe();
     this.destroyed$.next();
     this.destroyed$.complete();
   }
 
   fetchUserProfile(userId: string): void {
     this.userId = userId;
-    this.userProfileService
+    this.service
       .one("", this.userId)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());

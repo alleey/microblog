@@ -5,14 +5,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.zabardast.common.services.exceptions.ResourceAlreadyExistsException;
+import org.zabardast.common.services.exceptions.AlreadyExistsException;
 
 @ControllerAdvice
 public class ResourceAlreadyExistsAdvice {
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ResourceAlreadyExistsException.class)
-    String resourceAlreadyExistsHandler(ResourceAlreadyExistsException exception) {
+    @ExceptionHandler(AlreadyExistsException.class)
+    String resourceAlreadyExistsHandler(AlreadyExistsException exception) {
         return exception.getMessage();
     }
 }

@@ -1,5 +1,5 @@
-<ng-template #defaultContentTemplate let-badge>
-  <span data-testid="userName" (click)="badge.selectItem(userProfile, 'select')" class="fullname">{{badge.activeCaption}}</span>
+<ng-template #defaultContentTemplate let-badge let-profile="context">
+  <span data-testid="userName" (click)="badge.selectItem(profile, 'select')" class="fullname">{{badge.activeCaption}}</span>
 </ng-template>
 
 <ng-template #defaultNoContentTemplate let-badge>
@@ -7,6 +7,7 @@
 </ng-template>
 
 <utils-badge 
+    [context]="userProfile"
     [isActive]="!!userId"
     [activeCaption]="userProfile?.firstName + ' ' + userProfile?.lastName"
     [activeControlTemplate]="contentTemplate || defaultContentTemplate"

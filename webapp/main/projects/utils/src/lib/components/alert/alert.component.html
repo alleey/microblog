@@ -5,7 +5,7 @@
 </ng-container>
 
 <ng-template #defaultTemplate let-item>
-    <div [ngClass]="['alert', 'alert-' + item.kind]" role="alert">
+    <div [ngClass]="['alert', 'alert-' + item.displayKind]" role="alert">
         <button data-testid="close" type="button" class="close" data-dismiss="alert" aria-label="Close" (click)="item.fireOnClose()" *ngIf="item.dismissable">
             <span aria-hidden="true">&times;</span>
         </button>

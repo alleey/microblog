@@ -74,17 +74,6 @@ export class BlogPostComponent implements OnInit, OnDestroy {
   }
 
   handleViewEvent(evt: BlogPostViewEvent) {
-    switch(evt.opcode) {
-      case 'edit': this.editPost(evt.item); break;
-      case 'delete': this.deletePost(evt.item); break;
-    }
     this.onEvent.emit(evt);
-  }
-
-  editPost(post: BlogPostModel): void {
-    this.router.navigate(['/posts', 'edit', post.id]);
-  }
-
-  deletePost(post: BlogPostModel): void {
   }
 }

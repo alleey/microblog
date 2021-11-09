@@ -4,6 +4,7 @@ export interface UserProfileServiceConfig {
   serviceBaseUrl: string,
   defaultEndpoint: string,
   pageSize: number,
+  maxAboutLength: number,
 }
 
 export const UserProfileServiceConfigToken = new InjectionToken<UserProfileServiceConfig>("UserProfileServiceConfig");

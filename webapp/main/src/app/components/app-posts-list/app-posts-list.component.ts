@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { BlogPostListEvent } from 'blog';
 
@@ -8,6 +8,10 @@ import { BlogPostListEvent } from 'blog';
   styleUrls: ['./app-posts-list.component.scss']
 })
 export class AppPostsListComponent implements OnInit {
+
+  @Input() itemTemplate: TemplateRef<any> | undefined;
+  @Input() headerTemplate: TemplateRef<any> | undefined;
+  @Input() footerTemplate: TemplateRef<any> | undefined;
 
   constructor(private router: Router) { }
 

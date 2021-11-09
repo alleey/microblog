@@ -16,7 +16,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,12 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.userprofile.dto.UserProfileRequestRepresentation;
 import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
-import org.zabardast.userprofile.model.UserProfile;
 import org.zabardast.userprofile.dto.assemblers.UserProfileResponseRepresentationAssembler;
+import org.zabardast.userprofile.model.UserProfile;
 import org.zabardast.userprofile.services.UserProfileService;
 
 @Slf4j
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/api/v1/users")
 @ExposesResourceFor(UserProfile.class)

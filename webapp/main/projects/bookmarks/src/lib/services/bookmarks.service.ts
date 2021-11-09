@@ -38,7 +38,7 @@ export class BookmarksService {
   public findMatchingCaption(endpoint: string, caption: string, pageable?: Pageable): Observable<BookmarkListResponseModel> {
     const query = {
       "conditions": [
-        { "attribute": "caption", "operator": "like", "value": `%${caption}%` }
+        { "attribute": "caption", "operator": "ilike", "value": `%${caption}%` }
       ]
     };
     return this.search(endpoint, query, pageable);

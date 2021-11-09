@@ -1,30 +1,29 @@
 package org.zabardast.blog.runners;
 
+import com.github.slugify.Slugify;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.PostRequestRepresentation;
 import org.zabardast.blog.dto.PostResponseRepresentation;
 import org.zabardast.blog.dto.TopicRequestRepresentation;
 import org.zabardast.blog.dto.TopicResponseRepresentation;
-import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.services.CommentService;
 import org.zabardast.blog.services.PostService;
-
 import org.zabardast.blog.services.PostTopicService;
 import org.zabardast.blog.services.TopicService;
-import com.github.slugify.Slugify;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Slf4j
 @Profile("!test")
 @Configuration
-class SeedDatabaseRunner implements CommandLineRunner {
+class SeedDatabaseRunner implements ApplicationRunner {
 
     public static final String UserIdGuest = "e7deac8e-56b7-4741-a119-757bbb00b999";
     public static final String UserIdAdmin = "742d6b04-89e8-4322-a9c4-179540b1eaaa";
@@ -48,7 +47,7 @@ class SeedDatabaseRunner implements CommandLineRunner {
     PostTopicService postTopicService;
 
     @Override
-    public void run(String... strings) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
 
         List<TopicResponseRepresentation> createdTopics = Arrays.stream(TopicNames)
                 .map(t -> createBlogTopic(t))

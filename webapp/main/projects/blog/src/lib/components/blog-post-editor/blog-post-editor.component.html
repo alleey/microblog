@@ -1,4 +1,3 @@
-
 <ng-template #defaultTitleTemplate let-item>
     <div class="d-flex justify-content-between">
         <div>
@@ -9,7 +8,7 @@
     <hr class="my-4">
 </ng-template>
 
-<div>
+<ng-container>
     <ng-container 
         [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
         [ngTemplateOutletContext]="{ $implicit: this }">
@@ -19,11 +18,11 @@
         <utils-loader></utils-loader>
     </div>
     <div *ngIf="!viewModel.isLoading">
-        <utils-alert data-testid="editorSuccess" *ngIf="viewModel.isSuccess" [dismissable]="true" [minimal]="false" [kind]="'success'" [title]="'Congratulations!'">
-            <p>{{ successDesc }}</p>
+        <utils-alert data-testid="editorSuccess" *ngIf="viewModel.isSuccess" [dismissable]="true" [minimal]="false" [displayKind]="'success'" [title]="'Congratulations!'">
+            <p>Post updated successfully!</p>
         </utils-alert>
         <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure" [dismissable]="false" [minimal]="false">
-            <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
+            <p>An error occurred accessing the post: {{ viewModel.Error.message }}</p>
         </utils-alert>
     </div>
     
@@ -106,7 +105,7 @@
             <input data-testid="update" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updatePost()">
         </div>
     </form>
-</div>
+</ng-container>
 
 <ng-template #topicsNotFoundTemplate let-item>
     No topic found!

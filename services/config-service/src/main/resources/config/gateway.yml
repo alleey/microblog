@@ -59,7 +59,7 @@ spring:
         - id: bookmark
           uri: lb://bookmark-service
           predicates:
-            - Path=/bookmark/**
+            - Path=/bookmarks/**
           filters:
             - TokenRelay=
             - StripPrefix=1

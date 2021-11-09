@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: resource-service
+
+server:
+  port: 9085
+  ssl:
+    enabled: false
+    client-auth: none
+    #    protocol: TLS
+    #    enabled-protocols: TLSv1.2
+    key-store: classpath:keystore/server.jks
+    key-alias: server
+    key-store-type: JKS
+    key-store-password: zabardast
+    trust-store: classpath:keystore/server.jks
+    trust-store-type: JKS
+    trust-store-password: zabardast
+  cors:
+    '[/**]':
+      allowCredentials: true
+      allowedOriginPatterns:
+        - https://*
+        - http://*
+      allowedMethods: "*"
+      allowedHeaders: "*"
+      maxAge: -1
+
+service:
+  storage:
+    location: data
+  tasks:
+    flushoutbox:
+      fixedDelay: ${EVENT_FLUSH_INTERVAL:180000}
+      batchSize: ${EVENT_FLUSH_BATCHSIZE:100}

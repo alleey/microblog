@@ -1,16 +1,16 @@
 package org.zabardast.bookmarks.runners;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Configuration;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.services.BookmarkService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
-
 @Slf4j
 @Configuration
-class SeedDatabaseRunner implements CommandLineRunner {
+class SeedDatabaseRunner implements ApplicationRunner {
 
     public static final String UserIdGuest = "e7deac8e-56b7-4741-a119-757bbb00b999";
     public static final String UserIdAdmin = "742d6b04-89e8-4322-a9c4-179540b1eaaa";
@@ -20,7 +20,7 @@ class SeedDatabaseRunner implements CommandLineRunner {
     BookmarkService service;
 
     @Override
-    public void run(String... strings) throws Exception {
+    public void run(ApplicationArguments args) throws Exception {
 
         service.newBookmark(UserIdGuest, createBookmark("Microsoft", "http://www.microsoft.com"));
         service.newBookmark(UserIdGuest, createBookmark("Apple", "http://www.apple.com"));

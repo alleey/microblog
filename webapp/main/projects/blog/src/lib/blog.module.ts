@@ -10,13 +10,13 @@ import {
   BlogPostEditorComponent,
   BlogPostListComponent,
   BlogPostListViewComponent,
-  BlogPostViewComponent, 
-  CommentEditorComponent, 
-  CommentListComponent, 
-  CommentListViewComponent, 
-  TopicEditorComponent, 
+  BlogPostViewComponent,
+  CommentEditorComponent,
+  CommentListComponent,
+  CommentListViewComponent,
+  TopicEditorComponent,
   TopicListComponent,
-  TopicListViewComponent, 
+  TopicListViewComponent,
   TopicSelectorComponent
 } from './components/public-api';
 import { BlogModuleConfig, CommentsServiceConfigToken, PostsServiceConfigToken, TopicsServiceConfigToken } from './config/config';

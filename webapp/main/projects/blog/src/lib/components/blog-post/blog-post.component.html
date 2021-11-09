@@ -4,7 +4,7 @@
 
 <ng-template #contents>
     <utils-alert *ngIf="viewModel.isFailure; else viewer" [dismissable]="false" [minimal]="false">
-        <p>An error occurred accessing the post: {{ viewModel.Error }}</p>
+        <p>An error occurred accessing the post: {{ viewModel.Error.message }}</p>
     </utils-alert>
 </ng-template>
 

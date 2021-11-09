@@ -13,7 +13,7 @@
     </ng-container>
     <ng-container *ngIf="!viewModel.isLoading">
         <utils-alert *ngIf="viewModel.isFailure" [dismissable]="false" [minimal]="true">
-            <p>An error occurred fetching the topics list: {{ viewModel.Error }}</p>
+            <p>An error occurred fetching the topics list: {{ viewModel.Error.message }}</p>
         </utils-alert>
     </ng-container>
 

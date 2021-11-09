@@ -51,13 +51,14 @@ export const environment = {
     },
     bookmarks: {
       serviceBaseUrl: "http://localhost:9081/api/v1",
-      defaultEndpoint: "bookmark",
+      defaultEndpoint: "bookmarks",
       pageSize: 25,
     },
     userProfiles: {
       serviceBaseUrl: "http://localhost:9082/api/v1",
       defaultEndpoint: "users",
       pageSize: 10,
+      maxAboutLength: 4096,
     },
     followers: {
       serviceBaseUrl: "http://localhost:9083/api/v1",

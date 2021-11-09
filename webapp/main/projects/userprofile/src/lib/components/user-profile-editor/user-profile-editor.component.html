@@ -1,0 +1,56 @@
+<ng-template #defaultTitleTemplate let-item>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h5>UPDATE PROFILE</h5>
+        </div>
+        <div><a class="btn btn-success" role="button" (click)="cancel()">Cancel</a></div>
+    </div>
+</ng-template>
+
+<ng-container>
+
+    <ng-container 
+        [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
+        [ngTemplateOutletContext]="{ $implicit: this }">
+    </ng-container>
+
+    <div *ngIf="viewModel.isLoading">
+        <utils-loader></utils-loader>
+    </div>
+    <div *ngIf="!viewModel.isLoading">
+        <utils-alert data-testid="editorSuccess" *ngIf="viewModel.isSuccess" [dismissable]="true" [minimal]="false" [displayKind]="'success'" [title]="'Congratulations!'">
+            <p>Profile updated!</p>
+        </utils-alert>
+        <utils-alert data-testid="editorError" *ngIf="viewModel.isFailure" [dismissable]="false" [minimal]="false">
+            <p>An error occurred accessing the topic: {{ viewModel.Error.message }}</p>
+        </utils-alert>
+    </div>
+
+    <form [formGroup]="form" novalidate onSubmit="return false;">
+        <div class="row">
+            <div class="mb-3 col-sm-9">
+                <b>ABOUT:</b>
+
+                <textarea class="form-control" id="about" rows="3" formControlName="about" required aria-required="true"></textarea>
+                <div *ngIf="about?.invalid && (about?.dirty || about?.touched)">
+                    <utils-alert data-testid="requiredError" *ngIf="about?.errors?.required" [dismissable]="false" [minimal]="true">
+                        Sorry, cannot leave this empty!
+                    </utils-alert>
+                    <utils-alert data-testid="maxLengthError" *ngIf="about?.errors?.maxLength" [dismissable]="false" [minimal]="true">
+                        Conent length exceeds limit.
+                    </utils-alert>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+                <!-- <div class="mb-3 col-sm-3" *ngIf="!isUpdateMode">
+                <input data-testid="create" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Create" (click)="createNewTopic()">
+            </div> -->
+            <div class="mb-3 col-sm-3" *ngIf="isUpdateMode">
+                <input data-testid="update" class="btn btn-primary" type="button" [disabled]="viewModel.isLoading || !form.valid" value="Update" (click)="updateUserProfile()">
+            </div>
+        </div>
+    </form>
+
+</ng-container>

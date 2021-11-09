@@ -10,7 +10,7 @@ export class BadgeComponent implements OnInit {
   @Input() isActive: boolean = false;
   @Input() activeCaption: string = "";
   @Input() inactiveCaption: string = "";
-  @Input() kind: string = "primary";
+  @Input() displayKind: string = "primary";
 
   @Input() context: any;
   @Input() activeControlTemplate: TemplateRef<any> | undefined;

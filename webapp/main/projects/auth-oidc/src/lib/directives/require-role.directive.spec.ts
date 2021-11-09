@@ -16,6 +16,9 @@ import { RequireRoleDirective } from './require-role.directive';
   <div data-testid="third">
     <div *authRequireRole="'admin'">Default</div>
   </div>
+  <div data-testid="fourth" >
+    <div *authRequireRole="'guest' allowOwner 'me' then positive else negative"></div>
+  </div>
 
   <ng-template #positive>Positive</ng-template>
   <ng-template #negative>Negative</ng-template>
@@ -62,7 +65,7 @@ describe('RequireRoleDirective', () => {
   it('should render THEN template if admin is logged in and require different is NO', () => {
 
     const fakeUser = {
-      profile: {}
+      profile: { sub: 'me' }
     } as User;
     fakeUser.profile.roles = ['admin'];
 
@@ -79,7 +82,7 @@ describe('RequireRoleDirective', () => {
   it('should render ELSE template if Not-admin is logged in and require different is NO', () => {
 
     const fakeUser = {
-      profile: {}
+      profile: { sub: 'me' }
     } as User;
     fakeUser.profile.roles = ['notadmin'];
 
@@ -97,7 +100,7 @@ describe('RequireRoleDirective', () => {
   it('should render ELSE template if admin is logged in and require different is YES', () => {
 
     const fakeUser = {
-      profile: {}
+      profile: { sub: 'me' }
     } as User;
     fakeUser.profile.roles = ['admin'];
 
@@ -114,7 +117,7 @@ describe('RequireRoleDirective', () => {
   it('should render THEN template if Not-admin is logged in and require different is YES', () => {
 
     const fakeUser = {
-      profile: {}
+      profile: { sub: 'me' }
     } as User;
     fakeUser.profile.roles = ['notadmin'];
 
@@ -123,6 +126,23 @@ describe('RequireRoleDirective', () => {
 
     const { debugElement } = fixture;
     const element = debugElement.query(By.css('[data-testid="second"]'));
+
+    expect(element.nativeElement.innerHTML).toContain("Positive");
+    expect(element.nativeElement.innerHTML).not.toContain("Negative");
+  });
+
+  it('should render THEN template if roles dont agree but owner is present', () => {
+
+    const fakeUser = {
+      profile: { sub: 'me' }
+    } as User;
+    fakeUser.profile.roles = ['notadmin'];
+
+    service.userSubject.next(fakeUser);
+    fixture.detectChanges();
+
+    const { debugElement } = fixture;
+    const element = debugElement.query(By.css('[data-testid="fourth"]'));
 
     expect(element.nativeElement.innerHTML).toContain("Positive");
     expect(element.nativeElement.innerHTML).not.toContain("Negative");

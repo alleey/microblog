@@ -1,10 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { AuthGuard } from 'auth-oidc';
 import { BlogPostEditorComponent } from 'blog';
+import { UserProfileEditorComponent } from 'userprofile';
 import { AppPostComponent } from './components/app-post/app-post.component';
 import { AppPostsListComponent } from './components/app-posts-list/app-posts-list.component';
+import { AppTopicPostsListComponent } from './components/app-topic-posts-list/app-topic-posts-list.component';
+import { AppUserPostsListComponent } from './components/app-user-posts-list/app-user-posts-list.component';
+import { AppUserProfileComponent } from './components/app-user-profile/app-user-profile.component';
 
 const routes: Routes = [
 
@@ -15,11 +18,14 @@ const routes: Routes = [
   { path: 'posts/edit/:postId', component: BlogPostEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'posts/:pageNum', component: AppPostsListComponent },
 
-  { path: 'user/:userId/posts', component: AppPostsListComponent, pathMatch: 'full' },
-  { path: 'user/:userId/posts/:pageNum', component: AppPostsListComponent },
+  { path: 'users/:userId/posts', component: AppUserPostsListComponent, pathMatch: 'full' },
+  { path: 'users/:userId/posts/:pageNum', component: AppUserPostsListComponent },
 
-  { path: 'topics/:topicId/posts', component: AppPostsListComponent, pathMatch: 'full' },
-  { path: 'topics/:topicId/posts/:pageNum', component: AppPostsListComponent },
+  { path: 'users/:userId', component: AppUserProfileComponent, pathMatch: 'full' },
+  { path: 'users/edit/:userId', component: UserProfileEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
+  
+  { path: 'topics/:topicId/posts', component: AppTopicPostsListComponent, pathMatch: 'full' },
+  { path: 'topics/:topicId/posts/:pageNum', component: AppTopicPostsListComponent },
 
   { path: 'posts/:postId/:slug', component: AppPostComponent, pathMatch: 'full' },
 

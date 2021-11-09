@@ -10,7 +10,7 @@
 </ng-container>
 
 <ng-template #defaultActiveControlTemplate let-item>
-    <a type="button" [ngClass]="['btn', 'btn-' + item.kind]" (click)="item.fireRemove()" data-testid="button-unset">
+    <a type="button" [ngClass]="['btn', 'btn-' + item.displayKind]" (click)="item.fireRemove()" data-testid="button-unset">
         {{item.activeCaption}}
         <span #ref class="badge badge-light"><ng-content></ng-content></span>
         <span *ngIf="!ref.innerHTML.trim()">
@@ -20,7 +20,7 @@
 </ng-template>
 
 <ng-template #defaultInactiveControlTemplate let-item>
-    <a type="button" [ngClass]="['btn', 'btn-outline-' + item.kind]" (click)="item.fireAdd()" data-testid="button-set">
+    <a type="button" [ngClass]="['btn', 'btn-outline-' + item.displayKind]" (click)="item.fireAdd()" data-testid="button-set">
         {{item.inactiveCaption || item.activeCaption}}
     </a>
 </ng-template>

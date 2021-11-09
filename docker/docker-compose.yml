@@ -19,30 +19,45 @@ volumes:
 
 services:
   # Infrastructure
+  localdns:
+    image: defreitas/dns-proxy-server
+    hostname: dns
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/resolv.conf:/etc/resolv.conf
+    environment:
+      - MG_LOG_LEVEL=ERROR
+
   database:
     image: zabardast/postgres
+    hostname: database
     build:
-      context: ./infra/postgres
+      context: ../infra/postgres
       dockerfile: Dockerfile
     ports:
       - "5432:5432"
+    restart: on-failure:30
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
-      POSTGRES_DB: "zabardast"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   kafka:
     image: wurstmeister/kafka
+    hostname: kafka
     ports:
       - "9092:9092"
+    restart: on-failure:30
     environment:
+      KAFKA_BROKER_ID: 101
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: INTERNAL://:9094,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://:9094,EXTERNAL://127.0.0.1:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://:9094,EXTERNAL://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LOG_RETENTION_HOURS: 240
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 6000000
     volumes:
       - kafka_data:/kafka
     depends_on:
@@ -50,8 +65,10 @@ services:
 
   zookeeper:
     image: wurstmeister/zookeeper
+    hostname: zookeeper
     ports:
       - "2181:2181"
+    restart: on-failure:30
     environment:
       KAFKA_ADVERTISED_HOST_NAME: 'zookeeper'
     volumes:
@@ -60,18 +77,20 @@ services:
 
   keycloak:
     image: zabardast/keycloak
+    hostname: keycloak
     build:
-      context: ./infra/keycloak
+      context: ../infra/keycloak
       dockerfile: Dockerfile
       args:
         user: service
     ports:
       - "8080:8080"
       - "8443:8443"
+    restart: on-failure:30
     environment:
       DB_VENDOR: POSTGRES
       DB_ADDR: database
-      DB_DATABASE: zabardast
+      DB_DATABASE: keycloak
       DB_SCHEMA: keycloak
       DB_USER: keycloak
       DB_PASSWORD: keycloak
@@ -80,201 +99,297 @@ services:
     depends_on:
       - database
 
-  eurekaserver:
-    image: zabardast/eureka-service
-    build:
-      context: ./eureka-service
-      dockerfile: Dockerfile
-      args:
-        user: service
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    hostname: kafdrop
+    restart: "no"
     ports:
-       - "9001:9001"
+      - "8081:9000"
     environment:
-      SERVER_PORT: 9001
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
+      KAFKA_BROKERCONNECT: kafka:9094
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+      LOGSPOUT: 'ignore'
+    depends_on:
+      - "kafka"
 
-  # App services
-  configserver:
+  configservice:
     image: zabardast/config-service
     build:
-      context: ./config-service
+      context: ../services/config-service
       dockerfile: Dockerfile
       args:
         user: service
     ports:
        - "9003:9003"
+    restart: on-failure:30
     environment:
+      SPRING_PROFILES_ACTIVE: native
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
       SERVER_PORT: 9003
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      KEYCLOCK_URL: "https://keycloak:8443"
       KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
 
+  eurekaservice:
+    image: zabardast/eurekaservice
+    build:
+      context: ../services/eureka-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+       - "9001:9001"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9001
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+
+  # App services
   gateway:
     image: zabardast/gateway
     build:
-      context: ./gateway-service
+      context: ../services/gateway-service
       dockerfile: Dockerfile
       args:
         user: service
     ports:
        - "9000:9000"
+    restart: on-failure:30
     depends_on:
-      - configserver
-      - eurekaserver
-      - keycloak
+      - configservice
+      - eurekaservice
     environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
       SERVER_PORT: 9000
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      CONFIG_URI: "http://configserver:9003/config"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
       KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
 
-  blogserver:
+  blogservice:
     image: zabardast/blog-service
     build:
-      context: ./blog-service
-      dockerfile: Dockerfile
-      args:
-        user: service
-    ports:
-      - "9081:9081"
-    restart: on-failure
-    depends_on:
-      - database
-      - configserver
-      - eurekaserver
-      - keycloak
-      - gateway
-    environment:
-      SERVER_PORT: 9081
-      DATABASESERVER_PORT: "5432"
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      CONFIG_URI: "http://configserver:9003/config"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
-      KEYCLOCK_REALM: "zabardast"
-
-  bookmarkserver:
-    image: zabardast/bookmark-service
-    build:
-      context: ./bookmark-service
+      context: ../services/blog-service
       dockerfile: Dockerfile
       args:
         user: service
     ports:
       - "9080:9080"
-    restart: on-failure
+    restart: on-failure:30
     depends_on:
-      - database
-      - configserver
-      - eurekaserver
-      - keycloak
+      - configservice
+      - eurekaservice
       - gateway
     environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
       SERVER_PORT: 9080
-      DATABASESERVER_PORT: "5432"
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      CONFIG_URI: "http://configserver:9003/config"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: blogservice
+      DB_USER: blogservice
+      DB_PASSWORD: 'blogservice'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
       KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      PRUNE_ORPHANED_POSTS: 'true'
 
-  userprofileserver:
+  bookmarkservice:
+    image: zabardast/bookmark-service
+    build:
+      context: ../services/bookmark-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9081:9081"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9081
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: bookmarkservice
+      DB_USER: bookmarkservice
+      DB_PASSWORD: 'bookmarkservice'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      
+  userprofileservice:
     image: zabardast/user-profile-service
     build:
-      context: ./user-profile-service
+      context: ../services/user-profile-service
       dockerfile: Dockerfile
       args:
         user: service
     ports:
       - "9082:9082"
-    restart: on-failure
+    restart: on-failure:30
     depends_on:
-      - database
-      - configserver
-      - eurekaserver
-      - keycloak
+      - configservice
+      - eurekaservice
       - gateway
     environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
       SERVER_PORT: 9082
-      DATABASESERVER_PORT: "5432"
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      CONFIG_URI: "http://configserver:9003/config"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: userprofileservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
       KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      PROFILE_SYNC_INTERVAL: 180000
+      PROFILE_SYNC_BATCHSIZE: 1000
 
-  followersserver:
+  followersservice:
     image: zabardast/followers-service
     build:
-      context: ./followers-service
+      context: ../services/followers-service
       dockerfile: Dockerfile
       args:
         user: service
     ports:
       - "9083:9083"
-    restart: on-failure
+    restart: on-failure:30
     depends_on:
-      - database
-      - configserver
-      - eurekaserver
-      - keycloak
+      - configservice
+      - eurekaservice
       - gateway
     environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
       SERVER_PORT: 9083
-      DATABASESERVER_PORT: "5432"
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      CONFIG_URI: "http://configserver:9003/config"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: followersservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
       KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      KAFKA_BROKERS: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
 
-  statsserver:
+  statsservice:
     image: zabardast/stats-service
     build:
-      context: ./stats-service
+      context: ../services/stats-service
       dockerfile: Dockerfile
       args:
         user: service
     ports:
       - "9084:9084"
-    restart: on-failure
+    restart: on-failure:30
     depends_on:
-      - database
-      - configserver
-      - eurekaserver
-      - keycloak
+      - configservice
+      - eurekaservice
       - gateway
     environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
       SERVER_PORT: 9084
-      DATABASESERVER_PORT: "5432"
-      ENCRYPT_KEY: "IMSYMMETRIC"
-      CONFIG_URI: "http://configserver:9003/config"
-      EUREKA_URI: "http://eurekaserver:9001/eureka"
-      KEYCLOCK_URL: "http://keycloak:8080"
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: statsservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
       KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
 
   webapp:
     image: zabardast/webapp
     build:
-      context: ./webapp
+      context: ../webapp/main
       dockerfile: Dockerfile
       args:
         user: service
     ports:
       - "4200:80"
-    restart: on-failure
+    restart: on-failure:30
+    environment:
+      NGINX_PORT: 80
     depends_on:
-      - bookmarkserver
-      - blogserver
-      - userprofileserver
-      - followersserver
-      - statsserver
+      - blogservice
+      - bookmarkservice
+      - followersservice
+      - statsservice
+      - userprofileservice
 
-  logspout:
-    image: gliderlabs/logspout
-    command: syslog://logs3.papertrailapp.com:48292
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock

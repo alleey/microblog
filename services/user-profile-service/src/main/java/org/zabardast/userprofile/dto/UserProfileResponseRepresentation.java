@@ -25,7 +25,7 @@ public class UserProfileResponseRepresentation implements Comparable<UserProfile
     String firstName;
     String lastName;
     String email;
-    boolean enabled;
+    String about;
     private Date createdOn;
 
     static Comparator<String> nullSafeStringComparator = Comparator.nullsFirst(String::compareTo);
