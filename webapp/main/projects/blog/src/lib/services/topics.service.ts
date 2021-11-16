@@ -6,12 +6,16 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { TopicsServiceConfig, TopicsServiceConfigToken } from '../config/config';
 import { TopicResponseModel, TopicListResponseModel } from '../models/topic';
 
+export interface TopicsServiceChangeNotification {
+  id: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class TopicsService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange: Subject<TopicsServiceChangeNotification> = new Subject<TopicsServiceChangeNotification>();
 
   constructor(@Inject(TopicsServiceConfigToken) private config: TopicsServiceConfig, private httpClient: HttpClient) 
   { }
@@ -83,7 +87,7 @@ export class TopicsService {
             .post<TopicResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}`, topicRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id: x.id }); }
               })
             );
   }
@@ -97,7 +101,7 @@ export class TopicsService {
             .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, topicRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id }); }
               })
             );
   }
@@ -108,7 +112,7 @@ export class TopicsService {
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id }); }
               })
             );
   }

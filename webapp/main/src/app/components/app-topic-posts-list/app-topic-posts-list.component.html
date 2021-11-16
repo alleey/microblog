@@ -1,3 +1,9 @@
-<app-posts-list>
+<app-posts-list
+    [noContentsTemplate]="noPosts">
     <h5>Posted under topic: {{ topic.caption }}</h5>
 </app-posts-list>
+  
+<ng-template #noPosts let-control>
+    No posts listed under the topic. Maybe worth deleting it?
+</ng-template>
+  

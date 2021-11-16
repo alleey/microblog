@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.core.io.Resource;
 import org.springframework.hateoas.server.core.Relation;
@@ -18,6 +19,7 @@ import org.springframework.hateoas.server.core.Relation;
 @EqualsAndHashCode(callSuper = false)
 @Relation(collectionRelation = "resources")
 @JsonIgnoreProperties(value = { "contentLocation", "contents" })
+@ToString
 public class ResourceResponseRepresentation {
     private String owner;
     private String resource;

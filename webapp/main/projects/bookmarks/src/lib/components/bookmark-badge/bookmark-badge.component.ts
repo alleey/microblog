@@ -28,7 +28,12 @@ export class BookmarkBadgeComponent implements OnInit, OnDestroy {
     this.checkStatus();
     // Requery when the backend data changes
     this.subscription.add(
-      this.service.onChange.subscribe({ next: () => this.checkStatus() })
+      this.service.onChange.subscribe({ 
+        next: (notif) => {
+          if (notif.id === this.viewModel.Model?.id)
+            this.checkStatus();
+        }
+      })
     );
   }
 

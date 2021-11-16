@@ -13,7 +13,7 @@
       </p>
 
 
-      <!-- 
+      <!--
       <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Search Blog..">
         <span class="input-group-btn">
@@ -72,15 +72,21 @@
       <div class="tab-content" id="tab2Content">
         <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab" *authRequireLogin="'yes'">
           <ng-template #followingItemTemplate let-item let-control="control">
-            <user-profile-badge [userid]="item.userId" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
+            <user-profile-badge [userId]="item.userId" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
           </ng-template>
-          <following-list [itemTemplate]="followingItemTemplate"></following-list>
+
+          <following-list
+            [itemTemplate]="followingItemTemplate">
+          </following-list>
         </div>
         <div class="tab-pane fade" id="followers" role="tabpanel" aria-labelledby="followers-tab" *authRequireLogin="'yes'">
           <ng-template #followedItemTemplate let-item let-control="control">
-            <user-profile-badge [userid]="item.followedById" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
+            <user-profile-badge [userId]="item.followedById" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
           </ng-template>
-          <follower-list [itemTemplate]="followedItemTemplate"></follower-list>
+
+          <follower-list
+            [itemTemplate]="followedItemTemplate">
+          </follower-list>
         </div>
       </div>
 
@@ -90,11 +96,29 @@
 
 </div>
 
-
 <footer>
   This is a footer
 </footer>
 
 <ng-template #userProfileBadgeTemplate let-badge let-profile="context">
-  <a [routerLink]="['/users', profile.id]"><b>{{badge.activeCaption}}</b></a>
+  <div class="row">
+    <div class="col-md-3">
+      <image-resource resource="avatars" [key]="profile.id" [contentTemplate]="pictureTemplate" [noContentTemplate]="pictureTemplate">
+      </image-resource>
+    </div>
+    <div class="col-md-9">
+      <div class="row">
+        <a [routerLink]="['/users', profile.id]"><b>{{badge.activeCaption}}</b></a>
+      </div>
+      <div class="row">
+        {{profile.username}}
+      </div>
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #pictureTemplate let-item let-control="control">
+  <img src="{{control.downloadLink}}" class="img-fluid" *ngIf="item"/>
+  <img src="./assets/missing-avatar.jpg" class="img-fluid" *ngIf="!item"/>
 </ng-template>

@@ -12,7 +12,7 @@ export class AlertComponent implements OnInit {
   @Input() title: string = "Oops!";
   @Input() displayKind: string = "danger";
 
-  @Input() context: any;
+  @Input() context: any = {};
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   @Output() onClosed = new EventEmitter();

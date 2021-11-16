@@ -14,6 +14,7 @@ export class UserProfileBadgeViewComponent implements OnInit {
   @Input() userProfile?: UserProfileModel;
   @Input() contentTemplate: TemplateRef<any> | undefined;
   @Input() noContentTemplate: TemplateRef<any> | undefined;
+  @Input() context: any = {};
 
   @Output() onEvent = new EventEmitter<UserProfileBadgeViewEvent>();
 

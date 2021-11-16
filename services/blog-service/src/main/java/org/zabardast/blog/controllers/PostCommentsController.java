@@ -14,6 +14,7 @@ import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ import org.zabardast.blog.services.CommentService;
 @RestController
 @RequestMapping(value = "/api/v1/posts/{postId}/comments")
 @Relation(collectionRelation = "comments")
+@Validated
 public class PostCommentsController {
 
 	@Autowired
@@ -54,7 +56,8 @@ public class PostCommentsController {
 
 	@GetMapping(value = "{commentId}")
 	public ResponseEntity<?> getCommentById(@PathVariable Long postId,
-															   @PathVariable Long commentId) {
+											@PathVariable Long commentId)
+	{
 		return ResponseEntity
 				.ok()
 				.contentType(MediaTypes.HAL_JSON)
@@ -87,7 +90,8 @@ public class PostCommentsController {
 	@DeleteMapping(value = "{commentId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
 	public ResponseEntity<?> deleteComment(@PathVariable("postId") Long postId,
-										   @PathVariable Long commentId) {
+										   @PathVariable Long commentId)
+	{
 		commentService.deleteComment(postId, commentId);
 		return ResponseEntity.noContent().build();
 	}

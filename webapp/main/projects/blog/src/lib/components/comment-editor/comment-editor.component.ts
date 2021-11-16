@@ -1,7 +1,5 @@
-import { Location } from '@angular/common';
-import { Component, Inject, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
@@ -14,24 +12,19 @@ import { CommentsService } from '../../services/comments.service';
   templateUrl: './comment-editor.component.html',
   styleUrls: ['./comment-editor.component.css']
 })
-export class CommentEditorComponent implements OnInit, OnDestroy {
+export class CommentEditorComponent implements OnInit, OnDestroy, OnChanges {
 
-  @Input("postId") paramPostId?: number;
-  @Input("commentId") paramCommentId?: number;
+  @Input() postId?: number;
+  @Input() commentId?: number;
   @Input() updateMode: boolean = true;
-  @Input() headerTemplate: TemplateRef<any> | undefined;
 
   form!: FormGroup;
-
-  postId?: number;
-  commentId?: number;
   viewModel = new ViewModelHolder<CommentResponseModel>();
   destroyed$ = new Subject();
 
   constructor(
     @Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig,
-    private service: CommentsService, 
-    private activatedRoute: ActivatedRoute) {}
+    private service: CommentsService) {}
 
   ngOnInit(): void {
     this.form = new FormGroup(
@@ -41,18 +34,18 @@ export class CommentEditorComponent implements OnInit, OnDestroy {
           Validators.maxLength(this.config.maxContentLength)
       ]),
     });
-
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.postId = <number> (params.get("postId") ?? this.paramPostId);
-      this.commentId = <number> (params.get("commentId") ?? this.paramCommentId);
-      if(this.isUpdateMode)
-        this.fetchComment(this.postId!, this.commentId!);
-    });
   }
 
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['postId'] || changes['commentId']);
+    if(changed && this.isUpdateMode) {
+      this.fetchComment(this.postId!, this.commentId!);
+    }
   }
 
   get isUpdateMode(): boolean { return this.updateMode && this.commentId !== undefined; }

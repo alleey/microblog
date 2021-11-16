@@ -5,12 +5,17 @@ import { tap } from 'rxjs/operators';
 import { UserProfileServiceConfig, UserProfileServiceConfigToken } from '../config/config';
 import { UserProfileResponseModel } from '../models/user-profile';
 
+export interface UserProfileServiceChangeNotification {
+  id: string; 
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserProfileService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange = new Subject<UserProfileServiceChangeNotification>();
 
   constructor(
     @Inject(UserProfileServiceConfigToken)
@@ -35,7 +40,7 @@ export class UserProfileService {
             .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, userRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id }); }
               })
             );
   }

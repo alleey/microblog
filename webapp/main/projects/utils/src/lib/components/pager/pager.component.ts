@@ -11,11 +11,13 @@ export class PagerComponent implements OnInit {
   pageList: Array<number> = [];
   currentPage: PageModel | undefined;
 
-  @Input() context: any;
+  @Input() context: any = {};
   @Input() controlTemplate: TemplateRef<any> | undefined;
   @Input() prevNextLinks: boolean = true;
 
   @Output() onSelectPage = new EventEmitter<number>();
+
+  ngOnInit(): void { }
 
   @Input()
   set page(value: PageModel | undefined) {
@@ -25,8 +27,6 @@ export class PagerComponent implements OnInit {
       this.pageList = Array.from({length: this.numberOfPages},(v,k)=>k+1);
     //console.info("Current page " + this.currentPage);
   }
-
-  ngOnInit(): void { }
 
   get page(): PageModel | undefined {
     return this.currentPage;

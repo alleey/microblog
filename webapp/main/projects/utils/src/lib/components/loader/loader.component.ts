@@ -8,7 +8,7 @@ import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 export class LoaderComponent implements OnInit {
 
   @Input() message: string = "Loading...";
-  @Input() context: any;
+  @Input() context: any = {};
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   constructor() { }

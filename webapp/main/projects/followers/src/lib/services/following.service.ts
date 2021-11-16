@@ -5,15 +5,19 @@ import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Pageable } from 'utils';
 import { FollowingServiceConfig, FollowingServiceConfigToken } from '../config/config';
-import { FollowsListResponseModel, FollowsResponseModel } from '../models/follows';
+import { FollowsListResponseModel, FollowsModel, FollowsResponseModel } from '../models/follows';
 
+export interface FollowingServiceChangeNotification {
+  userId: string;
+  followedById?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class FollowingService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange = new Subject<FollowingServiceChangeNotification>();
   private userProfile?: Profile;
 
   constructor(
@@ -98,7 +102,7 @@ export class FollowingService {
             })
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({userId: userTofollow, followedById: owner}); }
               })
             );
   }
@@ -114,7 +118,7 @@ export class FollowingService {
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${owner}/following/${userToUnfollow}`)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({userId: userToUnfollow, followedById: owner}); }
               })
             );
   }

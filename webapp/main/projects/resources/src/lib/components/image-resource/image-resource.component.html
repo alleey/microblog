@@ -1,0 +1,17 @@
+<ng-container
+    *ngIf="hasValue"
+    [ngTemplateOutlet]="contentTemplate || defaultContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: resourceModel, control: this, downloadLink: downloadLink }">
+</ng-container>
+<ng-container
+    *ngIf="!hasValue"
+    [ngTemplateOutlet]="noContentTemplate || defaultNoContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: resourceModel, control: this }">
+</ng-container>
+
+<ng-template #defaultContentTemplate let-item let-control="control">
+    <img src="{{control.downloadLink}}" />
+</ng-template>
+<ng-template #defaultNoContentTemplate let-item let-control="control">
+    <img src="" />
+</ng-template>

@@ -1,12 +1,14 @@
 
 package org.zabardast.userprofile.controllers;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import org.zabardast.userprofile.services.UserAccountService;
 @RestController
 @RequestMapping(value = "/api/v1/users/accounts")
 @ExposesResourceFor(UserProfile.class)
+@Validated
 public class UserAccountController {
 
 	@Autowired
@@ -35,7 +38,7 @@ public class UserAccountController {
 
 	@DeleteMapping(value = "{userId}")
 	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> unregister(@PathVariable String userId) {
+	public ResponseEntity<?> unregister(@NotBlank @PathVariable String userId) {
 		userAccountService.unregister(userId);
 		return ResponseEntity.noContent().build();
 	}

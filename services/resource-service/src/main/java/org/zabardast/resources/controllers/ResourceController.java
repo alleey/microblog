@@ -2,7 +2,10 @@
 package org.zabardast.resources.controllers;
 
 import java.io.IOException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +18,9 @@ import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +40,10 @@ import org.zabardast.resources.services.ResourceManagerService;
 @RestController
 @RequestMapping(value = "/api/v1/resources")
 @ExposesResourceFor(Resource.class)
+@Validated
 public class ResourceController {
+
+	public static final String VALID_NAME_PATTERN = ResourceRequestRepresentation.VALID_NAME_PATTERN;
 
 	@Autowired
 	ResourceManagerService manager;
@@ -47,7 +55,10 @@ public class ResourceController {
 	ResourceResponseRepresentationAssembler assembler;
 
 	@GetMapping(value = "{resource}")
-	public ResponseEntity<?> getResources(@PathVariable("resource") String resource, final Pageable page) {
+	public ResponseEntity<?> getResources(
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("resource") String resource,
+			final Pageable page)
+	{
 
 		PagedModel<?> entities = pagedAssembler.toModel(
 			manager.findByResource(resource, page),
@@ -57,7 +68,9 @@ public class ResourceController {
 	}
 
 	@GetMapping(value = "{resource}/{key}")
-	public ResponseEntity<?> getResource(@PathVariable("resource") String resource, @PathVariable("key") String key) {
+	public ResponseEntity<?> getResource(
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("resource") String resource,
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("key") String key) {
 
 		ResourceResponseRepresentation response = manager.getResource(resource, key, false);
 		return ResponseEntity
@@ -67,9 +80,10 @@ public class ResourceController {
 	}
 
 	@GetMapping(value = "{resource}/{key}/download")
-	public ResponseEntity<?> downloadResource(@PathVariable("resource") String resource,
-										 @PathVariable("key") String key,
-										 @NotNull Authentication authentication) {
+	public ResponseEntity<?> downloadResource(
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("resource") String resource,
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("key") String key)
+	{
 		ResourceResponseRepresentation response = manager.getResource(resource, key, true);
 		return ResponseEntity
 				.ok()
@@ -80,9 +94,10 @@ public class ResourceController {
 
 	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
 	//@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> newResource(@NotNull @RequestPart("resource") ResourceRequestRepresentation request,
-										 @NotNull @RequestPart("file") MultipartFile file,
-										 @NotNull Authentication authentication) throws IOException
+	public ResponseEntity<?> newResource(
+			@Valid @RequestPart("resource") ResourceRequestRepresentation request,
+			@NotNull @RequestPart("file") MultipartFile file,
+			Authentication authentication) throws IOException
 	{
 		String ownerId = authentication == null ? Resource.AnonymousOwner :authentication.getName(); // only for testing
 		EntityModel<?> entity = assembler.toModel(
@@ -95,12 +110,13 @@ public class ResourceController {
 	}
 
 	@PutMapping(value = "{resource}/{key}", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE })
-	//@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @resourceOwnership.require(#folder, #resourceId, authentication)")
-	public ResponseEntity<?> updateResource(@PathVariable("resource") String resource,
-											@PathVariable("key") String key,
-											@NotNull @RequestPart("resource") ResourceRequestRepresentation request,
-											@NotNull @RequestPart("file") MultipartFile file,
-											@NotNull Authentication authentication) throws IOException
+	//@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @resourceOwnership.require(#resource, #key, authentication)")
+	public ResponseEntity<?> updateResource(
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("resource") String resource,
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("key") String key,
+			@Valid @RequestPart("resource") ResourceRequestRepresentation request,
+			@NotNull @RequestPart("file") MultipartFile file,
+			Authentication authentication) throws IOException
 	{
 		String ownerId = authentication == null ? Resource.AnonymousOwner :authentication.getName(); // only for testing
 		request.setResource(resource);
@@ -115,9 +131,11 @@ public class ResourceController {
 	}
 
 	@DeleteMapping(value = "{resource}/{key}")
-	//@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @resourceOwnership.require(#folder, #resourceId, authentication)")
-	public ResponseEntity<?> deleteResource(@PathVariable("resource") String resource,
-											@PathVariable("key") String key) {
+	//@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @resourceOwnership.require(#resource, #key, authentication)")
+	public ResponseEntity<?> deleteResource(
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("resource") String resource,
+			@NotBlank @Pattern(regexp = VALID_NAME_PATTERN) @PathVariable("key") String key)
+	{
 		manager.deleteResource(key, resource);
 		return ResponseEntity.noContent().build();
 	}

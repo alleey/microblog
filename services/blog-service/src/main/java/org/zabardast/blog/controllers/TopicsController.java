@@ -4,6 +4,7 @@ package org.zabardast.blog.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +37,7 @@ import org.zabardast.common.filtering.Filter;
 @RestController
 @RequestMapping(value = "/api/v1/topics")
 @Relation(collectionRelation = "topics")
+@Validated
 public class TopicsController {
 
 	@Autowired
@@ -56,8 +59,9 @@ public class TopicsController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<?> search(@NotNull @RequestParam("q")  final String criteria,
-																			final Pageable page)
+	public ResponseEntity<?> search(
+			@NotBlank @RequestParam("q")  final String criteria,
+			final Pageable page)
 	{
 		try
 		{

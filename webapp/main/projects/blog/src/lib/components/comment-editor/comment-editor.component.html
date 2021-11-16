@@ -1,16 +1,5 @@
-<ng-template #defaultTitleTemplate let-item>
-    <div class="d-flex justify-content-between">
-        <div>
-            <h5>POST A COMMENT</h5>
-        </div>
-    </div>
-</ng-template>
 
 <ng-container>
-    <ng-container 
-        [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
-        [ngTemplateOutletContext]="{ $implicit: this }">
-    </ng-container>
 
     <div *ngIf="viewModel.isLoading">
         <utils-loader></utils-loader>

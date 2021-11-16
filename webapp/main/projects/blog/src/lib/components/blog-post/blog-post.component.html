@@ -10,7 +10,8 @@
 
 <ng-template #viewer>
     <blog-post-view 
-        [item]="postItem" 
+        [context]="viewModel"
+        [item]="postItem"
         [topics]="postItem?.topics"
         [headerTemplate]="headerTemplate"
         [contentTemplate]="contentTemplate"

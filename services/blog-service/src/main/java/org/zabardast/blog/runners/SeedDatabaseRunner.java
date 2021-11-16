@@ -1,15 +1,19 @@
 package org.zabardast.blog.runners;
 
 import com.github.slugify.Slugify;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.zabardast.blog.config.InitialImportConfig;
 import org.zabardast.blog.dto.CommentRequestRepresentation;
 import org.zabardast.blog.dto.PostRequestRepresentation;
 import org.zabardast.blog.dto.PostResponseRepresentation;
@@ -30,13 +34,8 @@ class SeedDatabaseRunner implements ApplicationRunner {
     public static final String UserIdService = "2c21ad8e-2d19-4033-bd54-2cb778cd3eb7";
     public static final String UserIdUnknown = "00000000-0000-0000-0000-000000000000";
 
-    public static final String[] TopicNames = {
-        "General", "Politics", "Religion", "Philosophy", "Science", "Sports", "Technology",
-        "Cooking", "Gardening", "Programming", "Electronics", "Art", "History", "Falconry",
-        "E-Sports", "Mysticism", "Graphics Design", "Aviation", "Drugs", "International Relations",
-        "Defense", "Foreign Affairs", "War Studies"
-    };
-
+    @Autowired
+    InitialImportConfig initialImportConfig;
     @Autowired
     PostService postService;
     @Autowired
@@ -49,18 +48,41 @@ class SeedDatabaseRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        List<TopicResponseRepresentation> createdTopics = Arrays.stream(TopicNames)
-                .map(t -> createBlogTopic(t))
-                .collect(Collectors.toList());
+        if(!initialImportConfig.isEnabled()) {
+            return;
+        }
 
-        TopicResponseRepresentation topicGeneral = createdTopics.get(0);
+        Path storage = Paths.get(initialImportConfig.getLocation()).toAbsolutePath().normalize();
+        log.info("Executing initial import of resources under: " + storage.toString());
 
-        createBlogPost("Guest says Hello!", "This is a test post", UserIdGuest, topicGeneral.getId());
-        createBlogPost("Admin says Hello!", "This is another test post", UserIdAdmin, topicGeneral.getId());
-        createBlogPost("Guest is back!", "Third post completes hat-trick!", UserIdGuest, topicGeneral.getId());
-        createBlogPost("Catch me if you can!", "Unknown User!", UserIdUnknown, topicGeneral.getId());
-        createBlogPost("Catch me if you can 2!", "Unknown User!", UserIdUnknown, topicGeneral.getId());
-        createBlogPost("Catch me if you can 3!", "Unknown User!", UserIdUnknown, topicGeneral.getId());
+        try {
+            FileFilter filter = new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.getName().toLowerCase().endsWith(".md");
+                }
+            };
+            for (File dir : storage.toFile().listFiles())
+            {
+                if(!dir.isDirectory())
+                    continue;
+
+                TopicResponseRepresentation topic = createBlogTopic(dir.getName());
+
+                for (File file: dir.listFiles(filter)) {
+                    if(!file.isFile())
+                        continue;
+
+                    createBlogPost(
+                            file.getName().substring(0, file.getName().lastIndexOf('.')),
+                            Files.readString(file.toPath()),
+                            UserIdAdmin,
+                            topic.getId());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Resource import encountered an error: " + e.toString());
+        }
     }
 
     private CommentRequestRepresentation createComment(String text) {
@@ -78,10 +100,10 @@ class SeedDatabaseRunner implements ApplicationRunner {
                 .text(text)
                 .build());
 
-        commentService.newComment(created.getId(), UserIdGuest, createComment("I like it"));
-        commentService.newComment(created.getId(), UserIdUnknown, createComment("I like it, too!"));
-        commentService.newComment(created.getId(), UserIdAdmin, createComment("I like it, too!"));
-        commentService.newComment(created.getId(), UserIdUnknown, createComment("I like it, too!"));
+//        commentService.newComment(created.getId(), UserIdGuest, createComment("I like it"));
+//        commentService.newComment(created.getId(), UserIdUnknown, createComment("I like it, too!"));
+//        commentService.newComment(created.getId(), UserIdAdmin, createComment("I like it, too!"));
+//        commentService.newComment(created.getId(), UserIdUnknown, createComment("I like it, too!"));
         postTopicService.assignTopic(created.getId(), topicId);
     }
 

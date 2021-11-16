@@ -4,6 +4,7 @@ package org.zabardast.blog.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +38,7 @@ import org.zabardast.common.filtering.Filter;
 @RestController
 @RequestMapping(value = "/api/v1/posts")
 @Relation(collectionRelation = "posts")
+@Validated
 public class PostsController {
 
 	@Autowired
@@ -59,7 +62,7 @@ public class PostsController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<?> search(@NotNull @RequestParam("q")  final String criteria, final Pageable page)
+	public ResponseEntity<?> search(@NotBlank @RequestParam("q")  final String criteria, final Pageable page)
 	{
 		try
 		{
@@ -99,8 +102,11 @@ public class PostsController {
 
 	@PutMapping(value = "{postId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> updatePost(@PathVariable long postId, @RequestBody PostRequestRepresentation blogPost,
-										@NotNull Authentication authentication) {
+	public ResponseEntity<?> updatePost(
+			@PathVariable long postId,
+			@RequestBody PostRequestRepresentation blogPost,
+			@NotNull Authentication authentication)
+	{
 		EntityModel<?> entity = assembler.toModel(
 			postService.updatePost(postId, blogPost)
 		);
@@ -109,8 +115,10 @@ public class PostsController {
 
 	@DeleteMapping(value = "{postId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> deletePost(@PathVariable long postId,
-										@NotNull Authentication authentication) {
+	public ResponseEntity<?> deletePost(
+			@PathVariable long postId,
+			@NotNull Authentication authentication)
+	{
 		postService.deletePost(postId);
 		return ResponseEntity.noContent().build();
 	}

@@ -1,11 +1,15 @@
 <ng-container *ngIf="items">
-    <div *ngFor="let x of items" class="bg-light">
-        <ng-container [ngTemplateOutlet]="itemTemplate || defaultItemTemplate" [ngTemplateOutletContext]="{ $implicit: x, control: this }">
+    <div *ngFor="let x of items; index as i" class="bg-light">
+        <ng-container 
+            [ngTemplateOutlet]="itemTemplate || defaultItemTemplate" 
+            [ngTemplateOutletContext]="{ $implicit: x, index: i, control: this, context: context }">
         </ng-container>
     </div>
 </ng-container>
 <ng-container *ngIf="!items">
-    <ng-container [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate" [ngTemplateOutletContext]="{ $implicit: this }">
+    <ng-container 
+        [ngTemplateOutlet]="noContentsTemplate || defaultNoContentsTemplate" 
+        [ngTemplateOutletContext]="{ $implicit: this, control: this, context: context }">
     </ng-container>
 </ng-container>
 

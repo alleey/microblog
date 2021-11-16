@@ -1,38 +1,75 @@
-<user-profile [contentTemplate]="defaultContentTemplate">
+<user-profile 
+    [userId]="userId" 
+    [contentTemplate]="defaultContentTemplate">
 </user-profile>
 
 <ng-template #defaultContentTemplate let-item>
-    <h4>User Profile</h4>
-    <div class="d-flex">
-        <counter-stats [caption]="'Views'" [counterId]="'userprofile.views:' + item.id" [displayStats]="'sum'"></counter-stats>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h4>User Profile</h4>
+                <div class="d-flex">
+                    <counter-stats 
+                        [caption]="'Views'" 
+                        [counterId]="'userprofile.views-' + item.id"
+                        [displayStats]="'sum'">
+                    </counter-stats>
+                    <follower-badge [userId]="item.id" class="mx-1"></follower-badge>
+                </div>
+                <hr />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-9">
+                <dl>
+                    <dt>Userid:</dt>
+                    <dd>{{ item.id }}</dd>
+
+                    <dt>Username:</dt>
+                    <dd>{{ item.username }}</dd>
+
+                    <dt>Name:</dt>
+                    <dd>{{ item.firstName }} {{ item.lastName }}</dd>
+
+                    <dt>Email:</dt>
+                    <dd>{{ item.email }}</dd>
+
+                    <dt>Member since:</dt>
+                    <dd>{{ item.createdOn | prettyDate }}</dd>
+                </dl>
+            </div>
+            <div class="col-md-3 container" >
+                <image-resource resource="avatars" [key]="item.id" class="img-fluid"
+                    [contentTemplate]="pictureTemplate"
+                    [noContentTemplate]="pictureTemplate">
+                </image-resource>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <hr />
+                <div class="my-3">
+                    <following-badge [userId]="item.id" class="mx-1"></following-badge>
+                    <a class="btn btn-primary mr-1" role="button" (click)="userPosts(item)">Posts by {{ item.username }}</a>
+                    <a class="btn btn-success mr-1" role="button" (click)="editUserProfile(item)" *authRequireRole="'admin' allowOwner item.id">Edit Profile</a>
+                    <a class="btn btn-primary mr-1" role="button" (click)="editUserProfile(item)" *authRequireRole="'admin' allowOwner item.id">Change Avatar</a>
+                </div>
+                <hr />
+                <div>
+                    <h4>About:</h4>
+                    <markdown class="variable-binding" [data]="item.about"></markdown>
+                </div>
+                <div [statsSetCounter]="'userprofile.views:' + item.id" [counterSetMode]="'inc'" [counterSetValue]="1">
+                </div>
+                <hr />
+            </div>
+        </div>
     </div>
-    <hr/>
-    <dl>
-        <dt>Userid:</dt>
-        <dd>{{ item.id }}</dd>
 
-        <dt>Username:</dt>
-        <dd>{{ item.username }}</dd>
+</ng-template>
 
-        <dt>Name:</dt>
-        <dd>{{ item.firstName }} {{ item.lastName }}</dd>
-
-        <dt>Email:</dt>
-        <dd>{{ item.email }}</dd>
-
-        <dt>Member since:</dt>
-        <dd>{{ item.createdOn | prettyDate }}</dd>
-    </dl>
-    <hr/>
-    <div class="my-3">
-        <a class="btn btn-primary mr-1" role="button" (click)="userPosts(item)">Posts by {{ item.username }}</a>
-        <a class="btn btn-success" role="button" (click)="editUserProfile(item)" *authRequireRole="'admin' allowOwner item.id">Edit</a>
-    </div>
-    <hr/>
-    <div>
-        <h4>About:</h4>
-        <markdown class="variable-binding" [data]="item.about"></markdown>
-    </div>
-    <div [statsSetCounter]="'userprofile.views:' + item.id" [counterSetMode]="'inc'" [counterSetValue]="1"></div>
-    <hr/>
+<ng-template #pictureTemplate let-item let-control="control">
+    <img src="{{control.downloadLink}}" class="img-fluid" style="border: 2px;" *ngIf="item"/>
+    <img src="./assets/missing-avatar.jpg" class="img-fluid" style="border: 2px;" *ngIf="!item"/>
 </ng-template>

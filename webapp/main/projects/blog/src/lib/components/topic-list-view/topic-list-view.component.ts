@@ -14,6 +14,7 @@ export class TopicListViewComponent implements OnInit {
   @Input() items?: TopicModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
+  @Input() context: any = {};
 
   @Output() onEvent = new EventEmitter<TopicListViewEvent>();
 

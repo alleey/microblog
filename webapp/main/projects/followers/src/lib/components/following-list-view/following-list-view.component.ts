@@ -14,6 +14,7 @@ export class FollowingListViewComponent implements OnInit {
   @Input() items?: FollowsModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
+  @Input() context: any = {};
 
   @Output() onEvent = new EventEmitter<FollowingListViewEvent>();
 

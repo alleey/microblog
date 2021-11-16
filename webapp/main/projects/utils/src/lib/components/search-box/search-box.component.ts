@@ -10,7 +10,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 export class SearchBoxComponent implements OnInit, OnDestroy {
 
   @Input() debounceTime: number = 500;
-  @Input() context: any;
+  @Input() context: any = {};
   @Input() controlTemplate: TemplateRef<any> | undefined;
 
   @Output() onApplyFilter = new EventEmitter<string>();

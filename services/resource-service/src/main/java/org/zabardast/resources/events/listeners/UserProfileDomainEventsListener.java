@@ -8,10 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
+import org.zabardast.common.domain.DomainConstants;
 import org.zabardast.resources.dto.ResourceResponseRepresentation;
 import org.zabardast.resources.model.Event;
-import org.zabardast.resources.services.ResourceService;
-import org.zabardast.common.domain.DomainConstants;
+import org.zabardast.resources.model.ResourceKey;
+import org.zabardast.resources.services.ResourceManagerService;
 
 @Slf4j
 @Component
@@ -20,7 +21,7 @@ public class UserProfileDomainEventsListener {
     public static final String DOMAIN_EVENT_USERPROFILE_DELETED = "org.zabardast.userprofile.events.UserProfileDeletedEvent";
 
     @Autowired
-    ResourceService resourceService;
+    ResourceManagerService resourceManagerService;
 
     @Bean
     public Consumer<Message<Event>> userProfileEvents() {
@@ -39,10 +40,14 @@ public class UserProfileDomainEventsListener {
     void handleUserProfileDeletion(String userId) {
 
         log.info("handleUserProfileDeletion " + userId);
-//        Page<ResourceResponseRepresentation> bookmarks = resourceService.getAllBookmarks(userId, Pageable.unpaged());
-//        for (ResourceResponseRepresentation bookmark: bookmarks) {
-//            resourceService.deleteBookmark(bookmark.getId());
-//            log.info("Deleted orphaned bookmark " + bookmark.getId());
-//        }
+        Page<ResourceResponseRepresentation> resources = resourceManagerService.findByOwner(userId, Pageable.unpaged());
+        for (ResourceResponseRepresentation res: resources) {
+            ResourceKey rkey = ResourceKey.builder()
+                    .resource(res.getResource())
+                    .key(res.getKey())
+                    .build();
+            resourceManagerService.deleteResource(res.getKey(), res.getResource());
+            log.info("Deleted orphaned res " + rkey);
+        }
     }
 }

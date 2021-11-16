@@ -1,0 +1,7 @@
+<ng-container 
+    [ngTemplateOutlet]="contentTemplate || defaultContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: resourceModel, control: this, downloadLink: downloadLink }">
+</ng-container>
+
+<ng-template #defaultContentTemplate let-item let-control="control">
+</ng-template>

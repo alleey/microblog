@@ -1,0 +1,31 @@
+<div>
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h5>UPDATE PROFILE</h5>
+            </div>
+            <div><a class="btn btn-success" role="button" (click)="cancel()">Cancel</a></div>
+        </div>
+    </div>
+</div>
+<div>
+    <div class="col-md-9">
+        <user-profile-editor [userId]="userId"></user-profile-editor>
+    </div>
+    <div class="col-md-3">
+        <image-resource-upload
+            resource="avatars" 
+            [key]="userId!" 
+            [contentTemplate]="pictureTemplate"
+            [noContentTemplate]="missingPictureTemplate">
+        </image-resource-upload>
+    </div>
+</div>
+
+<ng-template #pictureTemplate let-item let-control="control">
+    <img src="{{control.downloadLink}}" class="img-fluid" *ngIf="item"/>
+</ng-template>
+
+<ng-template #missingPictureTemplate let-item let-control="control">
+    <img src="./assets/missing-avatar.jpg" class="img-fluid" *ngIf="!item"/>
+</ng-template>

@@ -6,12 +6,16 @@ import { Pageable } from 'utils';
 import { PostsServiceConfig, PostsServiceConfigToken } from '../config/config';
 import { BlogPostListResponseModel, BlogPostResponseModel } from '../models/blog-post';
 
+export interface PostsServiceChangeNotification {
+  id: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class PostsService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange: Subject<PostsServiceChangeNotification> = new Subject<PostsServiceChangeNotification>();
 
   constructor(@Inject(PostsServiceConfigToken) private config: PostsServiceConfig, private httpClient: HttpClient) 
   { }
@@ -74,7 +78,7 @@ export class PostsService {
             .post<BlogPostResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}`, postRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id: x.id }); }
               })
             );
   }
@@ -88,7 +92,7 @@ export class PostsService {
             .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`, postRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id }); }
               })
             );
   }
@@ -99,7 +103,7 @@ export class PostsService {
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id }); }
               })
             );
   }

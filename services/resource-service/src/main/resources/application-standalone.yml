@@ -21,11 +21,11 @@ spring:
           zkNodes: "${ZOOKEEPER_NODES:localhost:2181}"
       bindings:
         domainEvents-out-0:
-          destination: media.zabardast
+          destination: resource.zabardast
           producer:
             partition-key-expression: headers['Service']
         userProfileEvents-in-0:
-          group: media-service
+          group: resource-service
           destination: userprofile.zabardast
           enableDlq: true
           dlqName: userprofile.zabardast.resources.dlq
@@ -33,7 +33,7 @@ spring:
             configuration:
               value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
         blogEvents-in-0:
-          group: media-service
+          group: resource-service
           destination: blog.zabardast
           enableDlq: true
           dlqName: blog.zabardast.resources.dlq

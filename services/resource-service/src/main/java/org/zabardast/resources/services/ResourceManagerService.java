@@ -1,6 +1,7 @@
 package org.zabardast.resources.services;
 
 import javax.validation.constraints.NotNull;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +16,10 @@ public class ResourceManagerService
 {
     @Autowired
     StorageService storageService;
-
     @Autowired
     ResourceService resourceService;
+    @Autowired
+    MimeTypeResolver mimeTypeResolver;
 
     public ResourceResponseRepresentation getResource(@NotNull String resource,
                                                       @NotNull String key,
@@ -41,8 +43,8 @@ public class ResourceManagerService
         return resourceService.findByResource(resource, pageable);
     }
 
-    public Page<ResourceResponseRepresentation> findByOwnerAndFolder(String ownerId, String folder, Pageable pageable) {
-        return resourceService.findByOwnerAndResource(ownerId, folder, pageable);
+    public Page<ResourceResponseRepresentation> findByOwnerAndFolder(String ownerId, String resource, Pageable pageable) {
+        return resourceService.findByOwnerAndResource(ownerId, resource, pageable);
     }
 
     @Transactional
@@ -54,9 +56,13 @@ public class ResourceManagerService
                 .resource(request.getResource())
                 .key(request.getKey())
                 .build();
-        String moniker = storageService.getResolvableMoniker(rkey);
 
+        String moniker = storageService.getResolvableMoniker(rkey);
+        if(Strings.isBlank(request.getContentType())) {
+            request.setContentType(mimeTypeResolver.resolveMimeType(file.getFilename()));
+        }
         request.setLocation(moniker);
+
         return resourceService.newResource(ownerId, rkey, request, f -> {
             storageService.save(moniker, file);
         });
@@ -70,9 +76,13 @@ public class ResourceManagerService
                 .resource(request.getResource())
                 .key(request.getKey())
                 .build();
-        String moniker = storageService.getResolvableMoniker(rkey);
 
+        String moniker = storageService.getResolvableMoniker(rkey);
+        if(Strings.isBlank(request.getContentType())) {
+            request.setContentType(mimeTypeResolver.resolveMimeType(file.getFilename()));
+        }
         request.setLocation(moniker);
+
         return resourceService.updateResource(ownerId, rkey, request, f -> {
             storageService.save(moniker, file);
         });
@@ -85,7 +95,6 @@ public class ResourceManagerService
                 .key(key)
                 .build();
         String moniker = storageService.getResolvableMoniker(rkey);
-
         resourceService.deleteResource(rkey, f -> {
             storageService.delete(moniker);
         });

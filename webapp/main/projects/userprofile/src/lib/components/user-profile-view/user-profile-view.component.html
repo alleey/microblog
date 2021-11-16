@@ -1,12 +1,12 @@
 <ng-container 
-    *ngIf="!userProfile" 
-    [ngTemplateOutlet]="noContentTemplate || defaultNoContentTemplate"
-    [ngTemplateOutletContext]="{ $implicit: this }">
-</ng-container>
-<ng-container 
     *ngIf="!!userProfile" 
     [ngTemplateOutlet]="contentTemplate || defaultContentTemplate"
-    [ngTemplateOutletContext]="{ $implicit: userProfile, control: this }">
+    [ngTemplateOutletContext]="{ $implicit: userProfile, control: this, context: context }">
+</ng-container>
+<ng-container 
+    *ngIf="!userProfile" 
+    [ngTemplateOutlet]="noContentTemplate || defaultNoContentTemplate"
+    [ngTemplateOutletContext]="{ $implicit: this, control: this, context: context }">
 </ng-container>
 
 <ng-template #defaultContentTemplate let-item>

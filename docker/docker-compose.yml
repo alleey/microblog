@@ -223,6 +223,8 @@ services:
       EVENT_FLUSH_INTERVAL: 180000
       EVENT_FLUSH_BATCHSIZE: 100
       PRUNE_ORPHANED_POSTS: 'true'
+      SERVICE_IMPORT_ON_STARTUP_ENABLED: 'true'
+      SERVICE_IMPORT_ON_STARTUP_LOCATION: data/seeddata
 
   bookmarkservice:
     image: zabardast/bookmark-service
@@ -374,6 +376,50 @@ services:
       EVENT_FLUSH_INTERVAL: 180000
       EVENT_FLUSH_BATCHSIZE: 100
 
+  resourceservice:
+    image: zabardast/resource-service
+    build:
+      context: ../services/resource-service
+      dockerfile: Dockerfile
+      args:
+        user: service
+    ports:
+      - "9085:9085"
+    restart: on-failure:30
+    depends_on:
+      - configservice
+      - eurekaservice
+      - gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      ENCRYPT_KEY: "Pox1dH2G&w%hscRrLSjGpDn!BX1A&V6CJPKz@9c6UQwbycQf"
+      SERVER_PORT: 9085
+      SERVER_SSL_ENABLED: 'false'
+      SERVER_SSL_CLIENT_AUTH: 'none'
+      DB_ADDR: 'database:5432'
+      DB_DATABASE: resourceservice
+      DB_USER: postgres
+      DB_PASSWORD: 'postgres'
+      EUREKA_URI: "http://eurekaservice:9001/eureka"
+      CONFIG_URI: "http://configservice:9003/config"
+      CONFIG_RETRY_INITIAL_INTERVAL: 3000
+      CONFIG_RETRY_MAX_ATTEMPTS: 15
+      CONFIG_RETRY_MAX_INTERVAL: 15000
+      CONFIG_RETRY_MULTIPLIER: 1.2
+      KEYCLOCK_URL: "https://keycloak:8443"
+      KEYCLOCK_REALM: "zabardast"
+      KAFKA_BROKERS: kafka:9092
+      ZOOKEEPER_NODES: zookeeper:2181
+      EVENT_FLUSH_INTERVAL: 180000
+      EVENT_FLUSH_BATCHSIZE: 100
+      SERVICE_STORAGE_STORE_LOCATION: data/store
+      SERVICE_IMPORT_ON_STARTUP_ENABLED: 'true'
+      SERVICE_IMPORT_ON_STARTUP_LOCATION: data/seeddata
+      SERVICE_UPLOAD_MAX_FILE_FIZE: 1MB
+      SERVICE_UPLOAD_MAX_REQUEST_FIZE: 1MB
+    volumes:
+      - resourceservice_data:/usr/local/service/data
+
   webapp:
     image: zabardast/webapp
     build:
@@ -392,4 +438,4 @@ services:
       - followersservice
       - statsservice
       - userprofileservice
-
+      - resourceservice

@@ -12,7 +12,7 @@ export class BadgeComponent implements OnInit {
   @Input() inactiveCaption: string = "";
   @Input() displayKind: string = "primary";
 
-  @Input() context: any;
+  @Input() context: any = {};
   @Input() activeControlTemplate: TemplateRef<any> | undefined;
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 

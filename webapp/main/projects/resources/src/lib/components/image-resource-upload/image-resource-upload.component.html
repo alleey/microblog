@@ -1,0 +1,32 @@
+<image-resource 
+    [resource]="resource" 
+    [key]="key" 
+    [noContentTemplate]="noContentTemplate || missingPictureTemplate"
+    #picture>
+</image-resource>
+<form [formGroup]="form" novalidate onSubmit="return false;">
+<div>
+    <input type="file" class="form-control" id="file" formControlName="file" accept=".gif,.jpg,.jpeg,.png"
+        required (change)="onFileChange($event)">
+
+    <div *ngIf="file?.invalid && (file?.dirty || file?.touched)">
+        <utils-alert *ngIf="file?.errors?.required" [dismissable]="false" [minimal]="true">
+            File is required.
+        </utils-alert>
+    </div>
+</div>
+<div class="mt-3">
+    <input data-testid="update" class="btn btn-primary" type="button" [disabled]="!form.valid" value="Update"
+    (click)="updateProfilePicture()">
+</div>
+</form>
+
+
+<ng-template #pictureTemplate let-item let-control="control">
+    <img src="{{control.downloadLink}}" *ngIf="item"/>
+</ng-template>
+
+
+<ng-template #missingPictureTemplate let-item let-control="control">
+    <span>Not found!</span>
+</ng-template>

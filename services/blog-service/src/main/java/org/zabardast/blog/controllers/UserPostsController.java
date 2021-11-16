@@ -1,6 +1,7 @@
 
 package org.zabardast.blog.controllers;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ import org.zabardast.blog.services.PostService;
 @RestController
 @RequestMapping(value = "/api/v1/users/{userId}")
 @Relation(collectionRelation = "posts")
+@Validated
 public class UserPostsController {
 
 	@Autowired
@@ -34,7 +37,7 @@ public class UserPostsController {
 	PostResponseRepresentationAssembler assembler;
 
 	@GetMapping(value = "posts")
-	public ResponseEntity<?> getOwnersPosts(@PathVariable("userId") String userId, @NotNull final Pageable page)
+	public ResponseEntity<?> getOwnersPosts(@NotBlank @PathVariable("userId") String userId, @NotNull final Pageable page)
 	{
 		PagedModel<?> entities = pagedAssembler.toModel(
 			postService.getOwnerPosts(userId, page),

@@ -69,6 +69,11 @@ export const environment = {
       serviceBaseUrl: "http://localhost:9084/api/v1",
       defaultEndpoint: "counters"
     },
+    resources: {
+      serviceBaseUrl: "http://localhost:9085/api/v1",
+      defaultEndpoint: "resources",
+      pageSize: 10,
+    },
   }
 };
 

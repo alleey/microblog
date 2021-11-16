@@ -1,6 +1,5 @@
-import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
@@ -12,31 +11,20 @@ import { TopicsService } from '../../services/topics.service';
   templateUrl: './topic-editor.component.html',
   styleUrls: ['./topic-editor.component.css']
 })
-export class TopicEditorComponent implements OnInit, OnDestroy {
+export class TopicEditorComponent implements OnInit, OnDestroy, OnChanges {
 
-  @Input("topicId") paramTopicId?: number;
+  @Input() topicId?: number;
   @Input() updateMode: boolean = true;
-  @Input() headerTemplate: TemplateRef<any> | undefined;
 
   form!: FormGroup;
-  topicId?: number;
   viewModel = new ViewModelHolder<TopicResponseModel>();
   destroyed$ = new Subject();
 
-  constructor(
-    private service: TopicsService,
-    private activatedRoute: ActivatedRoute) {}
+  constructor(private service: TopicsService) {}
 
   ngOnInit(): void {
-
     this.form = new FormGroup({
       "caption": new FormControl("", Validators.required)
-    });
-
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.topicId = <number> (params.get("topicId") ?? this.paramTopicId);
-      if(this.isUpdateMode)
-        this.fetchTopic(this.topicId!);
     });
   }
 
@@ -45,8 +33,15 @@ export class TopicEditorComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
-  get caption() { return this.form.get('caption'); }
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['topicId']);
+    if(changed && this.isUpdateMode) {
+      this.fetchTopic(this.topicId!);
+    }
+  }
+
   get isUpdateMode(): boolean { return this.updateMode && this.topicId !== undefined;}
+  get caption() { return this.form.get('caption'); }
   get topic(): TopicResponseModel|undefined { return this.viewModel.Model; }
 
   updateForm(): void {

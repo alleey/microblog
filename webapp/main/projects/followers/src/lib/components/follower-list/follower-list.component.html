@@ -2,7 +2,7 @@
 
     <ng-container
         [ngTemplateOutlet]="headerTemplate || defaultHeaderTemplate"
-        [ngTemplateOutletContext]="{ $implicit: this }">
+        [ngTemplateOutletContext]="{ $implicit: this, control: this }">
     </ng-container>
 
     <ng-container *ngIf="viewModel.isLoading">
@@ -26,7 +26,7 @@
 
     <ng-container
         [ngTemplateOutlet]="footerTemplate || defaultFooterTemplate"
-        [ngTemplateOutletContext]="{ $implicit: this }">
+        [ngTemplateOutletContext]="{ $implicit: this, control: this }">
     </ng-container>
 
 </ng-container>

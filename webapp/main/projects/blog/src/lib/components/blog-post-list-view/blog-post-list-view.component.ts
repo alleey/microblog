@@ -14,6 +14,7 @@ export class BlogPostListViewComponent implements OnInit {
   @Input() items?: BlogPostModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
+  @Input() context: any = {};
 
   @Output() onEvent = new EventEmitter<BlogPostListViewEvent>();
 

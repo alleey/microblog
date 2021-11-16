@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { PageModel, ViewModelHolder } from 'utils';
 import { BlogPostListResponseModel, BlogPostModel } from '../../models/blog-post';
 import { PostsService } from '../../services/posts.service';
 import { BlogPostListViewEvent } from '../blog-post-list-view/blog-post-list-view.component';
@@ -14,7 +14,9 @@ export type BlogPostListEvent = BlogPostListViewEvent;
   templateUrl: './blog-post-list.component.html',
   styleUrls: ['./blog-post-list.component.scss']
 })
-export class BlogPostListComponent implements OnInit, OnDestroy {
+export class BlogPostListComponent implements OnInit, OnDestroy, OnChanges {
+
+  @Input() pageNum: number = 0;
 
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
   @Input() itemTemplate: TemplateRef<any> | undefined;
@@ -24,33 +26,21 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
   @Output() onEvent = new EventEmitter<BlogPostListEvent>();
 
   state: any;
-
-  pageable: Pageable;
   viewModel = new ViewModelHolder<BlogPostListResponseModel>();
   destroyed$ = new Subject();
-
   subscription: Subscription = new Subscription();
 
   constructor(
     private service: PostsService, 
-    private router: Router, 
-    private activatedRoute: ActivatedRoute) 
+    private router: Router) 
   {
     this.state = this.router.getCurrentNavigation()?.extras.state;
-    this.pageable = {
-      page: 0
-    };
-    //console.log(this.state);
   }
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe(params => {
-      const pageNum = <number> (params.get("pageNum") ?? 0);
-      this.fetchPage(pageNum);
-    });
     // Requery when the backend data changes
     this.subscription.add(
-      this.service.onChange.subscribe({ next: () => this.fetchPage(0) })
+      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageNum) })
     );
   }
 
@@ -60,12 +50,18 @@ export class BlogPostListComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['pageNum']);
+    if(changed) {
+      this.fetchPage(this.pageNum!);
+    }
+  }
+
   fetchPage(pageNum: number): void {
     //const routeParams = this.route.snapshot.paramMap;
     //this.organizationId = routeParams.get('orgId') as string;  
-    this.pageable.page = pageNum;
     this.service
-      .all(this.state?.endpoint ?? "", this.pageable)
+      .all(this.state?.endpoint ?? "", { page: pageNum })
       .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }

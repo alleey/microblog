@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserProfileModel } from 'userprofile';
 
 @Component({
@@ -9,11 +9,16 @@ import { UserProfileModel } from 'userprofile';
 })
 export class AppUserProfileComponent implements OnInit {
 
+  userId?: string;
+
   constructor(
-    private router: Router) 
-  { }
+    private router: Router,
+    private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.activatedRoute.paramMap.subscribe(params => {
+      const userId = params.get("userId");
+    });
   }
 
   userPosts(item: UserProfileModel) : void {

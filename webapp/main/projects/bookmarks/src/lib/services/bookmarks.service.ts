@@ -6,12 +6,16 @@ import { map, tap } from "rxjs/operators";
 import { BookmarkResponseModel, BookmarkListResponseModel } from '../models/bookmark';
 import { BookmarksServiceConfig, BookmarksServiceConfigToken } from '../config/config';
 
+export interface BookmarksServiceChangeNotification {
+  id: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class BookmarksService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange: Subject<BookmarksServiceChangeNotification> = new Subject<BookmarksServiceChangeNotification>();
 
   constructor(
     @Inject(BookmarksServiceConfigToken) 
@@ -84,7 +88,7 @@ export class BookmarksService {
             .post<BookmarkResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}`, boomarkRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id: x.id }); }
               })
             );
   }
@@ -95,7 +99,7 @@ export class BookmarksService {
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${id}`)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ id }); }
               })
             );
   }

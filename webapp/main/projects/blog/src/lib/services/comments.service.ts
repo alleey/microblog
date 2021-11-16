@@ -6,12 +6,17 @@ import { catchError, map, tap } from "rxjs/operators";
 import { CommentResponseModel, CommentListResponseModel } from '../models/comment';
 import { CommentsServiceConfig, CommentsServiceConfigToken } from '../config/config';
 
+export interface CommentsServiceChangeNotification {
+  postId: number;
+  id: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CommentsService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange: Subject<CommentsServiceChangeNotification> = new Subject<CommentsServiceChangeNotification>();
 
   constructor(@Inject(CommentsServiceConfigToken) private config: CommentsServiceConfig, private httpClient: HttpClient) 
   { }
@@ -47,7 +52,7 @@ export class CommentsService {
             .post<CommentResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments`, commentRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ postId, id: x.id }); }
               })
             );
   }
@@ -61,7 +66,7 @@ export class CommentsService {
             .put<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`, commentRepr)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ postId, id }); }
               })
             );
   }
@@ -72,7 +77,7 @@ export class CommentsService {
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${postId}/comments/${id}`)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ postId, id }); }
               })
             );
   }

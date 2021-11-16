@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { PageModel, ViewModelHolder } from 'utils';
 import { TopicListResponseModel, TopicModel } from '../../models/topic';
 import { TopicsService } from '../../services/topics.service';
 import { TopicListViewEvent } from '../topic-list-view/topic-list-view.component';
@@ -14,10 +13,11 @@ export type TopicListEvent = TopicListViewEvent;
   templateUrl: './topic-list.component.html',
   styleUrls: ['./topic-list.component.scss']
 })
-export class TopicListComponent implements OnInit, OnDestroy {
+export class TopicListComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() enableSearch: boolean = true;
-  @Input() filterText: string = '';
+  @Input() filter: string = '';
+  @Input() pageNum: number = 0;
 
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
@@ -26,30 +26,20 @@ export class TopicListComponent implements OnInit, OnDestroy {
 
   @Output() onEvent = new EventEmitter<TopicListEvent>();
 
-  currentFilter: string = "";
-  pageable: Pageable;
+  filterText: string = '';
   viewModel = new ViewModelHolder<TopicListResponseModel>();
   destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
-  constructor(
-    private service: TopicsService, 
-    private activatedRoute: ActivatedRoute) 
+  constructor(private service: TopicsService) 
   { 
-    this.currentFilter = this.filterText;
-    this.pageable = {
-      page: 0
-    };
+    this.filterText = this.filterText;
   }
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe(params => {
-      const pageNum = <number> (params.get("pageNum") ?? 0);
-      this.fetchPage(pageNum);
-    }); 
     // Requery when the backend data changes
     this.subscription.add(
-      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
+      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageNum) })
     );
   }
 
@@ -59,22 +49,28 @@ export class TopicListComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['pageNum']);
+    if(changed) {
+      this.fetchPage(this.pageNum!);
+    }
+  }
+
   onApplyFilter(text: string): void {
     this.filterText = text;
     this.fetchPage(0);
   }
 
   fetchPage(pageNum: number): void {
-    this.pageable.page = pageNum;
     if(!!this.filterText) {
       this.service
-        .findMatchingCaption("", this.filterText, this.pageable)
+        .findMatchingCaption("", this.filterText, { page: pageNum })
         .pipe(takeUntil(this.destroyed$))
         .subscribe(this.viewModel.expectModel());
     }
     else {
       this.service
-        .all("", this.pageable)
+        .all("", { page: pageNum })
         .pipe(takeUntil(this.destroyed$))
         .subscribe(this.viewModel.expectModel());
     }

@@ -1,8 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { BookmarkListEvent, BookmarkModel, BookmarksService } from 'bookmarks';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { ViewModelHolder } from 'utils';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { BookmarkListComponent, BookmarkListEvent, BookmarkModel } from 'bookmarks';
 
 @Component({
   selector: 'app-bookmarks-list',
@@ -11,13 +9,18 @@ import { ViewModelHolder } from 'utils';
 })
 export class AppBookmarksListComponent implements OnInit {
 
-  destroyed$ = new Subject();
-  viewModel = new ViewModelHolder<any>();
+  pageNum: number = 0;
+  
+  @ViewChild('bookmarksList')
+  bookmarksListComponent!: BookmarkListComponent;
 
-  constructor(
-    private service: BookmarksService) { }
+  constructor(private activatedRoute: ActivatedRoute) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void { 
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.pageNum = Number(params.get("pageNum")) || 0;
+    });
+  }
 
   handleListViewEvent(evt: BookmarkListEvent) {
     switch(evt.opcode) {
@@ -27,10 +30,7 @@ export class AppBookmarksListComponent implements OnInit {
   }
 
   deleteBookmark(bookmark: BookmarkModel): void {
-    this.service
-      .delete("", bookmark.id)
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe(this.viewModel.expectUndefined());
+    this.bookmarksListComponent.deleteBookmark(bookmark);
   }
 
   navigateBookmark(bookmark: BookmarkModel): void {

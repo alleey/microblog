@@ -15,6 +15,7 @@ export class BlogPostViewComponent implements OnInit {
   @Input() item!: BlogPostModel;
   @Input() topics!: TopicModel[];
   @Input() enableComments: boolean = true;
+  @Input() context: any = {};
 
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() contentTemplate: TemplateRef<any> | undefined;

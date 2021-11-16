@@ -22,6 +22,7 @@ import org.zabardast.resources.events.ResourceUpdatedEvent;
 import org.zabardast.resources.model.Resource;
 import org.zabardast.resources.model.ResourceKey;
 import org.zabardast.resources.repository.ResourceRepository;
+import org.zabardast.resources.services.exceptions.ResourceAlreadyExistsException;
 import org.zabardast.resources.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -104,6 +105,10 @@ public class ResourceService
                                                       @NotNull ResourceRequestRepresentation request,
                                                       @NotNull Consumer<ResourceResponseRepresentation> continuation)
     {
+        resourceRepository.findById(key).ifPresent(f -> {
+            throw new ResourceAlreadyExistsException(key);
+        });
+
         Resource resource = Resource.builder()
                 .resource((key.getResource()))
                 .key(key.getKey())
@@ -114,8 +119,10 @@ public class ResourceService
                 .build();
         Resource saved = resourceRepository.save(resource);
         ResourceResponseRepresentation response = modelMapper.map(saved, ResourceResponseRepresentation.class);
+
         if(continuation != null)
             continuation.accept(response);
+
         eventPublisher.publishEvent(new ResourceCreatedEvent(this, key));
         return response;
     }
@@ -143,8 +150,8 @@ public class ResourceService
                     eventPublisher.publishEvent(new ResourceUpdatedEvent(this, key));
                     return response;
                 })
-                .orElseGet(() -> {
-                    return newResource(owner, key, request, continuation);
+                .orElseThrow(() -> {
+                    throw new ResourceNotFoundException(key);
                 });
     }
 

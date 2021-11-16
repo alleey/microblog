@@ -4,6 +4,7 @@ package org.zabardast.bookmarks.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,7 @@ import org.zabardast.common.filtering.Filter;
 @RestController
 @RequestMapping(value = "/api/v1/bookmarks")
 @ExposesResourceFor(Bookmark.class)
+@Validated
 public class BookmarksController {
 
 	@Autowired
@@ -59,9 +62,10 @@ public class BookmarksController {
 
 	@GetMapping("search")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> search(@NotNull @RequestParam("q")  final String criteria,
-																			final Pageable page,
-																			@NotNull Authentication authentication)
+	public ResponseEntity<?> search(
+			@NotBlank @RequestParam("q")  final String criteria,
+			final Pageable page,
+			@NotNull Authentication authentication)
 	{
 		try
 		{
@@ -84,8 +88,10 @@ public class BookmarksController {
 
 	@GetMapping(value = "{bookmarkId}")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> getBookmarkById(@PathVariable("bookmarkId") Long bookmarkId,
-																 @NotNull Authentication authentication) {
+	public ResponseEntity<?> getBookmarkById(
+			@NotBlank @PathVariable("bookmarkId") Long bookmarkId,
+			@NotNull Authentication authentication)
+	{
 		return ResponseEntity
 				.ok()
 				.contentType(MediaTypes.HAL_JSON)
@@ -94,7 +100,10 @@ public class BookmarksController {
 
 	@PostMapping()
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> newBookmark(@NotNull @RequestBody BookmarkRequestRepresentation bookmark, @NotNull Authentication authentication) {
+	public ResponseEntity<?> newBookmark(
+			@NotNull @RequestBody BookmarkRequestRepresentation bookmark,
+			@NotNull Authentication authentication)
+	{
 		EntityModel<?> entity = assembler.toModel(
 			bookmarkService.newBookmark(authentication.getName(), bookmark)
 		);
@@ -103,9 +112,10 @@ public class BookmarksController {
 
 	@PutMapping(value = "{bookmarkId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
-	public ResponseEntity<?> updateBookmark(@PathVariable Long bookmarkId,
-											@NotNull @RequestBody BookmarkRequestRepresentation bookmark,
-											@NotNull Authentication authentication)
+	public ResponseEntity<?> updateBookmark(
+			@NotBlank @PathVariable Long bookmarkId,
+			@NotNull @RequestBody BookmarkRequestRepresentation bookmark,
+			@NotNull Authentication authentication)
 	{
 		EntityModel<?> entity = assembler.toModel(
 			bookmarkService.updateBookmark(bookmarkId, bookmark)
@@ -115,7 +125,10 @@ public class BookmarksController {
 
 	@DeleteMapping(value = "{bookmarkId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
-	public ResponseEntity<?> deleteBookmark(@PathVariable Long bookmarkId, @NotNull Authentication authentication) {
+	public ResponseEntity<?> deleteBookmark(
+			@NotBlank @PathVariable Long bookmarkId,
+			@NotNull Authentication authentication)
+	{
 		bookmarkService.deleteBookmark(bookmarkId);
 		return ResponseEntity.noContent().build();
 	}

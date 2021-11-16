@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.Principal;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +38,7 @@ import org.zabardast.userprofile.services.UserProfileService;
 @RestController
 @RequestMapping(value = "/api/v1/users")
 @ExposesResourceFor(UserProfile.class)
+@Validated
 public class UserProfilesController {
 
 	@Autowired
@@ -59,7 +63,7 @@ public class UserProfilesController {
 	@GetMapping("search")
 	//@PreAuthorize("isAuthenticated")
 	public ResponseEntity<?> search(
-			@NotNull @RequestParam("q")  final String criteria,
+			@NotBlank @RequestParam("q")  final String criteria,
 			final Pageable page)
 	{
 		try
@@ -82,7 +86,8 @@ public class UserProfilesController {
 
 	@GetMapping(value = "{userProfileId}")
 	//@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> getUserProfileById(@PathVariable("userProfileId") String userProfileId)
+	public ResponseEntity<?> getUserProfileById(
+			@NotBlank @PathVariable("userProfileId") String userProfileId)
 	{
 		return ResponseEntity
 				.ok()
@@ -92,9 +97,11 @@ public class UserProfilesController {
 
 	@PutMapping(value = "{userProfileId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @userProfileOwnership.require(#userProfileId, authentication)")
-	public ResponseEntity<?> updateUserProfile(@PathVariable String userProfileId,
-											   @NotNull @RequestBody UserProfileRequestRepresentation userProfile,
-											   Principal principal) {
+	public ResponseEntity<?> updateUserProfile(
+			@NotBlank @PathVariable String userProfileId,
+			@NotNull @RequestBody UserProfileRequestRepresentation userProfile,
+			@NotNull Authentication authentication)
+	{
 		EntityModel<?> entity = assembler.toModel(
 			userProfileService.updateUserProfile(userProfileId, userProfile, false)
 		);
@@ -103,7 +110,9 @@ public class UserProfilesController {
 
 	@DeleteMapping(value = "{userProfileId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @userProfileOwnership.require(#userProfileId, authentication)")
-	public ResponseEntity<?> deleteUserProfile(@PathVariable String userProfileId, Principal principal) {
+	public ResponseEntity<?> deleteUserProfile(
+			@NotBlank @PathVariable String userProfileId, @NotNull Authentication authentication)
+	{
 		userProfileService.deleteUserProfile(userProfileId);
 		return ResponseEntity.noContent().build();
 	}

@@ -23,7 +23,7 @@ public class FilesytemStorageService implements StorageService {
 
     @Autowired
     public FilesytemStorageService(StorageConfig config) {
-        storage = Paths.get(config.getLocation()).toAbsolutePath().normalize();
+        storage = Paths.get(config.getStoreLocation()).toAbsolutePath().normalize();
         log.info("Resource storage path set to " + storage.toString());
     }
 

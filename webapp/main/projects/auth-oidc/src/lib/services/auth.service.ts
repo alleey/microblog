@@ -1,6 +1,6 @@
 import { Inject, Injectable, InjectionToken } from '@angular/core';
-import { Router, RouterStateSnapshot } from '@angular/router';
-import { UserManager, UserManagerSettings, User as OidcUser, Profile as OidcProfile } from 'oidc-client';
+import { ActivatedRoute, Router, RouterStateSnapshot } from '@angular/router';
+import { Profile as OidcProfile, User as OidcUser, UserManager, UserManagerSettings } from 'oidc-client';
 import { BehaviorSubject } from 'rxjs';
 
 export interface OidcAuthConfig {
@@ -32,8 +32,9 @@ export class OidcAuthService {
   public userSubject = new BehaviorSubject<User|null>(null); 
 
   constructor(
-    @Inject(OidcAuthConfigToken) private config: OidcAuthConfig, 
-    private router: Router) 
+    @Inject(OidcAuthConfigToken) private config: OidcAuthConfig,
+    private router: Router,
+    private route: ActivatedRoute) 
   {
     const oidcConfig: UserManagerSettings = {
       authority: this.config.issuer,
@@ -76,15 +77,13 @@ export class OidcAuthService {
   }
 
   startSignin(): Promise<void> {
-    const snapshot: RouterStateSnapshot = this.router.routerState.snapshot;
-    this.redirectUrl = snapshot.url;
+    this.redirectUrl = this.route.snapshot.queryParams['returnUrl'] || "/";
     return this.userManager.signinRedirect();
   }
 
   completeSignin(): Promise<void> {
     return this.userManager.signinRedirectCallback().then(user => {
       this.userSubject.next(user);
-      //console.log("Login ok: " + user + " redirecting to " + this.redirectUrl);
       this.router.navigateByUrl(this.redirectUrl);
     });
   }

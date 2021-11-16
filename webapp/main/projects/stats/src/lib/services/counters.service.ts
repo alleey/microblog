@@ -1,26 +1,30 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
-import { Observable, Subject, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-import { CounterStatisticsResponseModel } from '../models/counter-statistics';
+import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { CountersServiceConfig, CountersServiceConfigToken } from '../config/config';
-import { CounterListResponseModel, CounterResponseModel } from '../models/counter';
-import { CounterStatisticsModel } from '../models/counter-statistics';
+import { CounterResponseModel } from '../models/counter';
+import { CounterStatisticsModel, CounterStatisticsResponseModel } from '../models/counter-statistics';
 
 export interface CounterRequest {
   counter: string;
   value: Number;
 };
+
 export interface BatchCounterRequest extends CounterRequest {
   operation: string;
 };
+
+export interface CountersServiceChangeNotification {
+  counter: string; 
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class CountersService {
 
-  public onChange: Subject<any> = new Subject<any>();
+  public onChange = new Subject<CountersServiceChangeNotification>();
 
   constructor(
     @Inject(CountersServiceConfigToken) 
@@ -60,7 +64,7 @@ export class CountersService {
             .post<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}/increment`, value)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ counter }); }
               })
             );
   }
@@ -72,7 +76,7 @@ export class CountersService {
             .post<CounterResponseModel>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`, value)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ counter }); }
               })
             );
   }
@@ -84,7 +88,7 @@ export class CountersService {
             .delete<void>(`${this.config.serviceBaseUrl}/${apiEndpoint}/${counterId}`)
             .pipe(
               tap({
-                next: x => { this.onChange.next(x); }
+                next: x => { this.onChange.next({ counter }); }
               })
             );
   }

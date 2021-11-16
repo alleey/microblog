@@ -14,6 +14,7 @@ export class BookmarkListViewComponent implements OnInit {
   @Input() bookmarks?: BookmarkModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
+  @Input() context: any = {};
 
   @Output() onEvent = new EventEmitter<BookmarkListViewEvent>();
 

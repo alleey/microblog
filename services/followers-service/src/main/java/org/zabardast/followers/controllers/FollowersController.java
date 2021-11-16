@@ -4,6 +4,7 @@ package org.zabardast.followers.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,7 @@ import org.zabardast.followers.services.FollowingService;
 @RestController
 @RequestMapping(value = "/api/v1/users/{userId}/followers")
 @ExposesResourceFor(Following.class)
+@Validated
 public class FollowersController {
 
 	@Autowired
@@ -41,7 +44,7 @@ public class FollowersController {
     FollowResponseRepresentationAssembler assembler;
 
 	@GetMapping("{followerId}")
-	public ResponseEntity<?> getOne(@PathVariable String userId, @PathVariable String followerId) {
+	public ResponseEntity<?> getOne(@NotBlank @PathVariable String userId, @NotBlank @PathVariable String followerId) {
 		EntityModel<?> entity = assembler.toModel(
 			followingService.listOne(userId, followerId)
 		);
@@ -50,7 +53,7 @@ public class FollowersController {
 
 	@GetMapping("")
 	//@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> getAlLFollowers(@PathVariable String userId, final Pageable page)
+	public ResponseEntity<?> getAlLFollowers(@NotBlank @PathVariable String userId, final Pageable page)
 	{
 		PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
 			followingService.listFollowers(userId, page),
@@ -60,9 +63,9 @@ public class FollowersController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<?> findFollowed(@PathVariable String userId,
-										   @NotNull @RequestParam("q")  final String criteria,
-										   final Pageable page)
+	public ResponseEntity<?> findFollowed(@NotBlank @PathVariable String userId,
+										  @NotBlank @RequestParam("q")  final String criteria,
+										  final Pageable page)
 	{
 		try
 		{

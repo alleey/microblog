@@ -16,5 +16,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "service.storage")
 @Configuration
 public class StorageConfig {
-    String location;
+    String storeLocation;
 }

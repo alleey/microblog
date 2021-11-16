@@ -1,48 +1,35 @@
-import { Component, Inject, Input, OnInit, TemplateRef } from '@angular/core';
+import { Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
+import { UserProfileServiceConfig, UserProfileServiceConfigToken } from '../../config/config';
 import { UserProfileResponseModel } from '../../models/user-profile';
 import { UserProfileService } from '../../services/user-profile.service';
-import { UserProfileServiceConfig, UserProfileServiceConfigToken } from '../../config/config';
-import { Location } from '@angular/common';
 
 @Component({
   selector: 'user-profile-editor',
   templateUrl: './user-profile-editor.component.html',
   styleUrls: ['./user-profile-editor.component.css']
 })
-export class UserProfileEditorComponent implements OnInit {
+export class UserProfileEditorComponent implements OnInit, OnDestroy, OnChanges {
 
-  @Input("userId") paramUserId?: string;
+  @Input() userId?: string;
   @Input() updateMode: boolean = true;
-  @Input() headerTemplate: TemplateRef<any> | undefined;
 
   form!: FormGroup;
-  userId?: string;
   viewModel = new ViewModelHolder<UserProfileResponseModel>();
   destroyed$ = new Subject();
 
   constructor(
     @Inject(UserProfileServiceConfigToken) private config: UserProfileServiceConfig,
-    private service: UserProfileService,
-    private location: Location,
-    private activatedRoute: ActivatedRoute) {}
+    private service: UserProfileService) {}
 
   ngOnInit(): void {
-
     this.form = new FormGroup({
       "about": new FormControl("", [
         Validators.maxLength(this.config.maxAboutLength)
       ])
-    });
-
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.userId = (params.get("userId") ?? this.paramUserId);
-      if(this.isUpdateMode)
-        this.fetchUserProfile(this.userId!);
     });
   }
 
@@ -51,14 +38,21 @@ export class UserProfileEditorComponent implements OnInit {
     this.destroyed$.complete();
   }
 
-  get about() { return this.form.get('about'); }
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['userId']);
+    if(changed) {
+      this.fetchUserProfile(this.userId!);
+    }
+  }
+
   get isUpdateMode(): boolean { return this.updateMode && this.userId !== undefined;}
+  get about() { return this.form.get('about'); }
   get userProfile(): UserProfileResponseModel|undefined { return this.viewModel.Model; }
 
-  updateForm(): void {
+  updateForm(i: UserProfileResponseModel): void {
     if(this.isUpdateMode) {
-      this.userId = this.viewModel.Model?.id;
-      this.about!.setValue (this.userProfile?.about);
+      this.userId = i.id;
+      this.about!.setValue (i.about);
     } else {
 
     }
@@ -70,7 +64,7 @@ export class UserProfileEditorComponent implements OnInit {
       .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel({
         nextObserver: {
-          next: (i: UserProfileResponseModel) => this.updateForm()
+          next: (i: UserProfileResponseModel) => this.updateForm(i)
         }
       }));
   }
@@ -80,9 +74,5 @@ export class UserProfileEditorComponent implements OnInit {
       .update("", this.userId!, this.about?.value)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectNothing());
-  }
-
-  cancel(): void {
-    this.location.back();
   }
 }

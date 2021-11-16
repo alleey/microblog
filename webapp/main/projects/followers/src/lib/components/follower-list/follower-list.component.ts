@@ -1,8 +1,7 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { PageModel, ViewModelHolder } from 'utils';
 import { FollowsListResponseModel, FollowsModel } from '../../models/follows';
 import { FollowingService } from '../../services/following.service';
 import { FollowerListViewEvent } from '../follower-list-view/follower-list-view.component';
@@ -14,7 +13,9 @@ export type FollowerListEvent = FollowerListViewEvent;
   templateUrl: './follower-list.component.html',
   styleUrls: ['./follower-list.component.css']
 })
-export class FollowersListComponent implements OnInit, OnDestroy {
+export class FollowersListComponent implements OnInit, OnDestroy, OnChanges {
+
+  @Input() pageNum: number = 0;
 
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
@@ -23,28 +24,17 @@ export class FollowersListComponent implements OnInit, OnDestroy {
 
   @Output() onEvent = new EventEmitter<FollowerListEvent>();
         
-  pageable: Pageable; 
   viewModel = new ViewModelHolder<FollowsListResponseModel>();
   destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
-  constructor(
-      private service: FollowingService, 
-      private activatedRoute: ActivatedRoute) 
-  { 
-    this.pageable = {
-      page: 0
-    };
-  }
+  constructor(private service: FollowingService) 
+  { }
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe(params => {
-      const pageNum = <number> (params.get("pageNum") ?? 0);
-      this.fetchPage(pageNum);
-    });
     // Requery when the backend data changes
     this.subscription.add(
-      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageable.page) })
+      this.service.onChange.subscribe({ next: () => this.fetchPage(this.pageNum) })
     );
   }
 
@@ -54,10 +44,16 @@ export class FollowersListComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['pageNum']);
+    if(changed) {
+      this.fetchPage(this.pageNum!);
+    }
+  }
+
   fetchPage(pageNum: number): void {
-    this.pageable.page = pageNum;
     this.service
-      .followers("", "", this.pageable)
+      .followers("", "", { page: pageNum })
       .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }

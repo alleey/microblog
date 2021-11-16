@@ -1,7 +1,5 @@
-import { Location } from '@angular/common';
-import { Component, Inject, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
@@ -34,25 +32,20 @@ function slugify(text: string) {
   templateUrl: './blog-post-editor.component.html',
   styleUrls: ['./blog-post-editor.component.scss']
 })
-export class BlogPostEditorComponent implements OnInit, OnDestroy {
+export class BlogPostEditorComponent implements OnInit, OnDestroy, OnChanges {
 
-  @Input("postId") paramPostId?: number;
+  @Input() postId?: number;
   @Input() updateMode: boolean = true;
-
-  @Input() headerTemplate: TemplateRef<any> | undefined;
 
   @ViewChild('topicSelector') topicSelector!: TopicSelectorComponent;
 
-  postId?: number;
   form!: FormGroup;
   viewModel = new ViewModelHolder<BlogPostResponseModel>();
   destroyed$ = new Subject();
 
   constructor(
     @Inject(PostsServiceConfigToken) private config: PostsServiceConfig,
-    private service: PostsService, 
-    private location: Location,
-    private activatedRoute: ActivatedRoute) {}
+    private service: PostsService) {}
 
   ngOnInit(): void {
 
@@ -80,12 +73,6 @@ export class BlogPostEditorComponent implements OnInit, OnDestroy {
         this.generateSlug();
       }
     });
-
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.postId = <number> (params.get("postId") ?? this.paramPostId);
-      if(this.isUpdateMode)
-        this.fetchPost(this.postId!);
-    });
   }
 
   ngOnDestroy(): void {
@@ -93,9 +80,14 @@ export class BlogPostEditorComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
-  get isUpdateMode(): boolean { 
-    return this.updateMode && this.postId !== undefined; 
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = changes['postId'];
+    if(changed && this.isUpdateMode) {
+      this.fetchPost(this.postId!);
+    }
   }
+
+  get isUpdateMode(): boolean { return this.updateMode && this.postId !== undefined; }
   get title() { return this.form.get('title'); }
   get slug() { return this.form.get('slug'); }
   get text() { return this.form.get('text'); }
@@ -171,9 +163,5 @@ export class BlogPostEditorComponent implements OnInit, OnDestroy {
           }
         })
       );
-  }
-
-  cancel(): void {
-    this.location.back();
   }
 }

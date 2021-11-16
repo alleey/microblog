@@ -18,7 +18,7 @@ public class DomainEventPublisher implements EventPublisher<Event> {
     @Value("${domain.events.bindingName:domainEvents-out-0}")
     String destination;
 
-    @Value("${spring.application.name:bookmark-service}")
+    @Value("${spring.application.name:resource-service}")
     String serviceName;
 
     @Autowired

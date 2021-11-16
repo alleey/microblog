@@ -1,5 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, TemplateRef } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ViewModelHolder } from 'utils';
@@ -11,30 +10,28 @@ import { FollowingService } from '../../services/following.service';
   templateUrl: './following-badge.component.html',
   styleUrls: ['./following-badge.component.css']
 })
-export class FollowingBadgeComponent implements OnInit, OnDestroy {
+export class FollowingBadgeComponent implements OnInit, OnDestroy, OnChanges {
 
-  @Input("userid") paramUserId: string = "";
+  @Input() userId?: string;
   @Input() activeControlTemplate: TemplateRef<any> | undefined;
   @Input() inactiveControlTemplate: TemplateRef<any> | undefined;
 
-  userId?: string;
   viewModel = new ViewModelHolder<FollowsResponseModel>();
   destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
-  constructor(
-    private service: FollowingService, 
-    private activatedRoute: ActivatedRoute) 
+  constructor(private service: FollowingService) 
     { }
 
   ngOnInit(): void { 
-    this.activatedRoute.paramMap.subscribe(params => {
-      this.userId = params.get("userId") ?? this.paramUserId;
-      this.checkStatus();
-    });
     // Requery when the backend data changes
     this.subscription.add(
-      this.service.onChange.subscribe({ next: () => this.checkStatus() })
+      this.service.onChange.subscribe({ 
+        next: (id) => {
+          if(id.userId === this.userId || id.followedById === this.userId)
+            this.checkStatus();
+        }
+      })
     );
   }
 
@@ -42,6 +39,13 @@ export class FollowingBadgeComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
     this.destroyed$.next();
     this.destroyed$.complete();
+  }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['userId']);
+    if(changed) {
+      this.checkStatus();
+    }
   }
 
   get isActive(): boolean {

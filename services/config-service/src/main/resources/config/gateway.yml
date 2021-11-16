@@ -59,7 +59,7 @@ spring:
         - id: bookmark
           uri: lb://bookmark-service
           predicates:
-            - Path=/bookmarks/**
+            - Path=/bookmarks/**,/bookmark/**
           filters:
             - TokenRelay=
             - StripPrefix=1
@@ -69,7 +69,7 @@ spring:
         - id: userprofile
           uri: lb://user-profile-service
           predicates:
-            - Path=/userprofile/**
+            - Path=/userprofile/**,/profile/**,/user/**
           filters:
             - TokenRelay=
             - StripPrefix=1
@@ -90,6 +90,16 @@ spring:
           uri: lb://stats-service
           predicates:
             - Path=/stats/**
+          filters:
+            - TokenRelay=
+            - StripPrefix=1
+            - name: Retry
+              args:
+                retries: 3
+        - id: resources
+          uri: lb://resource-service
+          predicates:
+            - Path=/resources/**
           filters:
             - TokenRelay=
             - StripPrefix=1

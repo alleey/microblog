@@ -1,7 +1,9 @@
 <blog-post-list
+    [pageNum]="pageNum"
     [headerTemplate]="headerTemplate || header"
     [itemTemplate]="itemTemplate || postSummary"
     [footerTemplate]="footerTemplate || footer"
+    [noContentsTemplate]="noContentsTemplate"
     (onEvent)="navigateToPost($event)">
 </blog-post-list>
 
@@ -28,7 +30,7 @@
     <div class="p-1">
         <a (click)="control.selectItem(item, 'select')" class="posttitle">{{item.title}}</a>
         <div class="created">
-            <user-profile-badge [userid]="item.owner" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
+            <user-profile-badge [userId]="item.owner" [contentTemplate]="userProfileBadgeTemplate"></user-profile-badge>
             posted {{item.createdOn | prettyDate}}.
         </div>
         <p class="posttext ">
@@ -48,4 +50,3 @@
 <ng-template #userProfileBadgeTemplate let-badge let-profile="context">
     <a [routerLink]="['/users', profile.id]"><b>{{badge.activeCaption}}</b></a>
 </ng-template>
-  

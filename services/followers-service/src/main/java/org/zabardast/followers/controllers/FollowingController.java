@@ -4,6 +4,7 @@ package org.zabardast.followers.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +38,7 @@ import org.zabardast.followers.services.FollowingService;
 @RestController
 @RequestMapping(value = "/api/v1/users/{userId}/following")
 @ExposesResourceFor(Following.class)
+@Validated
 public class FollowingController {
 
 	@Autowired
@@ -47,7 +51,7 @@ public class FollowingController {
 	FollowResponseRepresentationAssembler assembler;
 
 	@GetMapping("{followedId}")
-	public ResponseEntity<?> getOne(@PathVariable String userId, @PathVariable String followedId) {
+	public ResponseEntity<?> getOne(@NotBlank @PathVariable String userId, @NotBlank @PathVariable String followedId) {
 		EntityModel<?> entity = assembler.toModel(
 			followingService.listOne(followedId, userId)
 		);
@@ -56,7 +60,7 @@ public class FollowingController {
 
 	@GetMapping("")
 	//@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> getAlLFollowing(@PathVariable String userId, final Pageable page)
+	public ResponseEntity<?> getAlLFollowing(@NotBlank @PathVariable String userId, final Pageable page)
 	{
 		PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
 			followingService.listFollowing(userId, page),
@@ -66,8 +70,8 @@ public class FollowingController {
 	}
 
 	@GetMapping("search")
-	public ResponseEntity<?> findFollowing(@PathVariable String userId,
-										   @NotNull @RequestParam("q")  final String criteria,
+	public ResponseEntity<?> findFollowing(@NotBlank @PathVariable String userId,
+										   @NotBlank @RequestParam("q")  final String criteria,
 										   final Pageable page)
 	{
 		try
@@ -91,8 +95,9 @@ public class FollowingController {
 
 	@PostMapping()
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
-	public ResponseEntity<?> follow(@PathVariable String userId,
-									@RequestBody FollowRequestRepresentation followRequest)
+	public ResponseEntity<?> follow(@NotBlank @PathVariable String userId,
+									@RequestBody FollowRequestRepresentation followRequest,
+									@NotNull Authentication authentication)
 	{
 		EntityModel<?> entity = assembler.toModel(
 			followingService.follow(userId, followRequest)
@@ -102,7 +107,11 @@ public class FollowingController {
 
 	@DeleteMapping(value = "{followedId}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
-	public ResponseEntity<?> unfollow(@PathVariable String userId, @PathVariable String followedId) {
+	public ResponseEntity<?> unfollow(
+			@NotBlank @PathVariable String userId,
+			@NotBlank @PathVariable String followedId,
+			@NotNull Authentication authentication)
+	{
 		followingService.unfollow(userId, followedId);
 		return ResponseEntity.noContent().build();
 	}

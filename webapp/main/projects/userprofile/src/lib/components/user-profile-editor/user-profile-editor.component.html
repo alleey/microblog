@@ -1,18 +1,4 @@
-<ng-template #defaultTitleTemplate let-item>
-    <div class="d-flex justify-content-between">
-        <div>
-            <h5>UPDATE PROFILE</h5>
-        </div>
-        <div><a class="btn btn-success" role="button" (click)="cancel()">Cancel</a></div>
-    </div>
-</ng-template>
-
 <ng-container>
-
-    <ng-container 
-        [ngTemplateOutlet]="headerTemplate || defaultTitleTemplate"
-        [ngTemplateOutletContext]="{ $implicit: this }">
-    </ng-container>
 
     <div *ngIf="viewModel.isLoading">
         <utils-loader></utils-loader>

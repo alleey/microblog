@@ -73,6 +73,7 @@ export class ViewModelHolder<T> {
     return {
       next: () => {
         this.loading = (opts?.deferReset === true) || false;
+        this.Model = this.Model ? { ...this.Model }: undefined;
         opts?.nextObserver?.next?.();
       },
       error: (err: Error) => {

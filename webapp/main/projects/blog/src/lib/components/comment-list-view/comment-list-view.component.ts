@@ -14,6 +14,7 @@ export class CommentListViewComponent implements OnInit {
   @Input() items?: CommentModel[];
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
+  @Input() context: any = {};
 
   @Output() onEvent = new EventEmitter<CommentListViewEvent>();
 

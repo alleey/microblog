@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import org.zabardast.blog.services.PostTopicService;
 @RestController
 @RequestMapping(value = "/api/v1/posts/{postId}/topics")
 @Relation(collectionRelation = "topics")
+@Validated
 public class PostTopicsController {
 
 	@Autowired

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BlogPostListEvent } from 'blog';
 
 @Component({
@@ -12,10 +12,19 @@ export class AppPostsListComponent implements OnInit {
   @Input() itemTemplate: TemplateRef<any> | undefined;
   @Input() headerTemplate: TemplateRef<any> | undefined;
   @Input() footerTemplate: TemplateRef<any> | undefined;
+  @Input() noContentsTemplate: TemplateRef<any> | undefined;
 
-  constructor(private router: Router) { }
+  pageNum: number = 0;
 
-  ngOnInit(): void { }
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute) { }
+
+  ngOnInit(): void { 
+    this.activatedRoute.paramMap.subscribe(params => {
+      this.pageNum = Number(params.get("pageNum")) || 0;
+    });
+  }
 
   navigateToPost(evt: BlogPostListEvent): void {
     const post = evt.item;

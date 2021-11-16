@@ -20,6 +20,10 @@
         "dist/followers/followers",
         "dist/followers"
       ],
+      "resources": [
+        "dist/resources/resources",
+        "dist/resources"
+      ],
       "stats": [
         "dist/stats/stats",
         "dist/stats"

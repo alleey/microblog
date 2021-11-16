@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Pageable, PageModel, ViewModelHolder } from 'utils';
+import { PageModel, ViewModelHolder } from 'utils';
 import { CommentListResponseModel, CommentModel } from '../../models/comment';
 import { CommentsService } from '../../services/comments.service';
 import { CommentListViewEvent } from '../comment-list-view/comment-list-view.component';
@@ -14,9 +14,10 @@ export type CommentListEvent = CommentListViewEvent;
   templateUrl: './comment-list.component.html',
   styleUrls: ['./comment-list.component.css']
 })
-export class CommentListComponent implements OnInit, OnDestroy {
+export class CommentListComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() postId!: number;
+  @Input() pageNum: number = 0;
 
   @Input() noContentsTemplate: TemplateRef<any> | undefined;
   @Input() itemTemplate: TemplateRef<any> | undefined;
@@ -26,30 +27,21 @@ export class CommentListComponent implements OnInit, OnDestroy {
   @Output() onEvent = new EventEmitter<CommentListEvent>();
 
   state: any;
-  pageable: Pageable;
   viewModel = new ViewModelHolder<CommentListResponseModel>();
   destroyed$ = new Subject();
   subscription: Subscription = new Subscription();
 
   constructor(
     private service: CommentsService, 
-    private router: Router, 
-    private activatedRoute: ActivatedRoute) 
+    private router: Router) 
   { 
     this.state = this.router.getCurrentNavigation()?.extras.state;
-    this.pageable = {
-      page: 0
-    };
   }
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe(params => {
-      const pageNum = <number> (params.get("pageNum") ?? 0);
-      this.fetchPage(pageNum);
-    });
     // Requery when the backend data changes
     this.subscription.add(
-      this.service.onChange.subscribe({ next: () =>  this.fetchPage(0) })
+      this.service.onChange.subscribe({ next: () =>  this.fetchPage(this.pageNum) })
     );
   }
 
@@ -59,12 +51,19 @@ export class CommentListComponent implements OnInit, OnDestroy {
     this.destroyed$.complete();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const changed = (changes['pageNum']) ||
+                    (changes['postId']);
+    if(changed) {
+      this.fetchPage(this.pageNum!);
+    }
+  }
+
   fetchPage(pageNum: number): void {
     //const routeParams = this.route.snapshot.paramMap;
     //this.organizationId = routeParams.get('orgId') as string;  
-    this.pageable.page = pageNum;
     this.service
-      .all(this.state?.endpoint ?? "", this.postId, this.pageable)
+      .all(this.state?.endpoint ?? "", this.postId, { page: pageNum })
       .pipe(takeUntil(this.destroyed$))
       .subscribe(this.viewModel.expectModel());
   }

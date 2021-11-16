@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'auth-oidc';
-import { BlogPostEditorComponent } from 'blog';
-import { UserProfileEditorComponent } from 'userprofile';
+import { AppPostEditorComponent } from './components/app-post-editor/app-post-editor.component';
 import { AppPostComponent } from './components/app-post/app-post.component';
 import { AppPostsListComponent } from './components/app-posts-list/app-posts-list.component';
 import { AppTopicPostsListComponent } from './components/app-topic-posts-list/app-topic-posts-list.component';
 import { AppUserPostsListComponent } from './components/app-user-posts-list/app-user-posts-list.component';
+import { AppUserProfileEditorComponent } from './components/app-user-profile-editor/app-user-profile-editor.component';
 import { AppUserProfileComponent } from './components/app-user-profile/app-user-profile.component';
 
 const routes: Routes = [
@@ -14,15 +14,15 @@ const routes: Routes = [
   { path: '', redirectTo: '/posts', pathMatch: 'full' },
   { path: 'posts', component: AppPostsListComponent, pathMatch: 'full' },
 
-  { path: 'posts/new', component: BlogPostEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
-  { path: 'posts/edit/:postId', component: BlogPostEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: 'posts/new', component: AppPostEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: 'posts/edit/:postId', component: AppPostEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
   { path: 'posts/:pageNum', component: AppPostsListComponent },
 
   { path: 'users/:userId/posts', component: AppUserPostsListComponent, pathMatch: 'full' },
   { path: 'users/:userId/posts/:pageNum', component: AppUserPostsListComponent },
 
   { path: 'users/:userId', component: AppUserProfileComponent, pathMatch: 'full' },
-  { path: 'users/edit/:userId', component: UserProfileEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
+  { path: 'users/edit/:userId', component: AppUserProfileEditorComponent, pathMatch: 'full', canActivate: [AuthGuard] },
   
   { path: 'topics/:topicId/posts', component: AppTopicPostsListComponent, pathMatch: 'full' },
   { path: 'topics/:topicId/posts/:pageNum', component: AppTopicPostsListComponent },

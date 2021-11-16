@@ -1,3 +1,5 @@
 <bookmark-list 
-    (onEvent)="handleListViewEvent($event)">
+    [pageNum]="pageNum"
+    (onEvent)="handleListViewEvent($event)"
+    #bookmarksList>
 </bookmark-list>

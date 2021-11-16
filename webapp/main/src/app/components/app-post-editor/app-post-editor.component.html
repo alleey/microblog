@@ -1,0 +1,27 @@
+
+<ng-template #defaultTitleTemplate let-item>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h5>WRITE A POST</h5>
+        </div>
+        <div><a class="btn btn-success" role="button" (click)="cancel()">Cancel</a></div>
+    </div>
+    <hr class="my-4">
+</ng-template>
+
+<div>
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h5>WRITE A POST</h5>
+            </div>
+            <div><a class="btn btn-success" role="button" (click)="cancel()">Cancel</a></div>
+        </div>
+        <hr class="my-4">
+    </div>
+</div>
+<div>
+    <div class="col-md-12">
+        <blog-post-editor [postId]="postId"></blog-post-editor>
+    </div>
+</div>
