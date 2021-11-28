@@ -51,7 +51,7 @@
                 <hr />
                 <div class="my-3">
                     <following-badge [userId]="item.id" class="mx-1"></following-badge>
-                    <a class="btn btn-primary mr-1" role="button" (click)="userPosts(item)">Posts by {{ item.username }}</a>
+                    <a class="btn btn-primary mr-1" role="button" (click)="userPosts(item)">Posts by {{ item.firstName }} {{ item.lastName }}</a>
                     <a class="btn btn-success mr-1" role="button" (click)="editUserProfile(item)" *authRequireRole="'admin' allowOwner item.id">Edit Profile</a>
                     <a class="btn btn-primary mr-1" role="button" (click)="editUserProfile(item)" *authRequireRole="'admin' allowOwner item.id">Change Avatar</a>
                 </div>

@@ -8,6 +8,7 @@ import org.zabardast.blog.dto.CommentResponseRepresentation;
 import org.zabardast.blog.events.CommentCreatedEvent;
 import org.zabardast.blog.events.CommentDeletedEvent;
 import org.zabardast.blog.events.CommentUpdatedEvent;
+import org.zabardast.blog.events.EventFactory;
 import org.zabardast.blog.model.Comment;
 import org.zabardast.blog.model.Post;
 import org.zabardast.blog.repository.CommentRepository;
@@ -28,6 +29,9 @@ public class CommentService
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
+
+    @Autowired
+    EventFactory eventFactory;
 
     @Autowired
     PostRepository postRepository;
@@ -71,7 +75,7 @@ public class CommentService
                 post.getComments().add(comment);
 
                 Comment saved = commentRepository.save(comment);
-                eventPublisher.publishEvent(new CommentCreatedEvent(this, saved.getId()));
+                eventPublisher.publishEvent(eventFactory.commentCreated(this, postId, saved));
                 return convert(saved, postId);
             })
             .orElseThrow(() -> {
@@ -89,7 +93,7 @@ public class CommentService
         found.setText(commentRequestRepresentation.getText());
 
         Comment saved = commentRepository.save(found);
-        eventPublisher.publishEvent(new CommentUpdatedEvent(this, saved.getId()));
+        eventPublisher.publishEvent(eventFactory.commentUpdated(this, postId, saved));
         return convert(saved, postId);
     }
 
@@ -100,7 +104,7 @@ public class CommentService
                     throw new PostNotFoundException(postId);
                 });
         commentRepository.deleteByPostAndId(post, commentId);
-        eventPublisher.publishEvent(new CommentDeletedEvent(this, commentId));
+        eventPublisher.publishEvent(eventFactory.commentDeleted(this, postId, commentId));
     }
 
     Comment getPostCommentInternal(Long postId, Long commentId) {

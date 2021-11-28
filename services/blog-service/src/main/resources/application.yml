@@ -27,4 +27,4 @@ service:
       pruneOrphanedPosts: ${PRUNE_ORPHANED_POSTS:true}
   import-on-startup:
     enabled: true
-    location: data
+    location: seeddata

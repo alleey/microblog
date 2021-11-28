@@ -16,8 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
-import org.zabardast.bookmarks.events.BookmarkCreatedEvent;
-import org.zabardast.bookmarks.events.BookmarkDeletedEvent;
+import org.zabardast.bookmarks.events.EventFactory;
 import org.zabardast.bookmarks.model.Bookmark;
 import org.zabardast.bookmarks.repository.BookmarkRepository;
 import org.zabardast.bookmarks.services.exceptions.BookmarkNotFoundException;
@@ -33,6 +32,9 @@ public class BookmarkService
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
+
+    @Autowired
+    EventFactory eventFactory;
 
     @Autowired
     EntityManager entityManager;
@@ -107,7 +109,7 @@ public class BookmarkService
         bookmark.setOwner(ownerId);
 
         Bookmark saved = bookmarkRepository.save(bookmark);
-        eventPublisher.publishEvent(new BookmarkCreatedEvent(this, saved.getId()));
+        eventPublisher.publishEvent(eventFactory.bookmarkCreated(this, saved));
         return modelMapper.map(saved, BookmarkResponseRepresentation.class);
     }
 
@@ -119,7 +121,7 @@ public class BookmarkService
                     found.setUrl(bookmark.getUrl());
 
                     Bookmark saved = bookmarkRepository.save(found);
-                    eventPublisher.publishEvent(new BookmarkCreatedEvent(this, saved.getId()));
+                    eventPublisher.publishEvent(eventFactory.bookmarkUpdated(this, saved));
                     return modelMapper.map(saved, BookmarkResponseRepresentation.class);
                 })
                 .orElseThrow(() -> {
@@ -131,7 +133,7 @@ public class BookmarkService
     public void deleteBookmark(@NotNull Long bookmarkId) {
         if(bookmarkRepository.existsById(bookmarkId)) {
             bookmarkRepository.deleteById(bookmarkId);
-            eventPublisher.publishEvent(new BookmarkDeletedEvent(this, bookmarkId));
+            eventPublisher.publishEvent(eventFactory.bookmarkDeleted(this, bookmarkId));
         }
     }
 }

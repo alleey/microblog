@@ -4,9 +4,7 @@ import java.util.Date;
 import java.util.function.Consumer;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -16,9 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.resources.dto.ResourceRequestRepresentation;
 import org.zabardast.resources.dto.ResourceResponseRepresentation;
-import org.zabardast.resources.events.ResourceCreatedEvent;
-import org.zabardast.resources.events.ResourceDeletedEvent;
-import org.zabardast.resources.events.ResourceUpdatedEvent;
+import org.zabardast.resources.dto.converters.ResourceToResourceResponseRepresentationConverter;
+import org.zabardast.resources.events.EventFactory;
 import org.zabardast.resources.model.Resource;
 import org.zabardast.resources.model.ResourceKey;
 import org.zabardast.resources.repository.ResourceRepository;
@@ -33,6 +30,9 @@ public class ResourceService
     EventPublisher eventPublisher;
 
     @Autowired
+    EventFactory eventFactory;
+
+    @Autowired
     private ResourceRepository resourceRepository;
 
     @Autowired
@@ -40,30 +40,7 @@ public class ResourceService
 
     @PostConstruct
     public void init() {
-        Converter<?,?> converter = new Converter<Resource, ResourceResponseRepresentation>()
-        {
-            public ResourceResponseRepresentation convert(MappingContext<Resource, ResourceResponseRepresentation> context)
-            {
-                Resource s = context.getSource();
-                ResourceResponseRepresentation d = context.getDestination();
-
-                if(d == null)
-                    d = new ResourceResponseRepresentation();
-
-                d.setKey(s.getKey());
-                d.setResource(s.getResource());
-                d.setOwner(s.getOwner());
-                d.setContentType(s.getContentType());
-                d.setContentLocation(s.getContentLocation());
-                d.setCreatedOn(s.getCreatedOn());
-                d.setUpdatedOn(s.getUpdatedOn());
-
-//                ResourceKey key = new ResourceKey(s.getResource(), s.getFolder(), s.getOwner());
-//                d.setContents(storageService.load(key));
-                return d;
-            }
-        };
-        modelMapper.addConverter(converter);
+        modelMapper.addConverter(new ResourceToResourceResponseRepresentationConverter());
     }
 
     @Transactional
@@ -123,7 +100,7 @@ public class ResourceService
         if(continuation != null)
             continuation.accept(response);
 
-        eventPublisher.publishEvent(new ResourceCreatedEvent(this, key));
+        eventPublisher.publishEvent(eventFactory.resourceCreated(this, saved));
         return response;
     }
 
@@ -147,7 +124,7 @@ public class ResourceService
                     if(continuation != null)
                         continuation.accept(response);
 
-                    eventPublisher.publishEvent(new ResourceUpdatedEvent(this, key));
+                    eventPublisher.publishEvent(eventFactory.resourceUpdated(this, saved));
                     return response;
                 })
                 .orElseThrow(() -> {
@@ -162,7 +139,7 @@ public class ResourceService
             resourceRepository.deleteById(key);
             if(continuation != null)
                 continuation.accept(key);
-            eventPublisher.publishEvent(new ResourceDeletedEvent(this, key));
+            eventPublisher.publishEvent(eventFactory.resourceDeleted(this, key));
         }
     }
 }

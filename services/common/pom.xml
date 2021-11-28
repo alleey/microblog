@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>common</artifactId>
-	<name>Zabardast Common</name>
-	<description>common</description>
+	<name>Common</name>
+	<description>Zabardast Common</description>
 
 	<dependencies>
 		<dependency>

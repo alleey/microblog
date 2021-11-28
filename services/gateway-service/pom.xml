@@ -11,8 +11,8 @@
 	</parent>
 
 	<artifactId>gateway-service</artifactId>
-	<name>Zabardast Gateway Service</name>
-	<description>API Gateway</description>
+	<name>Gateway Service</name>
+	<description>Zabardast API Gateway</description>
 
 	<properties>
 		<container.expose>7860</container.expose>

@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>eureka-service</artifactId>
-	<name>Zabardast Eureka Service</name>
-	<description>Eureka Service</description>
+	<name>Eureka Service</name>
+	<description>Zabardast Eureka Service</description>
 
 	<dependencies>
 		<dependency>

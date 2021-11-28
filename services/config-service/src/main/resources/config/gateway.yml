@@ -67,7 +67,7 @@ spring:
               args:
                 retries: 3
         - id: userprofile
-          uri: lb://user-profile-service
+          uri: lb://userprofile-service
           predicates:
             - Path=/userprofile/**,/profile/**,/user/**
           filters:

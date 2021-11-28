@@ -1,11 +1,10 @@
 package org.zabardast.stats.events;
 
-import javax.validation.constraints.NotNull;
+import java.util.Map;
 import org.zabardast.common.events.BaseEvent;
-import org.zabardast.stats.model.Counter;
 
-public class CounterUpdatedEvent extends BaseEvent<Counter> {
-    public CounterUpdatedEvent(Object source, @NotNull Counter data) {
+public class CounterUpdatedEvent extends BaseEvent {
+    public CounterUpdatedEvent(Object source, Map<String, Object> data) {
         super(source, data);
     }
 }

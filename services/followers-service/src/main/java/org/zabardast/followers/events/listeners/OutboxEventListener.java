@@ -39,11 +39,11 @@ public class OutboxEventListener {
 
     @Transactional
     void processOneEvent() {
-        Optional<Event> evt = eventRepository.findTopByOrderByIdAsc();
+        Optional<Event> evt = eventRepository.findTopByOrderBySequenceAsc();
         if(!evt.isPresent()) {
             return;
         }
         domainEventPublisher.publishEvent(evt.get());
-        eventRepository.deleteById(evt.get().getId());
+        eventRepository.deleteById(evt.get().getSequence());
     }
 }

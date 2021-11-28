@@ -29,17 +29,20 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sequence", nullable = false)
-    private long id;
+    private long sequence;
 
     @Column(name = "instant", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date instant;
 
     @Column(name = "name", nullable = false)
-    private String name;
+    private String type;
 
     @Column(name = "principal", nullable = true)
     private String principal;
+
+    @Column(name = "traceId", nullable = true)
+    private String traceId;
 
     @Lob
     @Column(name = "payload", nullable = false)

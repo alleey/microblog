@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>stats-service</artifactId>
-	<name>Zabardast Statistics Service</name>
-	<description>Statistics Service</description>
+	<name>Statistics Service</name>
+	<description>Zabardast Statistics Service</description>
 
 	<properties>
 		<container.expose>8888</container.expose>

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zabardast.blog.events.EventFactory;
 import org.zabardast.blog.events.PostUpdatedEvent;
 import org.zabardast.blog.model.Post;
 import org.zabardast.blog.model.Topic;
@@ -26,6 +27,9 @@ public class PostTopicService
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
+
+    @Autowired
+    EventFactory eventFactory;
 
     @Autowired
     EntityManager entityManager;
@@ -53,7 +57,7 @@ public class PostTopicService
 
         post.setTopics(new HashSet<Topic>(topics));
         Post saved = postRepository.save(post);
-        eventPublisher.publishEvent(new PostUpdatedEvent(this, saved.getId()));
+        eventPublisher.publishEvent(eventFactory.postUpdated(this, saved));
     }
 
     @Transactional
@@ -66,7 +70,7 @@ public class PostTopicService
 
         post.getTopics().add(topic);
         Post saved = postRepository.save(post);
-        eventPublisher.publishEvent(new PostUpdatedEvent(this, saved.getId()));
+        eventPublisher.publishEvent(eventFactory.postUpdated(this, saved));
         return topic;
     }
 
@@ -80,6 +84,6 @@ public class PostTopicService
 
         post.getTopics().remove(topic);
         Post saved = postRepository.save(post);
-        eventPublisher.publishEvent(new PostUpdatedEvent(this, saved.getId()));
+        eventPublisher.publishEvent(eventFactory.postUpdated(this, saved));
     }
 }

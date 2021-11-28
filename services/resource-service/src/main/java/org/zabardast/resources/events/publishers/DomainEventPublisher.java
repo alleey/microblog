@@ -4,12 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
-import org.zabardast.resources.model.Event;
 import org.zabardast.common.domain.DomainConstants;
 import org.zabardast.common.events.publishers.EventPublisher;
+import org.zabardast.resources.model.Event;
 
 @Slf4j
 @Component
@@ -29,7 +28,7 @@ public class DomainEventPublisher implements EventPublisher<Event> {
         log.info(event.toString());
         streamBridge.send(this.destination, MessageBuilder.withPayload(event)
                 .setHeader(DomainConstants.HEADER_SERVICE, serviceName)
-                .setHeader(DomainConstants.HEADER_EVENT, event.getName())
+                .setHeader(DomainConstants.HEADER_EVENT, event.getType())
                 .build()
         );
     }

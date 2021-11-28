@@ -15,6 +15,7 @@ public class CounterResponseRepresentationAssembler implements
     public EntityModel<CounterResponseRepresentation> toModel(CounterResponseRepresentation counter) {
         return EntityModel.of(
             counter,
+            WebMvcLinkBuilder.linkTo(CounterController.class).slash(counter.getCounter()).withSelfRel(),
             WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder
                     .methodOn(CounterController.class)

@@ -1,11 +1,10 @@
 package org.zabardast.resources.events;
 
-import javax.validation.constraints.NotNull;
+import java.util.Map;
 import org.zabardast.common.events.BaseEvent;
-import org.zabardast.resources.model.ResourceKey;
 
-public class ResourceDeletedEvent extends BaseEvent<ResourceKey> {
-    public ResourceDeletedEvent(Object source, @NotNull ResourceKey resourceId) {
-        super(source, resourceId);
+public class ResourceDeletedEvent extends BaseEvent {
+    public ResourceDeletedEvent(Object source, Map<String, Object> data) {
+        super(source, data);
     }
 }

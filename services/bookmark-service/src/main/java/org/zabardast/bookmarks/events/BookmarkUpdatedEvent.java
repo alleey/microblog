@@ -1,10 +1,10 @@
 package org.zabardast.bookmarks.events;
 
-import javax.validation.constraints.NotNull;
+import java.util.Map;
 import org.zabardast.common.events.BaseEvent;
 
-public class BookmarkUpdatedEvent extends BaseEvent<Long> {
-    public BookmarkUpdatedEvent(Object source, @NotNull Long bookmarkId) {
-        super(source, bookmarkId);
+public class BookmarkUpdatedEvent extends BaseEvent {
+    public BookmarkUpdatedEvent(Object source, Map<String, Object> data) {
+        super(source, data);
     }
 }

@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>resource-service</artifactId>
-	<name>Zabardast Resource Service</name>
-	<description>Resource Service</description>
+	<name>Resource Service</name>
+	<description>Zabardast Resource Service</description>
 
 	<properties>
 		<container.expose>8888</container.expose>

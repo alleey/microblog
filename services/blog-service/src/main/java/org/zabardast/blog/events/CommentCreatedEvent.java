@@ -1,10 +1,10 @@
 package org.zabardast.blog.events;
 
-import javax.validation.constraints.NotNull;
+import java.util.Map;
 import org.zabardast.common.events.BaseEvent;
 
-public class CommentCreatedEvent extends BaseEvent<Long> {
-    public CommentCreatedEvent(Object source, @NotNull Long commentId) {
-        super(source, commentId);
+public class CommentCreatedEvent extends BaseEvent {
+    public CommentCreatedEvent(Object source, Map<String, Object> data) {
+        super(source, data);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.blog.events.OutboxEvent;
 import org.zabardast.blog.model.Event;
@@ -37,13 +38,13 @@ public class OutboxEventListener {
         }
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     void processOneEvent() {
-        Optional<Event> evt = eventRepository.findTopByOrderByIdAsc();
+        Optional<Event> evt = eventRepository.findTopByOrderBySequenceAsc();
         if(!evt.isPresent()) {
             return;
         }
         domainEventPublisher.publishEvent(evt.get());
-        eventRepository.deleteById(evt.get().getId());
+        eventRepository.deleteById(evt.get().getSequence());
     }
 }

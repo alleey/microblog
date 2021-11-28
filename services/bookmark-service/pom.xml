@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>bookmark-service</artifactId>
-	<name>Zabardast Bookmark Service</name>
-	<description>Bookmark Service</description>
+	<name>Bookmark Service</name>
+	<description>Zabardast Bookmark Service</description>
 
 	<properties>
 		<container.expose>8888</container.expose>

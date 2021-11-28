@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.blog.dto.PostRequestRepresentation;
 import org.zabardast.blog.dto.PostResponseRepresentation;
+import org.zabardast.blog.events.EventFactory;
 import org.zabardast.blog.events.PostCreatedEvent;
 import org.zabardast.blog.events.PostDeletedEvent;
 import org.zabardast.blog.events.PostUpdatedEvent;
@@ -34,6 +35,9 @@ public class PostService
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
+
+    @Autowired
+    EventFactory eventFactory;
 
     @Autowired
     EntityManager entityManager;
@@ -114,7 +118,7 @@ public class PostService
         post.setCreatedOn(new Date());
         Post saved = postRepository.save(post);
 
-        eventPublisher.publishEvent(new PostCreatedEvent(this, saved.getId()));
+        eventPublisher.publishEvent(eventFactory.postCreated(this, saved));
         return modelMapper.map(saved, PostResponseRepresentation.class);
     }
 
@@ -130,7 +134,7 @@ public class PostService
                 found.setText(postRequestRepresentation.getText());
                 Post saved = postRepository.save(found);
 
-                eventPublisher.publishEvent(new PostUpdatedEvent(this, saved.getId()));
+                eventPublisher.publishEvent(eventFactory.postUpdated(this, saved));
                 return modelMapper.map(saved, PostResponseRepresentation.class);
             })
             .orElseThrow(() -> {
@@ -141,6 +145,6 @@ public class PostService
     @Transactional
     public void deletePost(@NotNull Long postId) {
         postRepository.deleteById(postId);
-        eventPublisher.publishEvent(new PostDeletedEvent(this, postId));
+        eventPublisher.publishEvent(eventFactory.postDeleted(this, postId));
     }
 }

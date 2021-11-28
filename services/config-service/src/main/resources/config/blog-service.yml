@@ -1,3 +1,4 @@
+
 service:
   tasks:
     flushoutbox:
@@ -5,7 +6,10 @@ service:
       batchSize: ${EVENT_FLUSH_BATCHSIZE:100}
   listeners:
     userprofiledomainevents:
-      pruneOrphanedPosts: ${PRUNE_ORPHANED_POSTS:false}
+      pruneOrphanedPosts: ${PRUNE_ORPHANED_POSTS:true}
+  import-on-startup:
+    enabled: true
+    location: data/seeddata
 
 management:
   endpoints:

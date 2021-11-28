@@ -7,5 +7,5 @@ import org.zabardast.blog.model.Event;
 
 @Repository
 public interface EventRepository extends CrudRepository<Event, Long> {
-    Optional<Event> findTopByOrderByIdAsc();
+    Optional<Event> findTopByOrderBySequenceAsc();
 }

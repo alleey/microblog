@@ -40,7 +40,7 @@ export class ImageResourceUploadComponent implements OnInit {
     }
   }
 
-  updateProfilePicture(): void {
+  upload(): void {
     if(this.fileSelected)
       this.pictureEditor.upload(this.fileSelected!);
   }

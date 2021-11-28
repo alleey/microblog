@@ -1,16 +1,12 @@
 package org.zabardast.followers.events.publishers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.zabardast.common.events.BaseEvent;
 import org.zabardast.common.events.publishers.EventPublisher;
-import org.zabardast.common.services.ServiceSecurityContextProvider;
-import org.zabardast.followers.model.Event;
+import org.zabardast.followers.events.EventFactory;
 import org.zabardast.followers.events.OutboxEvent;
 import org.zabardast.followers.repository.EventRepository;
 
@@ -22,33 +18,24 @@ public class TransactionOutboxPublisher implements EventPublisher<BaseEvent> {
     ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    ServiceSecurityContextProvider serviceSecurityContextProvider;
+    EventRepository eventRepository;
 
     @Autowired
-    EventRepository eventRepository;
+    EventFactory eventFactory;
 
     @Override
     public void publishEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
-            event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
-        Event entity = Event.builder()
-                .instant(new Date())
-                .name(event.getClass().getName())
-                .principal(event.getPrincipal())
-                .build();
-        ObjectMapper objectMapper = new ObjectMapper();
         try
         {
-            String serialized = objectMapper.writeValueAsString(event.getData());
-            entity.setPayload(serialized);
-            eventRepository.save(entity);
+            eventRepository.save(eventFactory.domainEvent(event));
+            // Notify the listener to act asap
             applicationEventPublisher.publishEvent(new OutboxEvent(this));
         }
-        catch (JsonProcessingException e)
+        catch (Exception e)
         {
             log.error(e.toString());
-            throw new RuntimeException(e.getMessage(), e);
+            throw e;
         }
     }
 }

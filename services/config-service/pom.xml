@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>config-service</artifactId>
-	<name>Zabardast Configuration Service</name>
-	<description>Configuration Service</description>
+	<name>Configuration Service</name>
+	<description>Zabardast Configuration Service</description>
 
 	<properties>
 		<container.expose>8888</container.expose>

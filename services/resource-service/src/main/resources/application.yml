@@ -35,8 +35,7 @@ service:
     store-location: data
   import-on-startup:
     enabled: true
-    location: data
-
+    location: seeddata
   tasks:
     flushoutbox:
       fixedDelay: ${EVENT_FLUSH_INTERVAL:180000}

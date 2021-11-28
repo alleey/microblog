@@ -1,7 +1,9 @@
 package org.zabardast.blog.events.listeners;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,12 +16,14 @@ import org.zabardast.blog.dto.PostResponseRepresentation;
 import org.zabardast.blog.model.Event;
 import org.zabardast.blog.services.PostService;
 import org.zabardast.common.domain.DomainConstants;
+import org.zabardast.common.utils.JsonUtils;
 
 @Slf4j
 @Component
 public class UserProfileDomainEventsListener {
 
     public static final String DOMAIN_EVENT_USERPROFILE_DELETED = "org.zabardast.userprofile.events.UserProfileDeletedEvent";
+    public static final String ATTR_USER_ID = "userId";
 
     @Value("${service.listeners.userprofiledomainevents.pruneOrphanedPosts:false}")
     boolean pruneOrphanedPosts = false;
@@ -33,10 +37,14 @@ public class UserProfileDomainEventsListener {
             final String eventName = (String)event.getHeaders().get(DomainConstants.HEADER_EVENT);
             log.info("Received domain event " + eventName);
 
-            if(eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0)
-            {
-                String userId = event.getPayload().getPayload();
-                handleUserProfileDeletion(userId);
+            if(eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
+
+                Map attributes = JsonUtils.fromJson(event.getPayload().getPayload());
+                String userId = attributes.getOrDefault(ATTR_USER_ID, "").toString();
+
+                if(Strings.isNotBlank(userId)) {
+                    handleUserProfileDeletion(userId);
+                }
             }
         };
     }

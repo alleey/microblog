@@ -25,8 +25,7 @@ import org.zabardast.common.filtering.FilterPredicateConverter;
 import org.zabardast.common.filtering.Operator;
 import org.zabardast.followers.dto.FollowRequestRepresentation;
 import org.zabardast.followers.dto.FollowResponseRepresentation;
-import org.zabardast.followers.events.FollowingCreatedEvent;
-import org.zabardast.followers.events.FollowingDeletedEvent;
+import org.zabardast.followers.events.EventFactory;
 import org.zabardast.followers.model.Following;
 import org.zabardast.followers.model.FollowingKey;
 import org.zabardast.followers.repository.FollowingRepository;
@@ -39,6 +38,9 @@ public class FollowingService
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
+
+    @Autowired
+    EventFactory eventFactory;
 
     @Autowired
     EntityManager entityManager;
@@ -148,13 +150,14 @@ public class FollowingService
     public FollowResponseRepresentation follow(@NotNull String userId,
                                                @NotNull FollowRequestRepresentation followRequest)
     {
+        FollowingKey key = new FollowingKey(followRequest.getFollowedId(), userId);
         Following following = Following.builder()
                 .user(followRequest.getFollowedId())
                 .follower(userId)
                 .createdOn(new Date())
                 .build();
         Following saved = followingRepository.save(following);
-        eventPublisher.publishEvent(new FollowingCreatedEvent(this, saved, userId));
+        eventPublisher.publishEvent(eventFactory.followingCreated(this, saved));
         return modelMapper.map(saved, FollowResponseRepresentation.class);
     }
 
@@ -164,7 +167,7 @@ public class FollowingService
         FollowingKey key = new FollowingKey(followedId, userId);
         if(followingRepository.existsById(key)) {
             followingRepository.deleteById(key);
-            eventPublisher.publishEvent(new FollowingDeletedEvent(this, key, userId));
+            eventPublisher.publishEvent(eventFactory.followingDeleted(this, key));
         }
     }
 }

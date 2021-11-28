@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>followers-service</artifactId>
-	<name>Zabardast Followers Service</name>
-	<description>Followers Service</description>
+	<name>Followers Service</name>
+	<description>Zabardast Followers Service</description>
 
 	<properties>
 		<container.expose>8888</container.expose>

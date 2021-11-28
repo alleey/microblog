@@ -18,4 +18,6 @@ COPY --from=builder --chown=service:zabardast /build/dependencies/ ./
 COPY --from=builder --chown=service:zabardast /build/spring-boot-loader/ ./
 COPY --from=builder --chown=service:zabardast /build/snapshot-dependencies/ ./
 COPY --from=builder --chown=service:zabardast /build/application/ ./
+COPY --chown=service:zabardast ./seeddata/ ./data/seeddata
+VOLUME /usr/local/service/data
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]

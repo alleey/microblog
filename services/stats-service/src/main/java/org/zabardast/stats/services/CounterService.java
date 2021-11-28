@@ -19,9 +19,7 @@ import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 import org.zabardast.stats.dto.CounterResponseRepresentation;
-import org.zabardast.stats.events.CounterCreatedEvent;
-import org.zabardast.stats.events.CounterDeletedEvent;
-import org.zabardast.stats.events.CounterUpdatedEvent;
+import org.zabardast.stats.events.EventFactory;
 import org.zabardast.stats.model.Counter;
 import org.zabardast.stats.model.CounterKey;
 import org.zabardast.stats.model.CounterStatistics;
@@ -35,6 +33,9 @@ public class CounterService
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
+
+    @Autowired
+    EventFactory eventFactory;
 
     @Autowired
     EntityManager entityManager;
@@ -104,7 +105,7 @@ public class CounterService
                 .createdOn(new Date())
                 .build();
         Counter saved = counterRepository.save(counter);
-        eventPublisher.publishEvent(new CounterCreatedEvent(this, saved));
+        eventPublisher.publishEvent(eventFactory.counterCreated(this, saved));
         return modelMapper.map(saved, CounterResponseRepresentation.class);
     }
 
@@ -124,7 +125,7 @@ public class CounterService
                 .map(found -> {
                     found.setValue(valueSetter.apply(found.getValue()));
                     Counter saved = counterRepository.save(found);
-                    eventPublisher.publishEvent(new CounterUpdatedEvent(this, saved));
+                    eventPublisher.publishEvent(eventFactory.counterUpdated(this, saved));
                     return modelMapper.map(saved, CounterResponseRepresentation.class);
                 })
                 .orElseGet(() -> {
@@ -137,7 +138,7 @@ public class CounterService
         CounterKey key = new CounterKey(counterId, ownerId);
         if(counterRepository.existsById(key)) {
             counterRepository.deleteById(key);
-            eventPublisher.publishEvent(new CounterDeletedEvent(this, key));
+            eventPublisher.publishEvent(eventFactory.counterDeleted(this, key));
         }
     }
 }

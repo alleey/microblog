@@ -25,5 +25,4 @@ public class PostResponseRepresentationAssembler implements
                 .withRel("/")
         );
     }
-
 }

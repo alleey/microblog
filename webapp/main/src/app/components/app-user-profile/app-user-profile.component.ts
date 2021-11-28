@@ -17,7 +17,7 @@ export class AppUserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
-      const userId = params.get("userId");
+      this.userId = params.get("userId") || undefined;
     });
   }
 

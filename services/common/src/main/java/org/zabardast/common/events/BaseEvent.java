@@ -1,28 +1,27 @@
 package org.zabardast.common.events;
 
+import com.sun.istack.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.context.ApplicationEvent;
 
-public abstract class BaseEvent<T> extends ApplicationEvent {
+public abstract class BaseEvent extends ApplicationEvent {
 
-    private final T data;
+    private final Map<String, Object> data;
     private String principal;
 
-    public BaseEvent(Object source, T data) {
+    public BaseEvent(Object source) {
+        super(source);
+        this.data = new HashMap<>();
+    }
+    public BaseEvent(Object source, @NotNull Map<String, Object> data) {
         super(source);
         this.data = data;
-        this.principal = null;
     }
 
-    public BaseEvent(Object source, T data, String principal) {
-        super(source);
-        this.data = data;
-        this.principal = principal;
-    }
-
-    public final T getData() {
+    public final Map<String, Object> attributes() {
         return data;
     }
-
     public final String getPrincipal() {
         return principal;
     }

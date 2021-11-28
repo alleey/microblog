@@ -44,7 +44,7 @@ public class BlogDomainEventsListener {
     @Transactional
     void handleBlogPostDeletion(Long postId) {
 
-        String postCountersExpr = String.format("post.%:{0}", postId);
+        String postCountersExpr = String.format("post.%-{0}", postId);
         Filter filter = Filter.builder().conditions(
             Arrays.asList(Condition.builder().attribute("counter").operator(Operator.LIKE).value(postCountersExpr).build())
         ).build();

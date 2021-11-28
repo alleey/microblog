@@ -12,8 +12,8 @@
 
 	<groupId>org.zabardast</groupId>
 	<artifactId>blog-service</artifactId>
-	<name>Zabardast Blog Service</name>
-	<description>Blog Service</description>
+	<name>Blog Service</name>
+	<description>Zabardast Blog Service</description>
 
 	<dependencies>
 		<dependency>
