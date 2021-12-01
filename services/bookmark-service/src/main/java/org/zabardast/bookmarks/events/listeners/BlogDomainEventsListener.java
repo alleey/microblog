@@ -1,6 +1,7 @@
 package org.zabardast.bookmarks.events.listeners;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,25 +18,30 @@ import org.zabardast.common.domain.DomainConstants;
 import org.zabardast.common.filtering.Condition;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.Operator;
+import org.zabardast.common.utils.JsonUtils;
 
 @Slf4j
 @Component
 public class BlogDomainEventsListener {
 
     public static final String DOMAIN_EVENT_BLOGPOST_DELETED = "org.zabardast.blog.events.PostDeletedEvent";
+    public static final String ATTR_POST_ID = "postId";
 
     @Autowired
     BookmarkService bookmarkService;
 
     @Bean
     public Consumer<Message<Event>> blogEvents() {
+
         return event -> {
-            final String eventName = (String)event.getHeaders().get(DomainConstants.HEADER_EVENT);
+            final String eventName = (String) event.getHeaders().get(DomainConstants.HEADER_EVENT);
             log.info("Received domain event " + eventName);
 
-            if(eventName.compareTo(DOMAIN_EVENT_BLOGPOST_DELETED) == 0)
-            {
-                Long postId = Long.parseLong(event.getPayload().getPayload());
+            if (eventName.compareTo(DOMAIN_EVENT_BLOGPOST_DELETED) == 0) {
+                Map attributes = JsonUtils.mapFromJson(event.getPayload().getPayload());
+                String postIdStr = attributes.getOrDefault(ATTR_POST_ID, "").toString();
+                Long postId = Long.parseLong(postIdStr);
+
                 handleBlogPostDeletion(postId);
             }
         };
@@ -49,8 +55,7 @@ public class BlogDomainEventsListener {
             Arrays.asList(Condition.builder().attribute("url").operator(Operator.LIKE).value(postCountersExpr).build())
         ).build();
         Page<BookmarkResponseRepresentation> bookmarks = bookmarkService.findAllFiltered(filter, Pageable.unpaged());
-        for (BookmarkResponseRepresentation bookmark: bookmarks)
-        {
+        for (BookmarkResponseRepresentation bookmark : bookmarks) {
             bookmarkService.deleteBookmark(bookmark.getId());
             log.info("Deleted orphaned bookmark " + bookmark.getId());
         }

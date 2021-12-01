@@ -8,18 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.zabardast.blog.MockBlogData;
-import org.zabardast.blog.dto.TopicResponseRepresentation;
-import org.zabardast.blog.events.publishers.DomainEventPublisher;
-import org.zabardast.blog.services.TopicService;
-import org.zabardast.blog.services.exceptions.TopicNotFoundException;
 import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,9 +23,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.zabardast.blog.MockBlogData;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
+import org.zabardast.blog.services.TopicService;
+import org.zabardast.blog.services.exceptions.TopicNotFoundException;
 import org.zabardast.common.filtering.Condition;
 import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.Operator;
@@ -43,131 +41,131 @@ import org.zabardast.common.filtering.Operator;
 @ActiveProfiles("test")
 class TopicsController_AnonymousTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockBean
-	private TopicService topicService;
+    @MockBean
+    private TopicService topicService;
 
-	private MockBlogData blogData = new MockBlogData();
+    private MockBlogData blogData = new MockBlogData();
 
-	@Test
-	void getAllTopics() throws Exception {
+    @Test
+    void getAllTopics() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 20);
-		PageImpl page = new PageImpl(blogData.AllTopics.subList(0,pageable.getPageSize()), pageable, blogData.AllTopics.size());
-		Mockito.when(topicService.getAllTopics(pageable)).then(r -> page);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics")
-				.accept(MediaType.APPLICATION_JSON);
+        Pageable pageable = PageRequest.of(0, 20);
+        PageImpl page = new PageImpl(blogData.AllTopics.subList(0, pageable.getPageSize()), pageable, blogData.AllTopics.size());
+        Mockito.when(topicService.getAllTopics(pageable)).then(r -> page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics")
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
-				.andExpect(jsonPath("$._embedded.topics", hasSize(page.getNumberOfElements())))
-				.andExpect(jsonPath("$.page.size", is(page.getSize())))
-				.andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
-				.andExpect(jsonPath("$.page.totalElements", is((int)page.getTotalElements())))
-				.andExpect(jsonPath("$.page.number", is(page.getNumber())));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
+            .andExpect(jsonPath("$._embedded.topics", hasSize(page.getNumberOfElements())))
+            .andExpect(jsonPath("$.page.size", is(page.getSize())))
+            .andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
+            .andExpect(jsonPath("$.page.totalElements", is((int) page.getTotalElements())))
+            .andExpect(jsonPath("$.page.number", is(page.getNumber())));
+    }
 
-	@Test
-	void getAllTopicsCustomPaging() throws Exception {
+    @Test
+    void getAllTopicsCustomPaging() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 1);
-		PageImpl page = new PageImpl(Arrays.asList(blogData.AllTopics.get(0)), pageable, blogData.AllTopics.size());
-		Mockito.when(topicService.getAllTopics(pageable)).then(r -> page);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics?page=0&size=1")
-				.accept(MediaType.APPLICATION_JSON);
+        Pageable pageable = PageRequest.of(0, 1);
+        PageImpl page = new PageImpl(Arrays.asList(blogData.AllTopics.get(0)), pageable, blogData.AllTopics.size());
+        Mockito.when(topicService.getAllTopics(pageable)).then(r -> page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics?page=0&size=1")
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$._embedded.topics", hasSize(page.getNumberOfElements())))
-				.andExpect(jsonPath("$.page.size", is(page.getSize())))
-				.andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
-				.andExpect(jsonPath("$.page.totalElements", is((int)page.getTotalElements())))
-				.andExpect(jsonPath("$.page.number", is(page.getNumber())));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.topics", hasSize(page.getNumberOfElements())))
+            .andExpect(jsonPath("$.page.size", is(page.getSize())))
+            .andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
+            .andExpect(jsonPath("$.page.totalElements", is((int) page.getTotalElements())))
+            .andExpect(jsonPath("$.page.number", is(page.getNumber())));
+    }
 
-	@Test
-	void searchTopics() throws Exception {
+    @Test
+    void searchTopics() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 20);
-		PageImpl page = new PageImpl(blogData.AllTopics.subList(0,pageable.getPageSize()), pageable, blogData.AllTopics.size());
-		Filter critera = Filter.builder().conditions(
-			Arrays.asList(Condition.builder().attribute("caption").operator(Operator.EQ).value("something").build())
-		).build();
+        Pageable pageable = PageRequest.of(0, 20);
+        PageImpl page = new PageImpl(blogData.AllTopics.subList(0, pageable.getPageSize()), pageable, blogData.AllTopics.size());
+        Filter critera = Filter.builder().conditions(
+            Arrays.asList(Condition.builder().attribute("caption").operator(Operator.EQ).value("something").build())
+        ).build();
 
-		Mockito.when(topicService.getAllFiltered(critera, pageable)).then(r -> page);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics/search?q={json}", MockBlogData.objectToJson(critera))
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(topicService.getAllFiltered(critera, pageable)).then(r -> page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics/search?q={json}", MockBlogData.objectToJson(critera))
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$._embedded.topics", hasSize(page.getNumberOfElements())))
-				.andExpect(jsonPath("$.page.size", is(page.getSize())))
-				.andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
-				.andExpect(jsonPath("$.page.totalElements", is((int)page.getTotalElements())))
-				.andExpect(jsonPath("$.page.number", is(page.getNumber())));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.topics", hasSize(page.getNumberOfElements())))
+            .andExpect(jsonPath("$.page.size", is(page.getSize())))
+            .andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
+            .andExpect(jsonPath("$.page.totalElements", is((int) page.getTotalElements())))
+            .andExpect(jsonPath("$.page.number", is(page.getNumber())));
+    }
 
-	@Test
-	void getTopicById() throws Exception {
+    @Test
+    void getTopicById() throws Exception {
 
-		Mockito.when(topicService.findOne(5L)).then(r -> blogData.AllTopics.get(5));
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics/5")
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(topicService.findOne(5L)).then(r -> blogData.AllTopics.get(5));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics/5")
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(5)))
-				.andExpect(jsonPath("$.caption", equalTo(blogData.AllTopics.get(5).getCaption())))
-				.andExpect(jsonPath("$._links.self.href", endsWith("/api/v1/topics/5")));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(5)))
+            .andExpect(jsonPath("$.caption", equalTo(blogData.AllTopics.get(5).getCaption())))
+            .andExpect(jsonPath("$._links.self.href", endsWith("/api/v1/topics/5")));
+    }
 
-	@Test
-	void getNotExistentTopic() throws Exception {
+    @Test
+    void getNotExistentTopic() throws Exception {
 
-		Mockito.when(topicService.findOne(100L)).thenThrow(new TopicNotFoundException(100L));
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics/100")
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(topicService.findOne(100L)).thenThrow(new TopicNotFoundException(100L));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/topics/100")
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_NOT_FOUND));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_NOT_FOUND));
+    }
 
-	@Test
-	void createNewTopicRequiresLogin() throws Exception {
+    @Test
+    void createNewTopicRequiresLogin() throws Exception {
 
-		TopicResponseRepresentation newTopic = MockBlogData.createBlogTopicResponse(100L, "Test");
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/topics")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(newTopic));
+        TopicResponseRepresentation newTopic = MockBlogData.createBlogTopicResponse(100L, "Test");
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/topics")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockBlogData.objectToJson(newTopic));
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void updateTopicRequiresLogin() throws Exception {
+    @Test
+    void updateTopicRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/topics/1")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBlogData.objectToJson(blogData.AllTopics.get(0)));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/topics/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockBlogData.objectToJson(blogData.AllTopics.get(0)));
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void deleteTopicRequiresLogin() throws Exception {
+    @Test
+    void deleteTopicRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/topics/1")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/topics/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 }

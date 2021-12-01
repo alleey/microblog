@@ -2,10 +2,7 @@ package org.zabardast.followers.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -20,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @IdClass(FollowingKey.class)
-@Table(name = "followers", schema="followersservice")
+@Table(name = "followers", schema = "followersservice")
 @Data
 @Builder
 @NoArgsConstructor

@@ -31,54 +31,51 @@ import org.zabardast.followers.services.FollowingService;
 @ActiveProfiles("test")
 class FolloweingController_AdminTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    ModelMapper modelMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    @MockBean
+    private FollowingService followingService;
+    private MockFollowersData blogData = new MockFollowersData();
 
-	@MockBean
-	private FollowingService followingService;
+    @Test
+    @WithMockUser(username = MockFollowersData.UserIdAdmin, roles = "ADMIN")
+    void userCanAddFollowerToOther() throws Exception {
 
-	@Autowired
-	ModelMapper modelMapper;
+        FollowRequestRepresentation request = FollowRequestRepresentation.builder()
+            .followedId(MockFollowersData.UserIdService)
+            .build();
 
-	private MockFollowersData blogData = new MockFollowersData();
+        FollowResponseRepresentation follower = MockFollowersData
+            .createFollowsResponse(MockFollowersData.UserIdService, MockFollowersData.UserIdGuest);
+        Mockito.when(followingService.follow(MockFollowersData.UserIdGuest, request))
+            .then(r -> follower);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockFollowersData.objectToJson(request));
 
-	@Test
-	@WithMockUser(username = MockFollowersData.UserIdAdmin, roles = "ADMIN")
-	void userCanAddFollowerToOther() throws Exception {
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_CREATED));
+    }
 
-		FollowRequestRepresentation request = FollowRequestRepresentation.builder()
-				.followedId(MockFollowersData.UserIdService)
-				.build();
+    @Test
+    @WithMockUser(username = MockFollowersData.UserIdAdmin, roles = "ADMIN")
+    void userCanRemoveFollowerFromOther() throws Exception {
 
-		FollowResponseRepresentation follower = MockFollowersData
-				.createFollowsResponse(MockFollowersData.UserIdService, MockFollowersData.UserIdGuest);
-		Mockito.when(followingService.follow(MockFollowersData.UserIdGuest, request))
-				.then(r -> follower);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockFollowersData.objectToJson(request));
+        Mockito.doNothing().when(followingService)
+            .unfollow(MockFollowersData.UserIdService, MockFollowersData.UserIdGuest);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .delete("/api/v1/users/{userId}/following/{follower}", MockFollowersData.UserIdGuest, MockFollowersData.UserIdService)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_CREATED));
-	}
-
-	@Test
-	@WithMockUser(username = MockFollowersData.UserIdAdmin, roles = "ADMIN")
-	void userCanRemoveFollowerFromOther() throws Exception {
-
-		Mockito.doNothing().when(followingService)
-				.unfollow(MockFollowersData.UserIdService, MockFollowersData.UserIdGuest);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/users/{userId}/following/{follower}", MockFollowersData.UserIdGuest, MockFollowersData.UserIdService)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
-
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_NO_CONTENT))
-				.andExpect(jsonPath("$").doesNotExist());
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_NO_CONTENT))
+            .andExpect(jsonPath("$").doesNotExist());
+    }
 }

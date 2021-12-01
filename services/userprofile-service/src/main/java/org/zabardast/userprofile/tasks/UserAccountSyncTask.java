@@ -46,8 +46,7 @@ public class UserAccountSyncTask {
         userProfileService.setSyncOnForAllUserProfiles(null);
 
         log.info("Found {} users", usercount);
-        while(processed < usercount)
-        {
+        while (processed < usercount) {
             List<KeycloakUserRepresentation> users = keycloakService.users(processed, batchSize);
             users.forEach(u -> updateLocalProfile(u));
             processed += users.size();
@@ -60,16 +59,17 @@ public class UserAccountSyncTask {
         log.info("Finished keycloak user account sync process - {}", LocalDateTime.now());
     }
 
-    void updateLocalProfile(@NotNull  KeycloakUserRepresentation keycloakUserRepresentation) {
+    void updateLocalProfile(@NotNull KeycloakUserRepresentation keycloakUserRepresentation) {
+
         UserProfileRequestRepresentation userProfile = modelMapper.map(keycloakUserRepresentation, UserProfileRequestRepresentation.class);
         try {
             UserProfileResponseRepresentation savedProfile = userProfileService
-                    .getUserProfile(keycloakUserRepresentation.getId());
+                .getUserProfile(keycloakUserRepresentation.getId());
 
             log.info("Keycloak user profile: " + keycloakUserRepresentation);
             log.info("Saved profile: " + savedProfile);
 
-            if(savedProfile.compareTo(userProfile) != 0) {
+            if (savedProfile.compareTo(userProfile) != 0) {
                 // Only update when data has changed, ensuring frivolous domain events arent generated
                 userProfileService.updateUserProfile(keycloakUserRepresentation.getId(), userProfile, true);
             } else {
@@ -82,6 +82,7 @@ public class UserAccountSyncTask {
     }
 
     void deleteOrphanedProfiles() {
+
         userProfileService.getAllUnsyncedProfiles().forEach(
             userProfile -> {
                 log.info("Deleting orphaned user profile {}", userProfile.getId());

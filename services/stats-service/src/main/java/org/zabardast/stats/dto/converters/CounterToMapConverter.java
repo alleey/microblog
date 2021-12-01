@@ -8,18 +8,19 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.zabardast.stats.controllers.CounterController;
 import org.zabardast.stats.model.Counter;
 
-public class CounterToMapConverter implements Converter<Counter, Map<String, String>> {
+public class CounterToMapConverter implements Converter<Counter, Map<String, Object>> {
 
     public static final String ATTR_ID = "counterId";
     public static final String ATTR_OWNER = "owner";
     public static final String ATTR_REF = "ref";
 
     @Override
-    public Map<String, String> convert(MappingContext<Counter, Map<String, String>> context) {
-        Counter s = context.getSource();
-        Map<String, String> d = context.getDestination();
+    public Map<String, Object> convert(MappingContext<Counter, Map<String, Object>> context) {
 
-        if(d == null)
+        Counter s = context.getSource();
+        Map<String, Object> d = context.getDestination();
+
+        if (d == null)
             d = new HashMap<>();
 
         d.putAll(Map.of(

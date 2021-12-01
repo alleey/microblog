@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import org.zabardast.resources.dto.ResourceRequestRepresentation;
 import org.zabardast.resources.dto.ResourceResponseRepresentation;
 
@@ -30,25 +27,28 @@ public final class MockResourceData {
 
 
     public static ResourceRequestRepresentation createResourceRequest(String contentType) {
+
         return ResourceRequestRepresentation.builder()
-                .contentType(contentType)
-                .build();
+            .contentType(contentType)
+            .build();
     }
 
     public static ResourceResponseRepresentation createResourceResponse(String key,
                                                                         String resource,
                                                                         String userId,
                                                                         String contentType) {
+
         return ResourceResponseRepresentation.builder()
-                .key(key)
-                .resource(resource)
-                .owner(userId)
-                .contentType(contentType)
-                .createdOn(new Date())
-                .build();
+            .key(key)
+            .resource(resource)
+            .owner(userId)
+            .contentType(contentType)
+            .createdOn(new Date())
+            .build();
     }
 
     public static String objectToJson(Object post) throws JsonProcessingException {
+
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(post);
     }

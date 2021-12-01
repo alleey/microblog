@@ -241,7 +241,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<repository>alpha/${project.groupId}/${project.artifactId}</repository>
+					<repository>zabardast/${project.groupId}/${project.artifactId}</repository>
 					<tag>${project.version}</tag>
 					<contextDirectory>${project.basedir}</contextDirectory>
 					<dockerfile>Dockerfile</dockerfile>

@@ -3,9 +3,6 @@ package org.zabardast.userprofile.dto;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +17,7 @@ import org.springframework.hateoas.server.core.Relation;
 @EqualsAndHashCode(callSuper = false)
 @Relation(collectionRelation = "userprofiles")
 public class UserProfileResponseRepresentation implements Comparable<UserProfileRequestRepresentation> {
+    static Comparator<String> nullSafeStringComparator = Comparator.nullsFirst(String::compareTo);
     String id;
     String username;
     String firstName;
@@ -28,18 +26,17 @@ public class UserProfileResponseRepresentation implements Comparable<UserProfile
     String about;
     private Date createdOn;
 
-    static Comparator<String> nullSafeStringComparator = Comparator.nullsFirst(String::compareTo);
-
     @Override
     public int compareTo(UserProfileRequestRepresentation o) {
+
         int res = Objects.compare(this.id, o.getId(), nullSafeStringComparator);
-        if(res == 0)
+        if (res == 0)
             res = Objects.compare(this.username, o.getUsername(), nullSafeStringComparator);
-        if(res == 0)
+        if (res == 0)
             res = Objects.compare(this.firstName, o.getFirstName(), nullSafeStringComparator);
-        if(res == 0)
+        if (res == 0)
             res = Objects.compare(this.lastName, o.getLastName(), nullSafeStringComparator);
-        if(res == 0)
+        if (res == 0)
             res = Objects.compare(this.email, o.getEmail(), nullSafeStringComparator);
         return 0;
     }

@@ -3,7 +3,6 @@ package org.zabardast.blog.runners;
 import com.github.slugify.Slugify;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,7 +50,7 @@ class SeedDatabaseRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        if(!initialImportConfig.isEnabled()) {
+        if (!initialImportConfig.isEnabled()) {
             return;
         }
 
@@ -62,27 +61,27 @@ class SeedDatabaseRunner implements ApplicationRunner {
             FileFilter filter = new FileFilter() {
                 @Override
                 public boolean accept(File pathname) {
+
                     return pathname.getName().toLowerCase().endsWith(".md");
                 }
             };
 
-            for (File dir : storage.toFile().listFiles())
-            {
-                if(!dir.isDirectory())
+            for (File dir : storage.toFile().listFiles()) {
+                if (!dir.isDirectory())
                     continue;
 
                 TopicResponseRepresentation topic = createBlogTopic(dir.getName());
 
-                for (File file: dir.listFiles(filter)) {
-                    if(!file.isFile())
+                for (File file : dir.listFiles(filter)) {
+                    if (!file.isFile())
                         continue;
 
                     log.info("Import: " + file.toPath());
                     createBlogPost(
-                            file.getName().substring(0, file.getName().lastIndexOf('.')),
-                            Files.readString(file.toPath()),
-                            UserIdAdmin,
-                            topic.getId());
+                        file.getName().substring(0, file.getName().lastIndexOf('.')),
+                        Files.readString(file.toPath()),
+                        UserIdAdmin,
+                        topic.getId());
                 }
             }
         } catch (Exception e) {
@@ -91,19 +90,21 @@ class SeedDatabaseRunner implements ApplicationRunner {
     }
 
     private CommentRequestRepresentation createComment(String text) {
+
         return CommentRequestRepresentation.builder()
-                .text(text)
-                .build();
+            .text(text)
+            .build();
     }
 
     private void createBlogPost(String title, String text, String userId, Long topicId) {
+
         log.debug("Create test blog post: " + title);
         Slugify slg = new Slugify();
         PostResponseRepresentation created = postService.newPost(userId, PostRequestRepresentation.builder()
-                .title(title)
-                .slug(slg.slugify(title))
-                .text(text)
-                .build());
+            .title(title)
+            .slug(slg.slugify(title))
+            .text(text)
+            .build());
 
 //        commentService.newComment(created.getId(), UserIdGuest, createComment("I like it"));
 //        commentService.newComment(created.getId(), UserIdUnknown, createComment("I like it, too!"));
@@ -113,9 +114,10 @@ class SeedDatabaseRunner implements ApplicationRunner {
     }
 
     private TopicResponseRepresentation createBlogTopic(String caption) {
+
         log.debug("Create test blog topic: " + caption);
         return topicService.newTopic(TopicRequestRepresentation.builder()
-                .caption(caption)
-                .build());
+            .caption(caption)
+            .build());
     }
 }

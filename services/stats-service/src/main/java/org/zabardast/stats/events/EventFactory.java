@@ -30,18 +30,22 @@ public class EventFactory {
 
     @PostConstruct
     public void init() {
+
         modelMapper.addConverter(new CounterToMapConverter());
     }
 
     public CounterCreatedEvent counterCreated(Object source, @NotNull Counter counter) {
-        return new CounterCreatedEvent(source, modelMapper.map(counter,  Map.class));
+
+        return new CounterCreatedEvent(source, modelMapper.map(counter, Map.class));
     }
 
     public CounterUpdatedEvent counterUpdated(Object source, @NotNull Counter counter) {
-        return new CounterUpdatedEvent(source, modelMapper.map(counter,  Map.class));
+
+        return new CounterUpdatedEvent(source, modelMapper.map(counter, Map.class));
     }
 
     public CounterDeletedEvent counterDeleted(Object source, @NotNull CounterKey counterKey) {
+
         return new CounterDeletedEvent(source,
             Map.of(CounterToMapConverter.ATTR_ID, counterKey.getCounter())
         );
@@ -49,15 +53,15 @@ public class EventFactory {
 
     public Event domainEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
+        if (event.getPrincipal() == null)
             event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
 
         return Event.builder()
-                .instant(new Date())
-                .type(event.getClass().getName())
-                .principal(event.getPrincipal())
-                //.traceId(tracer.currentSpan().context().traceId())
-                .payload(JsonUtils.toJson(event.attributes()))
-                .build();
+            .instant(new Date())
+            .type(event.getClass().getName())
+            .principal(event.getPrincipal())
+            //.traceId(tracer.currentSpan().context().traceId())
+            .payload(JsonUtils.mapToJson(event.attributes()))
+            .build();
     }
 }

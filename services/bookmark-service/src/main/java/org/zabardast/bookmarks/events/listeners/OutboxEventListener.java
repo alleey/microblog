@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.zabardast.bookmarks.model.Event;
 import org.zabardast.bookmarks.events.OutboxEvent;
+import org.zabardast.bookmarks.model.Event;
 import org.zabardast.bookmarks.repository.EventRepository;
 import org.zabardast.common.events.publishers.EventPublisher;
 
@@ -27,21 +27,21 @@ public class OutboxEventListener {
 
     @Async
     @EventListener()
-    void handleOutboxEvent(OutboxEvent event)
-    {
+    void handleOutboxEvent(OutboxEvent event) {
+
         long now = System.currentTimeMillis() / 1000;
         int processed = 0;
-        while(processed < event.getBatchSize())
-        {
+        while (processed < event.getBatchSize()) {
             processOneEvent();
-            processed ++;
+            processed++;
         }
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     void processOneEvent() {
+
         Optional<Event> evt = eventRepository.findTopByOrderBySequenceAsc();
-        if(!evt.isPresent()) {
+        if (!evt.isPresent()) {
             return;
         }
         domainEventPublisher.publishEvent(evt.get());

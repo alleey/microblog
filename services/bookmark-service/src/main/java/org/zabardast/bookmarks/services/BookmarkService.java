@@ -27,8 +27,7 @@ import org.zabardast.common.filtering.FilterPredicateConverter;
 import org.zabardast.common.filtering.Operator;
 
 @Service
-public class BookmarkService 
-{
+public class BookmarkService {
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
@@ -50,34 +49,37 @@ public class BookmarkService
 
     @Transactional
     public BookmarkResponseRepresentation getBookmark(@NotNull String ownerId, @NotNull Long bookmarkId) {
+
         Bookmark bookmark = bookmarkRepository
-                .findByIdAndOwner(bookmarkId, ownerId)
-                .orElseThrow(() -> new BookmarkNotFoundException(bookmarkId));
+            .findByIdAndOwner(bookmarkId, ownerId)
+            .orElseThrow(() -> new BookmarkNotFoundException(bookmarkId));
         return modelMapper.map(bookmark, BookmarkResponseRepresentation.class);
     }
 
     @Transactional
     public BookmarkResponseRepresentation getBookmark(@NotNull Long bookmarkId) {
+
         Bookmark bookmark = bookmarkRepository
-                .findById(bookmarkId)
-                .orElseThrow(() -> new BookmarkNotFoundException(bookmarkId));
+            .findById(bookmarkId)
+            .orElseThrow(() -> new BookmarkNotFoundException(bookmarkId));
         return modelMapper.map(bookmark, BookmarkResponseRepresentation.class);
     }
 
     @Transactional
     public Page<BookmarkResponseRepresentation> getAllBookmarks(@NotNull String ownerId, @NotNull Pageable pageable) {
+
         return bookmarkRepository
-                .findAllByOwner(ownerId, pageable)
-                .map(i -> modelMapper.map(i, BookmarkResponseRepresentation.class));
+            .findAllByOwner(ownerId, pageable)
+            .map(i -> modelMapper.map(i, BookmarkResponseRepresentation.class));
     }
 
     @Transactional
     public Page<BookmarkResponseRepresentation> findAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<Bookmark> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
-                Bookmark.class,
-                criteria,
-                pageable.getSort());
+            Bookmark.class,
+            criteria,
+            pageable.getSort());
         TypedQuery<Bookmark> query = entityManager.createQuery(criteriaQuery);
 
         int totalRows = query.getResultList().size();
@@ -92,18 +94,19 @@ public class BookmarkService
     public Page<BookmarkResponseRepresentation> findAllFiltered(@NotNull String ownerId, @NotNull Filter criteria, @NotNull Pageable pageable) {
 
         return findAllFiltered(Filter.builder()
-                .conditions(Arrays.asList(
-                    Condition.builder()
-                            .attribute("owner")
-                            .operator(Operator.EQ)
-                            .value(ownerId)
-                            .build(),
-                    criteria))
-                .build(), pageable);
+            .conditions(Arrays.asList(
+                Condition.builder()
+                    .attribute("owner")
+                    .operator(Operator.EQ)
+                    .value(ownerId)
+                    .build(),
+                criteria))
+            .build(), pageable);
     }
 
     @Transactional
     public BookmarkResponseRepresentation newBookmark(@NotNull String ownerId, @NotNull BookmarkRequestRepresentation bookmarkRequestRepresentation) {
+
         Bookmark bookmark = modelMapper.map(bookmarkRequestRepresentation, Bookmark.class);
         bookmark.setCreatedOn(new Date());
         bookmark.setOwner(ownerId);
@@ -115,23 +118,25 @@ public class BookmarkService
 
     @Transactional
     public BookmarkResponseRepresentation updateBookmark(@NotNull Long bookmarkId, @NotNull BookmarkRequestRepresentation bookmark) {
-        return bookmarkRepository.findById(bookmarkId)
-                .map(found -> {
-                    found.setCaption(bookmark.getCaption());
-                    found.setUrl(bookmark.getUrl());
 
-                    Bookmark saved = bookmarkRepository.save(found);
-                    eventPublisher.publishEvent(eventFactory.bookmarkUpdated(this, saved));
-                    return modelMapper.map(saved, BookmarkResponseRepresentation.class);
-                })
-                .orElseThrow(() -> {
-                    throw new BookmarkNotFoundException(bookmarkId);
-                });
+        return bookmarkRepository.findById(bookmarkId)
+            .map(found -> {
+                found.setCaption(bookmark.getCaption());
+                found.setUrl(bookmark.getUrl());
+
+                Bookmark saved = bookmarkRepository.save(found);
+                eventPublisher.publishEvent(eventFactory.bookmarkUpdated(this, saved));
+                return modelMapper.map(saved, BookmarkResponseRepresentation.class);
+            })
+            .orElseThrow(() -> {
+                throw new BookmarkNotFoundException(bookmarkId);
+            });
     }
 
     @Transactional
     public void deleteBookmark(@NotNull Long bookmarkId) {
-        if(bookmarkRepository.existsById(bookmarkId)) {
+
+        if (bookmarkRepository.existsById(bookmarkId)) {
             bookmarkRepository.deleteById(bookmarkId);
             eventPublisher.publishEvent(eventFactory.bookmarkDeleted(this, bookmarkId));
         }

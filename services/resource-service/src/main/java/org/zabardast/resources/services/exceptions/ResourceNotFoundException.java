@@ -5,6 +5,7 @@ import org.zabardast.resources.model.ResourceKey;
 
 public class ResourceNotFoundException extends NotFoundException {
     public ResourceNotFoundException(ResourceKey resource) {
+
         super(String.format("Resource not found %s/%s", resource.getResource(), resource.getKey()));
     }
 }

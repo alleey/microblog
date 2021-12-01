@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 public class DefaultMimeTypeResolver implements MimeTypeResolver {
     @Override
     public String resolveMimeType(String filename) {
+
         MimetypesFileTypeMap fileTypeMap = new MimetypesFileTypeMap();
         String mimeType = fileTypeMap.getContentType(filename);
         return mimeType;

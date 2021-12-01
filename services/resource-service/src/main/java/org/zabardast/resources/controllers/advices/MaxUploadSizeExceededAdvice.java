@@ -16,6 +16,7 @@ public class MaxUploadSizeExceededAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({MaxUploadSizeExceededException.class})
     String maxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+
         return MAXIMUM_UPLOAD_SIZE_EXCEEDED;
     }
 }

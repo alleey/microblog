@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "events", schema="followersservice")
+@Table(name = "events", schema = "followersservice")
 @Data
 @Builder
 @NoArgsConstructor

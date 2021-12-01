@@ -6,16 +6,16 @@ import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
 import org.zabardast.blog.model.Comment;
 
-public class CommentToMapConverter implements Converter<Comment, Map<String, String>> {
+public class CommentToMapConverter implements Converter<Comment, Map<String, Object>> {
 
     public static final String ATTR_ID = "commentId";
     public static final String ATTR_OWNER = "owner";
     public static final String ATTR_REF = "ref";
 
     @Override
-    public Map<String, String> convert(MappingContext<Comment, Map<String, String>> context) {
+    public Map<String, Object> convert(MappingContext<Comment, Map<String, Object>> context) {
         Comment s = context.getSource();
-        Map<String, String> d = context.getDestination();
+        Map<String, Object> d = context.getDestination();
 
         if(d == null)
             d = new HashMap<>();

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.common.events.publishers.EventPublisher;
-import org.zabardast.stats.model.Event;
 import org.zabardast.stats.events.OutboxEvent;
+import org.zabardast.stats.model.Event;
 import org.zabardast.stats.repository.EventRepository;
 
 @Slf4j
@@ -27,21 +27,21 @@ public class OutboxEventListener {
 
     @Async
     @EventListener()
-    void handleOutboxEvent(OutboxEvent event)
-    {
+    void handleOutboxEvent(OutboxEvent event) {
+
         long now = System.currentTimeMillis() / 1000;
         int processed = 0;
-        while(processed < event.getBatchSize())
-        {
+        while (processed < event.getBatchSize()) {
             processOneEvent();
-            processed ++;
+            processed++;
         }
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     void processOneEvent() {
+
         Optional<Event> evt = eventRepository.findTopByOrderBySequenceAsc();
-        if(!evt.isPresent()) {
+        if (!evt.isPresent()) {
             return;
         }
         domainEventPublisher.publishEvent(evt.get());

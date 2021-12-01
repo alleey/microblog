@@ -13,6 +13,7 @@ public class ConstraintViolationAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({ConstraintViolationException.class})
     String constraintViolationException(ConstraintViolationException exception) {
+
         return exception.getMessage();
     }
 }

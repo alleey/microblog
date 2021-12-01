@@ -7,6 +7,8 @@ public interface StorageService {
     String getResolvableMoniker(ResourceKey key);
 
     Resource load(String fileName);
+
     void save(String fileName, Resource resource);
+
     void delete(String fileName);
 }

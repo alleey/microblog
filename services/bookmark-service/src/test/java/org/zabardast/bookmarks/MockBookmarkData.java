@@ -9,7 +9,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
-import org.zabardast.bookmarks.model.Bookmark;
 
 public final class MockBookmarkData {
 
@@ -24,34 +23,37 @@ public final class MockBookmarkData {
     public MockBookmarkData() {
 
         AlLUserBookmarks = IntStream.range(0, 15)
-                .mapToObj(i -> createBookmarkResponse(i, String.format("Bookmark %s",i), "http://www.google.com", UserIdGuest))
-                .collect(Collectors.toList());
+            .mapToObj(i -> createBookmarkResponse(i, String.format("Bookmark %s", i), "http://www.google.com", UserIdGuest))
+            .collect(Collectors.toList());
         AllAdminBookmarks = IntStream.range(0, 10)
-                .mapToObj(i -> createBookmarkResponse(i+15, String.format("Bookmark %s",i), "http://www.microsoft.com", UserIdAdmin))
-                .collect(Collectors.toList());
+            .mapToObj(i -> createBookmarkResponse(i + 15, String.format("Bookmark %s", i), "http://www.microsoft.com", UserIdAdmin))
+            .collect(Collectors.toList());
         AllBookmarks = Stream.concat(AlLUserBookmarks.stream(), AllAdminBookmarks.stream())
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
 
     public static BookmarkRequestRepresentation createBookmarkRequest(long id, String caption, String url, String userId) {
+
         return BookmarkRequestRepresentation.builder()
-                .caption(caption)
-                .url(url)
-                .build();
+            .caption(caption)
+            .url(url)
+            .build();
     }
 
     public static BookmarkResponseRepresentation createBookmarkResponse(long id, String caption, String url, String userId) {
+
         return BookmarkResponseRepresentation.builder()
-                .id(id)
-                .caption(caption)
-                .url(url)
-                .owner(userId)
-                .createdOn(new Date())
-                .build();
+            .id(id)
+            .caption(caption)
+            .url(url)
+            .owner(userId)
+            .createdOn(new Date())
+            .build();
     }
 
     public static String objectToJson(Object post) throws JsonProcessingException {
+
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(post);
     }

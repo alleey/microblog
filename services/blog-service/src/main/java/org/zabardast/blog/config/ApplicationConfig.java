@@ -12,14 +12,19 @@ import org.zabardast.common.feign.PropagatingCredentialsFeignRequestInterceptor;
 public class ApplicationConfig {
     @Bean
     public PropagatingCredentialsFeignRequestInterceptor requestInterceptor() {
+
         return new PropagatingCredentialsFeignRequestInterceptor();
     }
 
     @Bean
-    ForwardedHeaderFilter forwardedHeaderFilter() { return new ForwardedHeaderFilter(); }
+    ForwardedHeaderFilter forwardedHeaderFilter() {
+
+        return new ForwardedHeaderFilter();
+    }
 
     @Bean
     public ModelMapper modelMapper() {
+
         return new ModelMapper();
     }
 }

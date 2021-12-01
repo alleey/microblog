@@ -1,4 +1,3 @@
-
 package org.zabardast.blog.controllers;
 
 import javax.validation.constraints.NotNull;
@@ -35,64 +34,62 @@ import org.zabardast.blog.services.CommentService;
 @Validated
 public class PostCommentsController {
 
-	@Autowired
-	CommentService commentService;
+    @Autowired
+    CommentService commentService;
+    @Autowired
+    CommentResponseRepresentationAssembler assembler;
+    @Autowired
+    PagedResourcesAssembler<CommentResponseRepresentation> pagedAssembler;
 
-	@Autowired
-	private PagedResourcesAssembler<CommentResponseRepresentation> pagedAssembler;
+    @GetMapping()
+    public ResponseEntity<?> getAll(@PathVariable("postId") Long postId, @NotNull final Pageable page) {
 
-	@Autowired
-	CommentResponseRepresentationAssembler assembler;
+        PagedModel<?> entities = pagedAssembler.toModel(
+            commentService.getPostComments(postId, page),
+            assembler
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 
-	@GetMapping()
-	public ResponseEntity<?> getAll (@PathVariable("postId") Long postId, @NotNull final Pageable page) {
+    @GetMapping(value = "{commentId}")
+    public ResponseEntity<?> getCommentById(@PathVariable Long postId,
+                                            @PathVariable Long commentId) {
 
-		PagedModel<?> entities = pagedAssembler.toModel(
-			commentService.getPostComments(postId, page),
-			assembler
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        return ResponseEntity
+            .ok()
+            .contentType(MediaTypes.HAL_JSON)
+            .body(assembler.toModel(commentService.getPostComment(postId, commentId)));
+    }
 
-	@GetMapping(value = "{commentId}")
-	public ResponseEntity<?> getCommentById(@PathVariable Long postId,
-											@PathVariable Long commentId)
-	{
-		return ResponseEntity
-				.ok()
-				.contentType(MediaTypes.HAL_JSON)
-				.body(assembler.toModel(commentService.getPostComment(postId, commentId)));
-	}
+    @PostMapping()
+    public ResponseEntity<?> newComment(@PathVariable("postId") Long postId,
+                                        @RequestBody CommentRequestRepresentation blogComment,
+                                        @NotNull Authentication authentication) {
 
-	@PostMapping()
-	public ResponseEntity<?> newComment(@PathVariable("postId") Long postId,
-										@RequestBody CommentRequestRepresentation blogComment,
-										@NotNull Authentication authentication)
-	{
-		EntityModel<?> entity = assembler.toModel(
-			commentService.newComment(postId, authentication.getName(), blogComment)
-		);
-		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
-	}
+        EntityModel<?> entity = assembler.toModel(
+            commentService.newComment(postId, authentication.getName(), blogComment)
+        );
+        return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
+    }
 
-	@PutMapping(value = "{commentId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
-	public ResponseEntity<?> updateComment(@PathVariable("postId") Long postId,
-										   @PathVariable Long commentId,
-										   @RequestBody CommentRequestRepresentation blogComment)
-	{
-		EntityModel<?> entity = assembler.toModel(
-			commentService.updateComment(postId, commentId, blogComment)
-		);
-		return ResponseEntity.ok().build();
-	}
+    @PutMapping(value = "{commentId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
+    public ResponseEntity<?> updateComment(@PathVariable("postId") Long postId,
+                                           @PathVariable Long commentId,
+                                           @RequestBody CommentRequestRepresentation blogComment) {
 
-	@DeleteMapping(value = "{commentId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
-	public ResponseEntity<?> deleteComment(@PathVariable("postId") Long postId,
-										   @PathVariable Long commentId)
-	{
-		commentService.deleteComment(postId, commentId);
-		return ResponseEntity.noContent().build();
-	}
+        EntityModel<?> entity = assembler.toModel(
+            commentService.updateComment(postId, commentId, blogComment)
+        );
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "{commentId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @commentOwnership.require(#postId, #commentId, authentication)")
+    public ResponseEntity<?> deleteComment(@PathVariable("postId") Long postId,
+                                           @PathVariable Long commentId) {
+
+        commentService.deleteComment(postId, commentId);
+        return ResponseEntity.noContent().build();
+    }
 }

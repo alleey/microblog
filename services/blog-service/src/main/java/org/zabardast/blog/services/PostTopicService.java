@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.blog.events.EventFactory;
-import org.zabardast.blog.events.PostUpdatedEvent;
 import org.zabardast.blog.model.Post;
 import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.repository.PostRepository;
@@ -22,8 +21,7 @@ import org.zabardast.common.events.publishers.EventPublisher;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 
 @Service
-public class PostTopicService
-{
+public class PostTopicService {
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
@@ -50,10 +48,10 @@ public class PostTopicService
     public void resetTopics(@NotNull Long postId, @NotNull List<Long> topicIds) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+            .orElseThrow(() -> new PostNotFoundException(postId));
         List<Topic> topics = topicIds.stream()
-                .map(i -> topicRepository.findById(i).orElseThrow(() -> new TopicNotFoundException(i)))
-                .collect(Collectors.toList());
+            .map(i -> topicRepository.findById(i).orElseThrow(() -> new TopicNotFoundException(i)))
+            .collect(Collectors.toList());
 
         post.setTopics(new HashSet<Topic>(topics));
         Post saved = postRepository.save(post);
@@ -64,9 +62,9 @@ public class PostTopicService
     public Topic assignTopic(@NotNull Long postId, @NotNull Long topicId) {
 
         Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new TopicNotFoundException(topicId));
+            .orElseThrow(() -> new TopicNotFoundException(topicId));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+            .orElseThrow(() -> new PostNotFoundException(postId));
 
         post.getTopics().add(topic);
         Post saved = postRepository.save(post);
@@ -78,9 +76,9 @@ public class PostTopicService
     public void unassignTopic(@NotNull Long postId, @NotNull Long topicId) {
 
         Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new TopicNotFoundException(topicId));
+            .orElseThrow(() -> new TopicNotFoundException(topicId));
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+            .orElseThrow(() -> new PostNotFoundException(postId));
 
         post.getTopics().remove(topic);
         Post saved = postRepository.save(post);

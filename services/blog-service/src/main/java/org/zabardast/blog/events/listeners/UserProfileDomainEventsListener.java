@@ -33,17 +33,21 @@ public class UserProfileDomainEventsListener {
 
     @Bean
     public Consumer<Message<Event>> userProfileEvents() {
+
         return event -> {
-            final String eventName = (String)event.getHeaders().get(DomainConstants.HEADER_EVENT);
+            final String eventName = (String) event.getHeaders().get(DomainConstants.HEADER_EVENT);
             log.info("Received domain event " + eventName);
 
-            if(eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
+            if (pruneOrphanedPosts) {
 
-                Map attributes = JsonUtils.fromJson(event.getPayload().getPayload());
-                String userId = attributes.getOrDefault(ATTR_USER_ID, "").toString();
+                if (eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
 
-                if(Strings.isNotBlank(userId)) {
-                    handleUserProfileDeletion(userId);
+                    Map attributes = JsonUtils.mapFromJson(event.getPayload().getPayload());
+                    String userId = attributes.getOrDefault(ATTR_USER_ID, "").toString();
+
+                    if (Strings.isNotBlank(userId)) {
+                        handleUserProfileDeletion(userId);
+                    }
                 }
             }
         };
@@ -53,15 +57,10 @@ public class UserProfileDomainEventsListener {
     void handleUserProfileDeletion(String userId) {
 
         log.info("handleUserProfileDeletion " + userId);
-        if(pruneOrphanedPosts)
-        {
-            Page<PostResponseRepresentation> posts =  postService.getOwnerPosts(userId, Pageable.unpaged());
-            for (PostResponseRepresentation post: posts)
-            {
-                postService.deletePost(post.getId());
-                log.info("Deleted orphaned counter " + post.getTitle() + " of " + post.getOwner());
-            }
+        Page<PostResponseRepresentation> posts = postService.getOwnerPosts(userId, Pageable.unpaged());
+        for (PostResponseRepresentation post : posts) {
+            postService.deletePost(post.getId());
+            log.info("Deleted orphaned counter " + post.getTitle() + " of " + post.getOwner());
         }
-
     }
 }

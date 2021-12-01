@@ -8,12 +8,12 @@ import org.zabardast.resources.model.Resource;
 public class ResourceToResourceResponseRepresentationConverter implements Converter<Resource, ResourceResponseRepresentation> {
 
     @Override
-    public ResourceResponseRepresentation convert(MappingContext<Resource, ResourceResponseRepresentation> context)
-    {
+    public ResourceResponseRepresentation convert(MappingContext<Resource, ResourceResponseRepresentation> context) {
+
         Resource s = context.getSource();
         ResourceResponseRepresentation d = context.getDestination();
 
-        if(d == null)
+        if (d == null)
             d = new ResourceResponseRepresentation();
 
         d.setKey(s.getKey());

@@ -11,11 +11,13 @@ import org.zabardast.blog.services.exceptions.PostNotFoundException;
 @Slf4j
 @Component
 public class CommentOwnership {
-    @Autowired CommentService commentService;
+    @Autowired
+    CommentService commentService;
 
     public boolean require(Long postId, Long commentId, Authentication authentication) {
+
         CommentResponseRepresentation comment = commentService.getPostComment(postId, commentId);
-        if(comment == null)
+        if (comment == null)
             throw new PostNotFoundException(postId);
         return comment.getOwner().equalsIgnoreCase(authentication.getName());
     }

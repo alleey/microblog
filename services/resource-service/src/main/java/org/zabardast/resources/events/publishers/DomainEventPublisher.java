@@ -25,11 +25,12 @@ public class DomainEventPublisher implements EventPublisher<Event> {
 
     @Override
     public void publishEvent(Event event) {
+
         log.info(event.toString());
         streamBridge.send(this.destination, MessageBuilder.withPayload(event)
-                .setHeader(DomainConstants.HEADER_SERVICE, serviceName)
-                .setHeader(DomainConstants.HEADER_EVENT, event.getType())
-                .build()
+            .setHeader(DomainConstants.HEADER_SERVICE, serviceName)
+            .setHeader(DomainConstants.HEADER_EVENT, event.getType())
+            .build()
         );
     }
 }

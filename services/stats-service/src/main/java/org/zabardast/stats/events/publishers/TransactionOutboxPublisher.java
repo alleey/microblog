@@ -26,14 +26,11 @@ public class TransactionOutboxPublisher implements EventPublisher<BaseEvent> {
     @Override
     public void publishEvent(BaseEvent event) {
 
-        try
-        {
+        try {
             eventRepository.save(eventFactory.domainEvent(event));
             // Notify the listener to act asap
             applicationEventPublisher.publishEvent(new OutboxEvent(this));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error(e.toString());
             throw e;
         }

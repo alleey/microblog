@@ -1,4 +1,3 @@
-
 package org.zabardast.bookmarks.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,94 +41,92 @@ import org.zabardast.common.filtering.Filter;
 @Validated
 public class BookmarksController {
 
-	@Autowired
-	BookmarkService bookmarkService;
+    @Autowired
+    BookmarkService bookmarkService;
 
-	@Autowired
-	PagedResourcesAssembler<BookmarkResponseRepresentation> pagedAssembler;
+    @Autowired
+    PagedResourcesAssembler<BookmarkResponseRepresentation> pagedAssembler;
 
-	@Autowired
-	BookmarkResponseRepresentationAssembler assembler;
+    @Autowired
+    BookmarkResponseRepresentationAssembler assembler;
 
-	@GetMapping()
-	public ResponseEntity<?> getAll(final Pageable page, @NotNull Authentication authentication) {
-		PagedModel<?> entities = pagedAssembler.toModel(
-			bookmarkService.getAllBookmarks(authentication.getName(), page),
-			assembler
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+    @GetMapping()
+    public ResponseEntity<?> getAll(final Pageable page, @NotNull Authentication authentication) {
 
-	@GetMapping("search")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> search(
-			@NotBlank @RequestParam("q")  final String criteria,
-			final Pageable page,
-			@NotNull Authentication authentication)
-	{
-		try
-		{
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-			Filter filter = mapper.readValue(criteria, Filter.class);
+        PagedModel<?> entities = pagedAssembler.toModel(
+            bookmarkService.getAllBookmarks(authentication.getName(), page),
+            assembler
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 
-			PagedModel<?> entities = pagedAssembler.toModel(
-				bookmarkService.findAllFiltered(authentication.getName(), filter, page),
-				assembler
-			);
-			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-		}
-		catch (JsonProcessingException e)
-		{
-			log.error(e.toString());
-			return ResponseEntity.badRequest().build();
-		}
-	}
+    @GetMapping("search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> search(
+        @NotBlank @RequestParam("q") final String criteria,
+        final Pageable page,
+        @NotNull Authentication authentication) {
 
-	@GetMapping(value = "{bookmarkId}")
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> getBookmarkById(
-			@NotBlank @PathVariable("bookmarkId") Long bookmarkId,
-			@NotNull Authentication authentication)
-	{
-		return ResponseEntity
-				.ok()
-				.contentType(MediaTypes.HAL_JSON)
-				.body(assembler.toModel(bookmarkService.getBookmark(authentication.getName(), bookmarkId)));
-	}
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+            Filter filter = mapper.readValue(criteria, Filter.class);
 
-	@PostMapping()
-	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<?> newBookmark(
-			@NotNull @RequestBody BookmarkRequestRepresentation bookmark,
-			@NotNull Authentication authentication)
-	{
-		EntityModel<?> entity = assembler.toModel(
-			bookmarkService.newBookmark(authentication.getName(), bookmark)
-		);
-		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
-	}
+            PagedModel<?> entities = pagedAssembler.toModel(
+                bookmarkService.findAllFiltered(authentication.getName(), filter, page),
+                assembler
+            );
+            return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+        } catch (JsonProcessingException e) {
+            log.error(e.toString());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-	@PutMapping(value = "{bookmarkId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
-	public ResponseEntity<?> updateBookmark(
-			@NotBlank @PathVariable Long bookmarkId,
-			@NotNull @RequestBody BookmarkRequestRepresentation bookmark,
-			@NotNull Authentication authentication)
-	{
-		EntityModel<?> entity = assembler.toModel(
-			bookmarkService.updateBookmark(bookmarkId, bookmark)
-		);
-		return ResponseEntity.ok().build();
-	}
+    @GetMapping(value = "{bookmarkId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getBookmarkById(
+        @NotBlank @PathVariable("bookmarkId") Long bookmarkId,
+        @NotNull Authentication authentication) {
 
-	@DeleteMapping(value = "{bookmarkId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
-	public ResponseEntity<?> deleteBookmark(
-			@NotBlank @PathVariable Long bookmarkId,
-			@NotNull Authentication authentication)
-	{
-		bookmarkService.deleteBookmark(bookmarkId);
-		return ResponseEntity.noContent().build();
-	}
+        return ResponseEntity
+            .ok()
+            .contentType(MediaTypes.HAL_JSON)
+            .body(assembler.toModel(bookmarkService.getBookmark(authentication.getName(), bookmarkId)));
+    }
+
+    @PostMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> newBookmark(
+        @NotNull @RequestBody BookmarkRequestRepresentation bookmark,
+        @NotNull Authentication authentication) {
+
+        EntityModel<?> entity = assembler.toModel(
+            bookmarkService.newBookmark(authentication.getName(), bookmark)
+        );
+        return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
+    }
+
+    @PutMapping(value = "{bookmarkId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
+    public ResponseEntity<?> updateBookmark(
+        @NotBlank @PathVariable Long bookmarkId,
+        @NotNull @RequestBody BookmarkRequestRepresentation bookmark,
+        @NotNull Authentication authentication) {
+
+        EntityModel<?> entity = assembler.toModel(
+            bookmarkService.updateBookmark(bookmarkId, bookmark)
+        );
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "{bookmarkId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @bookmarkOwnership.require(#bookmarkId, authentication)")
+    public ResponseEntity<?> deleteBookmark(
+        @NotBlank @PathVariable Long bookmarkId,
+        @NotNull Authentication authentication) {
+
+        bookmarkService.deleteBookmark(bookmarkId);
+        return ResponseEntity.noContent().build();
+    }
 }

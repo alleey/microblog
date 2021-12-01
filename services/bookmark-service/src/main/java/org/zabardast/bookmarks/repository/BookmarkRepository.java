@@ -11,5 +11,6 @@ import org.zabardast.bookmarks.model.Bookmark;
 @Repository
 public interface BookmarkRepository extends PagingAndSortingRepository<Bookmark, Long> {
     public Page<Bookmark> findAllByOwner(String ownerId, Pageable page);
+
     public Optional<Bookmark> findByIdAndOwner(Long bookmarkId, String ownerId);
 }

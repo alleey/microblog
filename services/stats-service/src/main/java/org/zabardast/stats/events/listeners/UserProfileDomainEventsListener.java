@@ -29,16 +29,17 @@ public class UserProfileDomainEventsListener {
 
     @Bean
     public Consumer<Message<Event>> userProfileEvents() {
+
         return event -> {
-            final String eventName = (String)event.getHeaders().get(DomainConstants.HEADER_EVENT);
+            final String eventName = (String) event.getHeaders().get(DomainConstants.HEADER_EVENT);
             log.info("Received domain event " + eventName);
 
-            if(eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
+            if (eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
 
-                Map attributes = JsonUtils.fromJson(event.getPayload().getPayload());
+                Map attributes = JsonUtils.mapFromJson(event.getPayload().getPayload());
                 String userId = attributes.getOrDefault(ATTR_USER_ID, "").toString();
 
-                if(Strings.isNotBlank(userId)) {
+                if (Strings.isNotBlank(userId)) {
                     handleUserProfileDeletion(userId);
                 }
             }
@@ -46,11 +47,10 @@ public class UserProfileDomainEventsListener {
     }
 
     @Transactional
-    void handleUserProfileDeletion(String userId)
-    {
+    void handleUserProfileDeletion(String userId) {
+
         Page<CounterResponseRepresentation> counters = counterService.findAllByOwner(userId, Pageable.unpaged());
-        for (CounterResponseRepresentation counter: counters)
-        {
+        for (CounterResponseRepresentation counter : counters) {
             counterService.deleteCounter(counter.getCounter(), counter.getOwner());
             log.info("Deleted orphaned counter " + counter.getCounter() + " of " + counter.getOwner());
         }

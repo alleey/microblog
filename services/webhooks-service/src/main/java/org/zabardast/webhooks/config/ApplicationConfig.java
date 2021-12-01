@@ -1,0 +1,30 @@
+package org.zabardast.webhooks.config;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.filter.ForwardedHeaderFilter;
+import org.zabardast.common.feign.PropagatingCredentialsFeignRequestInterceptor;
+
+@Configuration
+@EnableScheduling
+public class ApplicationConfig {
+    @Bean
+    public PropagatingCredentialsFeignRequestInterceptor requestInterceptor() {
+
+        return new PropagatingCredentialsFeignRequestInterceptor();
+    }
+
+    @Bean
+    ForwardedHeaderFilter forwardedHeaderFilter() {
+
+        return new ForwardedHeaderFilter();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+
+        return new ModelMapper();
+    }
+}

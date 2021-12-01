@@ -24,13 +24,13 @@ import org.zabardast.userprofile.services.UserProfileService;
 @ActiveProfiles("test")
 class UserProfilesController_AnonymousTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockBean
-	private UserProfileService userProfileService;
+    @MockBean
+    private UserProfileService userProfileService;
 
-	private MockUserProfileData blogData = new MockUserProfileData();
+    private MockUserProfileData blogData = new MockUserProfileData();
 //
 //	@Test
 //	void getAllUserProfilesRequiresLogin() throws Exception {
@@ -55,28 +55,28 @@ class UserProfilesController_AnonymousTests {
 //				.andExpect(status().is(HttpStatus.SC_OK));
 //	}
 
-	@Test
-	void updateUserProfileRequiresLogin() throws Exception {
+    @Test
+    void updateUserProfileRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.put("/api/v1/users/{id}", MockUserProfileData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockUserProfileData.objectToJson(blogData.AllUserProfiles.get(0)));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .put("/api/v1/users/{id}", MockUserProfileData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockUserProfileData.objectToJson(blogData.AllUserProfiles.get(0)));
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void deleteUserProfileRequiresLogin() throws Exception {
+    @Test
+    void deleteUserProfileRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/users/{id}", MockUserProfileData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .delete("/api/v1/users/{id}", MockUserProfileData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 }

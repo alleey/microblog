@@ -16,11 +16,15 @@ import org.springframework.core.io.Resource;
 @Profile("!test")
 public class SSLConfig {
 
-    @Value("${server.ssl.trust-store:classpath:keystore/server.jks}") Resource trustStore;
-    @Value("${server.ssl.trust-store-password:secret}") String trustStorePassword;
+    @Value("${server.ssl.trust-store:classpath:keystore/server.jks}")
+    Resource trustStore;
+
+    @Value("${server.ssl.trust-store-password:secret}")
+    String trustStorePassword;
 
     @PostConstruct
     private void configureSSL() throws IOException {
+
         try {
             File tempFile = File.createTempFile("trust-store", ".jks");
             Files.copy(trustStore.getInputStream(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);

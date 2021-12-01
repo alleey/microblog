@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.server.core.Relation;
-import org.zabardast.stats.model.CounterStatistics;
 
 @Data
 @Builder

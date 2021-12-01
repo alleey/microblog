@@ -1,4 +1,3 @@
-
 package org.zabardast.blog.controllers;
 
 import javax.validation.constraints.NotNull;
@@ -26,25 +25,25 @@ import org.zabardast.blog.services.PostService;
 @Validated
 public class TopicPostsController {
 
-	@Autowired
-	PostService postService;
+    @Autowired
+    PostService postService;
 
-	@Autowired
-	PagedResourcesAssembler<PostResponseRepresentation> pagedAssembler;
+    @Autowired
+    PagedResourcesAssembler<PostResponseRepresentation> pagedAssembler;
 
-	@Autowired
-	PostResponseRepresentationAssembler assembler;
+    @Autowired
+    PostResponseRepresentationAssembler assembler;
 
-	@GetMapping()
-	public ResponseEntity<?> getAll (
-			@PathVariable("topicId") Long topicId,
-			@NotNull final Pageable page) {
+    @GetMapping()
+    public ResponseEntity<?> getAll(
+        @PathVariable("topicId") Long topicId,
+        @NotNull final Pageable page) {
 
-		PagedModel<?> entities = pagedAssembler.toModel(
-			postService.getTopicPosts(topicId, page),
-			assembler
-		);
+        PagedModel<?> entities = pagedAssembler.toModel(
+            postService.getTopicPosts(topicId, page),
+            assembler
+        );
 
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 }

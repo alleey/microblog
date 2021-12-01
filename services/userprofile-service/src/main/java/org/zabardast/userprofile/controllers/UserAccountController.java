@@ -1,4 +1,3 @@
-
 package org.zabardast.userprofile.controllers;
 
 import javax.validation.constraints.NotBlank;
@@ -26,20 +25,22 @@ import org.zabardast.userprofile.services.UserAccountService;
 @Validated
 public class UserAccountController {
 
-	@Autowired
-	UserAccountService userAccountService;
+    @Autowired
+    UserAccountService userAccountService;
 
-	@PostMapping()
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> register(@NotNull @RequestBody RegisterRequestRepresentation account) {
-		userAccountService.register(account);
-		return ResponseEntity.ok().build();
-	}
+    @PostMapping()
+    @PreAuthorize("isAuthenticated")
+    public ResponseEntity<?> register(@NotNull @RequestBody RegisterRequestRepresentation account) {
 
-	@DeleteMapping(value = "{userId}")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> unregister(@NotBlank @PathVariable String userId) {
-		userAccountService.unregister(userId);
-		return ResponseEntity.noContent().build();
-	}
+        userAccountService.register(account);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "{userId}")
+    @PreAuthorize("isAuthenticated")
+    public ResponseEntity<?> unregister(@NotBlank @PathVariable String userId) {
+
+        userAccountService.unregister(userId);
+        return ResponseEntity.noContent().build();
+    }
 }

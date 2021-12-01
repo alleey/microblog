@@ -5,6 +5,7 @@ import org.zabardast.common.events.BaseEvent;
 
 public class PostDeletedEvent extends BaseEvent {
     public PostDeletedEvent(Object source, Map<String, Object> data) {
+
         super(source, data);
     }
 }

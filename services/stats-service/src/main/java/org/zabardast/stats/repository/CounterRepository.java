@@ -15,17 +15,19 @@ import org.zabardast.stats.model.CounterStatistics;
 public interface CounterRepository extends PagingAndSortingRepository<Counter, CounterKey> {
 
     @Query("SELECT new org.zabardast.stats.model.CounterStatistics(" +
-            "count(value) as count," +
-            "min(value) as min," +
-            "max(value) as max," +
-            "sum(value) as sum," +
-            "avg(value) as avg" +
-           ") " +
-           "FROM Counter " +
-           "WHERE counter=:counterId")
+        "count(value) as count," +
+        "min(value) as min," +
+        "max(value) as max," +
+        "sum(value) as sum," +
+        "avg(value) as avg" +
+        ") " +
+        "FROM Counter " +
+        "WHERE counter=:counterId")
     public Optional<CounterStatistics> getCounterStatistics(@Param("counterId") String counterId);
 
     public Counter findByCounterAndOwner(String counterId, String ownerId);
+
     public Page<Counter> findByOwner(String ownerId, Pageable page);
+
     public Page<Counter> findByCounter(String counterId, Pageable page);
 }

@@ -6,7 +6,6 @@ import javax.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.zabardast.bookmarks.MockBookmarkData;
 import org.zabardast.bookmarks.dto.BookmarkRequestRepresentation;
 import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
-import org.zabardast.bookmarks.events.publishers.DomainEventPublisher;
 import org.zabardast.bookmarks.services.BookmarkService;
 
 @SpringBootTest()
@@ -32,75 +30,75 @@ import org.zabardast.bookmarks.services.BookmarkService;
 @ActiveProfiles("test")
 class BookmarksController_AnonymousTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockBean
-	private BookmarkService bookmarkService;
+    @MockBean
+    private BookmarkService bookmarkService;
 
-	@Autowired
-	private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-	private MockBookmarkData blogData = new MockBookmarkData();
+    private MockBookmarkData blogData = new MockBookmarkData();
 
-	@Test
-	void getAllBookmarksRequiresLogin() throws Exception {
+    @Test
+    void getAllBookmarksRequiresLogin() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 20);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/bookmarks")
-				.accept(MediaType.APPLICATION_JSON);
+        Pageable pageable = PageRequest.of(0, 20);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/bookmarks")
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void getBookmarkByIdRequiresLogin() throws Exception {
+    @Test
+    void getBookmarkByIdRequiresLogin() throws Exception {
 
-		Mockito.when(bookmarkService.getBookmark(5L)).then(r -> blogData.AllBookmarks.get(5));
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/bookmarks/5")
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(bookmarkService.getBookmark(5L)).then(r -> blogData.AllBookmarks.get(5));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/bookmarks/5")
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void createNewBookmarkRequiresLogin() throws Exception {
+    @Test
+    void createNewBookmarkRequiresLogin() throws Exception {
 
-		BookmarkResponseRepresentation newBookmark = MockBookmarkData
-				.createBookmarkResponse(100, "Test", "Test", MockBookmarkData.UserIdGuest);
-		BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(newBookmark, BookmarkRequestRepresentation.class);
+        BookmarkResponseRepresentation newBookmark = MockBookmarkData
+            .createBookmarkResponse(100, "Test", "Test", MockBookmarkData.UserIdGuest);
+        BookmarkRequestRepresentation bookmarkRequestRepresentation = modelMapper.map(newBookmark, BookmarkRequestRepresentation.class);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/bookmarks")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/v1/bookmarks")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockBookmarkData.objectToJson(bookmarkRequestRepresentation));
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void updateBookmarkRequiresLogin() throws Exception {
+    @Test
+    void updateBookmarkRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/bookmarks/1")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockBookmarkData.objectToJson(blogData.AllBookmarks.get(0)));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/v1/bookmarks/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockBookmarkData.objectToJson(blogData.AllBookmarks.get(0)));
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void deleteBookmarkRequiresLogin() throws Exception {
+    @Test
+    void deleteBookmarkRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/bookmarks/1")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/bookmarks/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 }

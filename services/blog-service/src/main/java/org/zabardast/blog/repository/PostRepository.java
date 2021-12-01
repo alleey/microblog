@@ -11,7 +11,10 @@ import org.zabardast.blog.model.Topic;
 @Repository
 public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
     public Optional<Post> findBySlug(String slug);
+
     public Page<Post> findAll(Pageable page);
+
     public Page<Post> findAllByTopics(Topic post, Pageable page);
+
     public Page<Post> findByOwner(String ownerId, Pageable page);
 }

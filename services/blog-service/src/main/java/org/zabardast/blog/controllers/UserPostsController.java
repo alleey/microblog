@@ -1,4 +1,3 @@
-
 package org.zabardast.blog.controllers;
 
 import javax.validation.constraints.NotBlank;
@@ -27,22 +26,20 @@ import org.zabardast.blog.services.PostService;
 @Validated
 public class UserPostsController {
 
-	@Autowired
+    @Autowired
     PostService postService;
+    @Autowired
+    PostResponseRepresentationAssembler assembler;
+    @Autowired
+    PagedResourcesAssembler<PostResponseRepresentation> pagedAssembler;
 
-	@Autowired
-	private PagedResourcesAssembler<PostResponseRepresentation> pagedAssembler;
+    @GetMapping(value = "posts")
+    public ResponseEntity<?> getOwnersPosts(@NotBlank @PathVariable("userId") String userId, @NotNull final Pageable page) {
 
-	@Autowired
-	PostResponseRepresentationAssembler assembler;
-
-	@GetMapping(value = "posts")
-	public ResponseEntity<?> getOwnersPosts(@NotBlank @PathVariable("userId") String userId, @NotNull final Pageable page)
-	{
-		PagedModel<?> entities = pagedAssembler.toModel(
-			postService.getOwnerPosts(userId, page),
-			assembler
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        PagedModel<?> entities = pagedAssembler.toModel(
+            postService.getOwnerPosts(userId, page),
+            assembler
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 }

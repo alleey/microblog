@@ -1,4 +1,3 @@
-
 package org.zabardast.followers.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -41,78 +40,76 @@ import org.zabardast.followers.services.FollowingService;
 @Validated
 public class FollowingController {
 
-	@Autowired
-	FollowingService followingService;
+    @Autowired
+    FollowingService followingService;
 
-	@Autowired
-	PagedResourcesAssembler<FollowResponseRepresentation> followResponseRepresentationPagedResourcesAssembler;
+    @Autowired
+    PagedResourcesAssembler<FollowResponseRepresentation> followResponseRepresentationPagedResourcesAssembler;
 
-	@Autowired
-	FollowResponseRepresentationAssembler assembler;
+    @Autowired
+    FollowResponseRepresentationAssembler assembler;
 
-	@GetMapping("{followedId}")
-	public ResponseEntity<?> getOne(@NotBlank @PathVariable String userId, @NotBlank @PathVariable String followedId) {
-		EntityModel<?> entity = assembler.toModel(
-			followingService.listOne(followedId, userId)
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
-	}
+    @GetMapping("{followedId}")
+    public ResponseEntity<?> getOne(@NotBlank @PathVariable String userId, @NotBlank @PathVariable String followedId) {
 
-	@GetMapping("")
-	//@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> getAlLFollowing(@NotBlank @PathVariable String userId, final Pageable page)
-	{
-		PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
-			followingService.listFollowing(userId, page),
-			assembler
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        EntityModel<?> entity = assembler.toModel(
+            followingService.listOne(followedId, userId)
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
+    }
 
-	@GetMapping("search")
-	public ResponseEntity<?> findFollowing(@NotBlank @PathVariable String userId,
-										   @NotBlank @RequestParam("q")  final String criteria,
-										   final Pageable page)
-	{
-		try
-		{
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-			Filter filter = mapper.readValue(criteria, Filter.class);
+    @GetMapping("")
+    //@PreAuthorize("isAuthenticated")
+    public ResponseEntity<?> getAlLFollowing(@NotBlank @PathVariable String userId, final Pageable page) {
 
-			PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
-				followingService.findFollowing(userId, filter, page),
-				assembler
-			);
-			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-		}
-		catch (JsonProcessingException e)
-		{
-			log.error(e.toString());
-			return ResponseEntity.badRequest().build();
-		}
-	}
+        PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
+            followingService.listFollowing(userId, page),
+            assembler
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 
-	@PostMapping()
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
-	public ResponseEntity<?> follow(@NotBlank @PathVariable String userId,
-									@RequestBody FollowRequestRepresentation followRequest,
-									@NotNull Authentication authentication)
-	{
-		EntityModel<?> entity = assembler.toModel(
-			followingService.follow(userId, followRequest)
-		);
-		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
-	}
+    @GetMapping("search")
+    public ResponseEntity<?> findFollowing(@NotBlank @PathVariable String userId,
+                                           @NotBlank @RequestParam("q") final String criteria,
+                                           final Pageable page) {
 
-	@DeleteMapping(value = "{followedId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
-	public ResponseEntity<?> unfollow(
-			@NotBlank @PathVariable String userId,
-			@NotBlank @PathVariable String followedId,
-			@NotNull Authentication authentication)
-	{
-		followingService.unfollow(userId, followedId);
-		return ResponseEntity.noContent().build();
-	}
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+            Filter filter = mapper.readValue(criteria, Filter.class);
+
+            PagedModel<?> entities = followResponseRepresentationPagedResourcesAssembler.toModel(
+                followingService.findFollowing(userId, filter, page),
+                assembler
+            );
+            return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+        } catch (JsonProcessingException e) {
+            log.error(e.toString());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
+    public ResponseEntity<?> follow(@NotBlank @PathVariable String userId,
+                                    @RequestBody FollowRequestRepresentation followRequest,
+                                    @NotNull Authentication authentication) {
+
+        EntityModel<?> entity = assembler.toModel(
+            followingService.follow(userId, followRequest)
+        );
+        return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
+    }
+
+    @DeleteMapping(value = "{followedId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @followingOwnership.require(#userId, authentication)")
+    public ResponseEntity<?> unfollow(
+        @NotBlank @PathVariable String userId,
+        @NotBlank @PathVariable String followedId,
+        @NotNull Authentication authentication) {
+
+        followingService.unfollow(userId, followedId);
+        return ResponseEntity.noContent().build();
+    }
 }

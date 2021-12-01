@@ -18,16 +18,16 @@ public class FilterTests {
     void testSerialization() throws Exception {
 
         Filter filter = Filter.builder().type(FilterType.AND)
-                .conditions(Arrays.asList(
-                        Condition.builder().attribute("a").operator(Operator.EQ).value("1").build(),
-                        Condition.builder().attribute("b").operator(Operator.EQ).value("1").build()
-                )).build();
+            .conditions(Arrays.asList(
+                Condition.builder().attribute("a").operator(Operator.EQ).value("1").build(),
+                Condition.builder().attribute("b").operator(Operator.EQ).value("1").build()
+            )).build();
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(filter);
 
         Assert.hasText(
-                "{\"type\":\"AND\",\"conditions\":[{\"attribute\":\"a\",\"operator\":\"EQ\",\"value\":\"1\",\"values\":null},{\"attribute\":\"b\",\"operator\":\"EQ\",\"value\":\"1\",\"values\":null}]}",
-                "serialization");
+            "{\"type\":\"AND\",\"conditions\":[{\"attribute\":\"a\",\"operator\":\"EQ\",\"value\":\"1\",\"values\":null},{\"attribute\":\"b\",\"operator\":\"EQ\",\"value\":\"1\",\"values\":null}]}",
+            "serialization");
     }
 
     @Test
@@ -36,7 +36,7 @@ public class FilterTests {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
         Filter value = objectMapper.readValue("{\"type\":\"and\",\"conditions\":[{\"attribute\":\"a\",\"operator\":\"eq\",\"value\":\"1\",\"values\":null},{\"attribute\":\"b\",\"operator\":\"EQ\",\"value\":\"1\",\"values\":null}]}",
-                Filter.class);
+            Filter.class);
 
         Assert.notNull(value, "deserialization");
     }

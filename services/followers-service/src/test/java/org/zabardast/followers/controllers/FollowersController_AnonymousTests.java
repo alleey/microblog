@@ -33,60 +33,60 @@ import org.zabardast.followers.services.FollowingService;
 @ActiveProfiles("test")
 class FollowersController_AnonymousTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockBean
-	private FollowingService followingService;
+    @MockBean
+    private FollowingService followingService;
 
-	private MockFollowersData blogData = new MockFollowersData();
+    private MockFollowersData blogData = new MockFollowersData();
 
-	@Test
-	void getAllFollowers() throws Exception {
+    @Test
+    void getAllFollowers() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 20);
-		PageImpl page = new PageImpl(
-				blogData.AllGuestFollowers.subList(0, Math.min(pageable.getPageSize(), blogData.AllGuestFollowers.size())),
-				pageable,
-				blogData.AllGuestFollowers.size());
+        Pageable pageable = PageRequest.of(0, 20);
+        PageImpl page = new PageImpl(
+            blogData.AllGuestFollowers.subList(0, Math.min(pageable.getPageSize(), blogData.AllGuestFollowers.size())),
+            pageable,
+            blogData.AllGuestFollowers.size());
 
-		Mockito.when(followingService.listFollowers(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.get("/api/v1/users/{userId}/followers", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(followingService.listFollowers(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .get("/api/v1/users/{userId}/followers", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
-				.andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
-				.andExpect(jsonPath("$.page.size", is(page.getSize())))
-				.andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
-				.andExpect(jsonPath("$.page.totalElements", is((int)page.getTotalElements())))
-				.andExpect(jsonPath("$.page.number", is(page.getNumber())));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
+            .andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
+            .andExpect(jsonPath("$.page.size", is(page.getSize())))
+            .andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
+            .andExpect(jsonPath("$.page.totalElements", is((int) page.getTotalElements())))
+            .andExpect(jsonPath("$.page.number", is(page.getNumber())));
+    }
 
-	@Test
-	void getAllFollowersCustomPaging() throws Exception {
+    @Test
+    void getAllFollowersCustomPaging() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 1);
-		PageImpl page = new PageImpl(
-				blogData.AllGuestFollowers.subList(0, Math.min(pageable.getPageSize(), blogData.AllGuestFollowers.size())),
-				pageable,
-				blogData.AllGuestFollowers.size());
+        Pageable pageable = PageRequest.of(0, 1);
+        PageImpl page = new PageImpl(
+            blogData.AllGuestFollowers.subList(0, Math.min(pageable.getPageSize(), blogData.AllGuestFollowers.size())),
+            pageable,
+            blogData.AllGuestFollowers.size());
 
-		Mockito.when(followingService.listFollowers(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.get("/api/v1/users/{userId}/followers?page=0&size=1", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(followingService.listFollowers(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .get("/api/v1/users/{userId}/followers?page=0&size=1", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
-				.andExpect(jsonPath("$.page.size", is(page.getSize())))
-				.andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
-				.andExpect(jsonPath("$.page.totalElements", is((int)page.getTotalElements())))
-				.andExpect(jsonPath("$.page.number", is(page.getNumber())));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
+            .andExpect(jsonPath("$.page.size", is(page.getSize())))
+            .andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
+            .andExpect(jsonPath("$.page.totalElements", is((int) page.getTotalElements())))
+            .andExpect(jsonPath("$.page.number", is(page.getNumber())));
+    }
 }

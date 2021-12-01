@@ -22,25 +22,25 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 public class ClientCredentialsFeignRequestInterceptor implements RequestInterceptor {
 
     private static final Authentication ANONYMOUS_AUTHENTICATION = new AnonymousAuthenticationToken(
-            "anonymous", "anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
+        "anonymous", "anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
 
     private final OAuth2AuthorizedClientManager authorizedClientManager;
     private final String clientRegistrationId;
 
     public ClientCredentialsFeignRequestInterceptor(
-            final ClientRegistrationRepository clientRegistrationRepository,
-            final OAuth2AuthorizedClientService authorizedClientService,
-            final String clientRegistrationId) {
+        final ClientRegistrationRepository clientRegistrationRepository,
+        final OAuth2AuthorizedClientService authorizedClientService,
+        final String clientRegistrationId) {
 
         OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder
-                .builder()
-                .clientCredentials()
-                .build();
+            .builder()
+            .clientCredentials()
+            .build();
 
         AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
-                new AuthorizedClientServiceOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository,
-                        authorizedClientService);
+            new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+                clientRegistrationRepository,
+                authorizedClientService);
         authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
 
         this.authorizedClientManager = authorizedClientManager;
@@ -48,22 +48,24 @@ public class ClientCredentialsFeignRequestInterceptor implements RequestIntercep
     }
 
     public ClientCredentialsFeignRequestInterceptor(
-            final OAuth2AuthorizedClientManager authorizedClientManager,
-            final String clientRegistrationId) {
+        final OAuth2AuthorizedClientManager authorizedClientManager,
+        final String clientRegistrationId) {
+
         this.authorizedClientManager = authorizedClientManager;
         this.clientRegistrationId = clientRegistrationId;
     }
 
     @Override
     public void apply(RequestTemplate template) {
+
         if (this.authorizedClientManager == null) {
             return;
         }
 
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
-                .withClientRegistrationId(this.clientRegistrationId)
-                .principal(ANONYMOUS_AUTHENTICATION)
-                .build();
+            .withClientRegistrationId(this.clientRegistrationId)
+            .principal(ANONYMOUS_AUTHENTICATION)
+            .build();
 
         OAuth2AuthorizedClient authorizedClient = this.authorizedClientManager.authorize(authorizeRequest);
         OAuth2AccessToken accessToken = Objects.requireNonNull(authorizedClient).getAccessToken();

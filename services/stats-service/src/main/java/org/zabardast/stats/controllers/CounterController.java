@@ -1,4 +1,3 @@
-
 package org.zabardast.stats.controllers;
 
 import java.util.List;
@@ -38,94 +37,94 @@ import org.zabardast.stats.services.CounterService;
 @Validated
 public class CounterController {
 
-	@Autowired
+    @Autowired
     CounterService counterService;
 
-	@Autowired
-	CounterResponseRepresentationAssembler counterResponseRepresentationAssembler;
+    @Autowired
+    CounterResponseRepresentationAssembler counterResponseRepresentationAssembler;
 
-	@Autowired
-	CounterStatisticsResponseRepresentationAssembler counterStatisticsResponseRepresentationAssembler;
+    @Autowired
+    CounterStatisticsResponseRepresentationAssembler counterStatisticsResponseRepresentationAssembler;
 
-	@Autowired
-	PagedResourcesAssembler<CounterResponseRepresentation> pagedAssembler;
+    @Autowired
+    PagedResourcesAssembler<CounterResponseRepresentation> pagedAssembler;
 
-	@GetMapping("{counter}/stats")
-	public ResponseEntity<?> getCounterStatistics(@NotBlank @PathVariable String counter) {
+    @GetMapping("{counter}/stats")
+    public ResponseEntity<?> getCounterStatistics(@NotBlank @PathVariable String counter) {
 
-		EntityModel<?> entity = counterStatisticsResponseRepresentationAssembler.toModel(
-			CounterStatisticsResponseRepresentation.builder()
-				.counter(counter)
-				.statistics(counterService.getCounterStatistics(counter))
-				.build()
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
-	}
+        EntityModel<?> entity = counterStatisticsResponseRepresentationAssembler.toModel(
+            CounterStatisticsResponseRepresentation.builder()
+                .counter(counter)
+                .statistics(counterService.getCounterStatistics(counter))
+                .build()
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
+    }
 
-	@GetMapping("{counter}/users")
-	public ResponseEntity<?> getCounterOwners(@NotBlank @PathVariable String counter, final Pageable page) {
+    @GetMapping("{counter}/users")
+    public ResponseEntity<?> getCounterOwners(@NotBlank @PathVariable String counter, final Pageable page) {
 
-		PagedModel<?> entities = pagedAssembler.toModel(
-			counterService.findAllByCounter(counter, page),
-			counterResponseRepresentationAssembler
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        PagedModel<?> entities = pagedAssembler.toModel(
+            counterService.findAllByCounter(counter, page),
+            counterResponseRepresentationAssembler
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 
-	@GetMapping("{counter}")
-	public ResponseEntity<?> getCounter(@NotBlank @PathVariable String counter, Authentication authentication) {
+    @GetMapping("{counter}")
+    public ResponseEntity<?> getCounter(@NotBlank @PathVariable String counter, Authentication authentication) {
 
-		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
-			counterService.getCounter(counter, authentication.getName())
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
-	}
+        EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
+            counterService.getCounter(counter, authentication.getName())
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
+    }
 
-	@PostMapping("{counter}/increment")
-	public ResponseEntity<?> increment(
-			@NotBlank @PathVariable String counter, @RequestBody double value, Authentication authentication) {
+    @PostMapping("{counter}/increment")
+    public ResponseEntity<?> increment(
+        @NotBlank @PathVariable String counter, @RequestBody double value, Authentication authentication) {
 
-		String ownerId = authentication == null ? Counter.AnonymousOwner :authentication.getName();
-		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
-			counterService.increment(counter, ownerId, value)
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
-	}
+        String ownerId = authentication == null ? Counter.AnonymousOwner : authentication.getName();
+        EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
+            counterService.increment(counter, ownerId, value)
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
+    }
 
-	@PostMapping("batch")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> batchUpdate(
-			@RequestBody List<BatchCounterRequestRepresentation> counters,
-			Authentication authentication)
-	{
-		List<?> entities = counters.stream()
-				.filter(item -> item.getOperation().equalsIgnoreCase("update"))
-				.map(item -> counterService.setCounter(item.getCounter(), authentication.getName(), item.getValue()))
-				.collect(Collectors.toList());
-		counters.stream()
-				.filter(item -> item.getOperation().equalsIgnoreCase("delete"))
-				.forEach(item -> counterService.deleteCounter(item.getCounter(), authentication.getName()));
+    @PostMapping("batch")
+    @PreAuthorize("isAuthenticated")
+    public ResponseEntity<?> batchUpdate(
+        @RequestBody List<BatchCounterRequestRepresentation> counters,
+        Authentication authentication) {
 
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        List<?> entities = counters.stream()
+            .filter(item -> item.getOperation().equalsIgnoreCase("update"))
+            .map(item -> counterService.setCounter(item.getCounter(), authentication.getName(), item.getValue()))
+            .collect(Collectors.toList());
+        counters.stream()
+            .filter(item -> item.getOperation().equalsIgnoreCase("delete"))
+            .forEach(item -> counterService.deleteCounter(item.getCounter(), authentication.getName()));
 
-	@PostMapping("{counter}")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> addCounter(
-			@NotBlank @PathVariable String counter, @RequestBody double value, Authentication authentication)
-	{
-		EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
-			counterService.setCounter(counter, authentication.getName(), value)
-		);
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
-	}
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 
-	@DeleteMapping(value = "{counter}")
-	@PreAuthorize("isAuthenticated")
-	public ResponseEntity<?> deleteCounter(
-			@NotBlank @PathVariable String counter, Authentication authentication)
-	{
-		counterService.deleteCounter(counter, authentication.getName());
-		return ResponseEntity.noContent().build();
-	}
+    @PostMapping("{counter}")
+    @PreAuthorize("isAuthenticated")
+    public ResponseEntity<?> addCounter(
+        @NotBlank @PathVariable String counter, @RequestBody double value, Authentication authentication) {
+
+        EntityModel<?> entity = counterResponseRepresentationAssembler.toModel(
+            counterService.setCounter(counter, authentication.getName(), value)
+        );
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entity);
+    }
+
+    @DeleteMapping(value = "{counter}")
+    @PreAuthorize("isAuthenticated")
+    public ResponseEntity<?> deleteCounter(
+        @NotBlank @PathVariable String counter, Authentication authentication) {
+
+        counterService.deleteCounter(counter, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
 }

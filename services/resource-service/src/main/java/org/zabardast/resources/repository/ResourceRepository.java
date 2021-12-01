@@ -10,6 +10,8 @@ import org.zabardast.resources.model.ResourceKey;
 @Repository
 public interface ResourceRepository extends PagingAndSortingRepository<Resource, ResourceKey> {
     public Page<Resource> findByOwner(String ownerId, Pageable page);
+
     public Page<Resource> findByResource(String resource, Pageable page);
+
     public Page<Resource> findByResourceAndOwner(String resource, String ownerId, Pageable page);
 }

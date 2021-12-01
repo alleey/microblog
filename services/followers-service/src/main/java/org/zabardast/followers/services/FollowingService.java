@@ -33,8 +33,7 @@ import org.zabardast.followers.services.exceptions.FollowingNotFoundException;
 
 @Slf4j
 @Service
-public class FollowingService
-{
+public class FollowingService {
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
@@ -47,23 +46,21 @@ public class FollowingService
 
     @Autowired
     FilterPredicateConverter filterPredicateConverter;
-
+    @Autowired
+    ModelMapper modelMapper;
     @Autowired
     private FollowingRepository followingRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
-
     @PostConstruct
     public void init() {
-        Converter<?,?> converter = new Converter<Following, FollowResponseRepresentation>()
-        {
-            public FollowResponseRepresentation convert(MappingContext<Following, FollowResponseRepresentation> context)
-            {
+
+        Converter<?, ?> converter = new Converter<Following, FollowResponseRepresentation>() {
+            public FollowResponseRepresentation convert(MappingContext<Following, FollowResponseRepresentation> context) {
+
                 Following s = context.getSource();
                 FollowResponseRepresentation d = context.getDestination();
 
-                if(d == null)
+                if (d == null)
                     d = new FollowResponseRepresentation();
 
                 d.setUserId(s.getUser());
@@ -76,41 +73,44 @@ public class FollowingService
 
     @Transactional
     public FollowResponseRepresentation listOne(@NotNull String userId, @NotNull String followerId) {
+
         FollowingKey key = new FollowingKey(userId, followerId);
         return followingRepository
-                .findById(key)
-                .map(i -> modelMapper.map(i, FollowResponseRepresentation.class))
-                .orElseThrow(() -> new FollowingNotFoundException(userId, followerId));
+            .findById(key)
+            .map(i -> modelMapper.map(i, FollowResponseRepresentation.class))
+            .orElseThrow(() -> new FollowingNotFoundException(userId, followerId));
     }
 
     @Transactional
     public Page<FollowResponseRepresentation> listFollowers(@NotNull String userId, @NotNull Pageable pageable) {
+
         return followingRepository
-                .findAllByUser(userId, pageable)
-                .map(i -> modelMapper.map(i, FollowResponseRepresentation.class));
+            .findAllByUser(userId, pageable)
+            .map(i -> modelMapper.map(i, FollowResponseRepresentation.class));
     }
 
     @Transactional
     public Page<FollowResponseRepresentation> listFollowing(@NotNull String userId, @NotNull Pageable pageable) {
+
         return followingRepository
-                .findAllByFollower(userId, pageable)
-                .map(i -> modelMapper.map(i, FollowResponseRepresentation.class));
+            .findAllByFollower(userId, pageable)
+            .map(i -> modelMapper.map(i, FollowResponseRepresentation.class));
     }
 
     @Transactional
     public Page<FollowResponseRepresentation> findFollowers(
-            @NotNull String userId,
-            @NotNull Filter criteria,
-            @NotNull Pageable pageable)
-    {
+        @NotNull String userId,
+        @NotNull Filter criteria,
+        @NotNull Pageable pageable) {
+
         CriteriaQuery<Following> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
-                Following.class,
-                Filter.builder().conditions(Arrays.asList(
-                    // Filter all records where userId is following
-                    Condition.builder().attribute("user").operator(Operator.EQ).value(userId).build(),
-                    criteria
-                )).build(),
-                pageable.getSort());
+            Following.class,
+            Filter.builder().conditions(Arrays.asList(
+                // Filter all records where userId is following
+                Condition.builder().attribute("user").operator(Operator.EQ).value(userId).build(),
+                criteria
+            )).build(),
+            pageable.getSort());
         TypedQuery<Following> query = entityManager.createQuery(criteriaQuery);
 
         int totalRows = query.getResultList().size();
@@ -123,18 +123,18 @@ public class FollowingService
 
     @Transactional
     public Page<FollowResponseRepresentation> findFollowing(
-            @NotNull String userId,
-            @NotNull Filter criteria,
-            @NotNull Pageable pageable)
-    {
+        @NotNull String userId,
+        @NotNull Filter criteria,
+        @NotNull Pageable pageable) {
+
         CriteriaQuery<Following> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
-                Following.class,
-                Filter.builder().conditions(Arrays.asList(
-                    // Filter all records where userId is followed
-                    Condition.builder().attribute("follower").operator(Operator.EQ).value(userId).build(),
-                    criteria
-                )).build(),
-                pageable.getSort());
+            Following.class,
+            Filter.builder().conditions(Arrays.asList(
+                // Filter all records where userId is followed
+                Condition.builder().attribute("follower").operator(Operator.EQ).value(userId).build(),
+                criteria
+            )).build(),
+            pageable.getSort());
         TypedQuery<Following> query = entityManager.createQuery(criteriaQuery);
 
         int totalRows = query.getResultList().size();
@@ -148,14 +148,14 @@ public class FollowingService
     // Make the user identitied by {userId} follow the user identified by {followRequest}
     @Transactional
     public FollowResponseRepresentation follow(@NotNull String userId,
-                                               @NotNull FollowRequestRepresentation followRequest)
-    {
+                                               @NotNull FollowRequestRepresentation followRequest) {
+
         FollowingKey key = new FollowingKey(followRequest.getFollowedId(), userId);
         Following following = Following.builder()
-                .user(followRequest.getFollowedId())
-                .follower(userId)
-                .createdOn(new Date())
-                .build();
+            .user(followRequest.getFollowedId())
+            .follower(userId)
+            .createdOn(new Date())
+            .build();
         Following saved = followingRepository.save(following);
         eventPublisher.publishEvent(eventFactory.followingCreated(this, saved));
         return modelMapper.map(saved, FollowResponseRepresentation.class);
@@ -164,8 +164,9 @@ public class FollowingService
     // Make the user identitied by {userId} unfollow the user identified by {followedId}
     @Transactional
     public void unfollow(@NotNull String userId, @NotNull String followedId) {
+
         FollowingKey key = new FollowingKey(followedId, userId);
-        if(followingRepository.existsById(key)) {
+        if (followingRepository.existsById(key)) {
             followingRepository.deleteById(key);
             eventPublisher.publishEvent(eventFactory.followingDeleted(this, key));
         }

@@ -9,10 +9,10 @@ import org.zabardast.stats.dto.CounterStatisticsResponseRepresentation;
 
 @Component
 public class CounterStatisticsResponseRepresentationAssembler implements
-        RepresentationModelAssembler<CounterStatisticsResponseRepresentation, EntityModel<CounterStatisticsResponseRepresentation>>
-{
+    RepresentationModelAssembler<CounterStatisticsResponseRepresentation, EntityModel<CounterStatisticsResponseRepresentation>> {
     @Override
     public EntityModel<CounterStatisticsResponseRepresentation> toModel(CounterStatisticsResponseRepresentation counter) {
+
         return EntityModel.of(
             counter,
             WebMvcLinkBuilder.linkTo(

@@ -15,6 +15,7 @@ public class ResourceOwnership {
     ResourceService resourceService;
 
     public boolean require(String resourceId, String folder, Authentication authentication) {
+
         ResourceResponseRepresentation resource = resourceService.getResource(new ResourceKey(resourceId, folder));
         return resource.getOwner().equalsIgnoreCase(authentication.getName());
     }

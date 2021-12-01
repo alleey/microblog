@@ -34,63 +34,63 @@ import org.zabardast.followers.services.FollowingService;
 @ActiveProfiles("test")
 class FollowingController_AnonymousTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockBean
-	private FollowingService followingService;
+    @MockBean
+    private FollowingService followingService;
 
-	private MockFollowersData blogData = new MockFollowersData();
+    private MockFollowersData blogData = new MockFollowersData();
 
-	@Test
-	void getAllFollowing() throws Exception {
+    @Test
+    void getAllFollowing() throws Exception {
 
-		Pageable pageable = PageRequest.of(0, 20);
-		PageImpl page = new PageImpl(
-				blogData.AllGuestFollowing.subList(0, Math.min(pageable.getPageSize(), blogData.AllGuestFollowing.size())),
-				pageable,
-				blogData.AllGuestFollowing.size());
+        Pageable pageable = PageRequest.of(0, 20);
+        PageImpl page = new PageImpl(
+            blogData.AllGuestFollowing.subList(0, Math.min(pageable.getPageSize(), blogData.AllGuestFollowing.size())),
+            pageable,
+            blogData.AllGuestFollowing.size());
 
-		Mockito.when(followingService.listFollowing(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.get("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON);
+        Mockito.when(followingService.listFollowing(MockFollowersData.UserIdGuest, pageable)).then(r -> page);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .get("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
-				.andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
-				.andExpect(jsonPath("$.page.size", is(page.getSize())))
-				.andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
-				.andExpect(jsonPath("$.page.totalElements", is((int)page.getTotalElements())))
-				.andExpect(jsonPath("$.page.number", is(page.getNumber())));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaTypes.HAL_JSON_VALUE))
+            .andExpect(jsonPath("$._embedded.follows", hasSize(page.getNumberOfElements())))
+            .andExpect(jsonPath("$.page.size", is(page.getSize())))
+            .andExpect(jsonPath("$.page.totalPages", is(page.getTotalPages())))
+            .andExpect(jsonPath("$.page.totalElements", is((int) page.getTotalElements())))
+            .andExpect(jsonPath("$.page.number", is(page.getNumber())));
+    }
 
-	@Test
-	void addFollowerRequiresLogin() throws Exception {
+    @Test
+    void addFollowerRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockFollowersData.objectToJson(blogData.AllGuestFollowers.get(0)));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockFollowersData.objectToJson(blogData.AllGuestFollowers.get(0)));
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 
-	@Test
-	void removeFollowerRequiresLogin() throws Exception {
+    @Test
+    void removeFollowerRequiresLogin() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .delete("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_UNAUTHORIZED));
+    }
 }

@@ -12,30 +12,30 @@ import org.zabardast.userprofile.dto.keycloak.KeycloakCreateUserRequestRepresent
 import org.zabardast.userprofile.dto.keycloak.KeycloakPasswordCredentialsRepresentation;
 
 @Service
-public class UserAccountService
-{
+public class UserAccountService {
     @Autowired
     private KeycloakService keycloakService;
 
     @Transactional
     public String register(@NotNull RegisterRequestRepresentation requestRepresentation) {
+
         KeycloakCreateUserRequestRepresentation request = KeycloakCreateUserRequestRepresentation.builder()
-                .username(requestRepresentation.getUsername())
-                .firstName(requestRepresentation.getFirstName())
-                .lastName(requestRepresentation.getLastName())
-                .email(requestRepresentation.getEmail())
-                .credentials(
-                    KeycloakPasswordCredentialsRepresentation.builder()
-                        .value(requestRepresentation.getPassword())
-                        .temporary(false)
-                        .build()
-                )
-                .emailVerified(true)
-                .enabled(true)
-                .totp(false)
-                .build();
+            .username(requestRepresentation.getUsername())
+            .firstName(requestRepresentation.getFirstName())
+            .lastName(requestRepresentation.getLastName())
+            .email(requestRepresentation.getEmail())
+            .credentials(
+                KeycloakPasswordCredentialsRepresentation.builder()
+                    .value(requestRepresentation.getPassword())
+                    .temporary(false)
+                    .build()
+            )
+            .emailVerified(true)
+            .enabled(true)
+            .totp(false)
+            .build();
         ResponseEntity<?> response = keycloakService.create(request);
-        if(response.getStatusCode() == HttpStatus.CREATED) {
+        if (response.getStatusCode() == HttpStatus.CREATED) {
             URI link = response.getHeaders().getLocation();
             return link.toString();
         }
@@ -45,6 +45,7 @@ public class UserAccountService
 
     @Transactional
     public void unregister(@NotNull String userId) {
+
         ResponseEntity<?> response = keycloakService.delete(userId);
     }
 }

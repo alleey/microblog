@@ -31,87 +31,84 @@ import org.zabardast.followers.services.FollowingService;
 @ActiveProfiles("test")
 class FollowingController_UserTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    ModelMapper modelMapper;
+    @Autowired
+    private MockMvc mockMvc;
+    @MockBean
+    private FollowingService followingService;
+    private MockFollowersData blogData = new MockFollowersData();
 
-	@MockBean
-	private FollowingService followingService;
+    @Test
+    @WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
+    void userCanAddFollowerToOwn() throws Exception {
 
-	@Autowired
-	ModelMapper modelMapper;
+        FollowRequestRepresentation request = FollowRequestRepresentation.builder()
+            .followedId(MockFollowersData.UserIdAdmin)
+            .build();
 
-	private MockFollowersData blogData = new MockFollowersData();
+        FollowResponseRepresentation follower = MockFollowersData
+            .createFollowsResponse(MockFollowersData.UserIdAdmin, MockFollowersData.UserIdGuest);
+        Mockito.when(followingService
+                .follow(MockFollowersData.UserIdGuest, request))
+            .then(r -> follower);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockFollowersData.objectToJson(request));
 
-	@Test
-	@WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
-	void userCanAddFollowerToOwn() throws Exception {
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().is(HttpStatus.SC_CREATED));
+    }
 
-		FollowRequestRepresentation request = FollowRequestRepresentation.builder()
-				.followedId(MockFollowersData.UserIdAdmin)
-				.build();
+    @Test
+    @WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
+    void userCanRemoveFollowerFromOwn() throws Exception {
 
-		FollowResponseRepresentation follower = MockFollowersData
-				.createFollowsResponse(MockFollowersData.UserIdAdmin, MockFollowersData.UserIdGuest);
-		Mockito.when(followingService
-				.follow(MockFollowersData.UserIdGuest, request))
-				.then(r -> follower);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/users/{userId}/following", MockFollowersData.UserIdGuest)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockFollowersData.objectToJson(request));
+        Mockito.doNothing().when(followingService)
+            .unfollow(MockFollowersData.UserIdAdmin, MockFollowersData.UserIdGuest);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .delete("/api/v1/users/{userId}/following/{follower}", MockFollowersData.UserIdGuest, MockFollowersData.UserIdAdmin)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andExpect(status().is(HttpStatus.SC_CREATED));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_NO_CONTENT))
+            .andExpect(jsonPath("$").doesNotExist());
+    }
 
-	@Test
-	@WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
-	void userCanRemoveFollowerFromOwn() throws Exception {
+    @Test
+    @WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
+    void userCannotAddFollowerToOther() throws Exception {
 
-		Mockito.doNothing().when(followingService)
-				.unfollow(MockFollowersData.UserIdAdmin, MockFollowersData.UserIdGuest);
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/users/{userId}/following/{follower}", MockFollowersData.UserIdGuest, MockFollowersData.UserIdAdmin)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
+        FollowRequestRepresentation request = FollowRequestRepresentation.builder()
+            .followedId(MockFollowersData.UserIdAdmin)
+            .build();
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_NO_CONTENT))
-				.andExpect(jsonPath("$").doesNotExist());
-	}
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .post("/api/v1/users/{userId}/following", MockFollowersData.UserIdService)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(MockFollowersData.objectToJson(request));
 
-	@Test
-	@WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
-	void userCannotAddFollowerToOther() throws Exception {
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_FORBIDDEN));
+    }
 
-		FollowRequestRepresentation request = FollowRequestRepresentation.builder()
-				.followedId(MockFollowersData.UserIdAdmin)
-				.build();
+    @Test
+    @WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
+    void userCannotRemoveFollowerFromOther() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/api/v1/users/{userId}/following", MockFollowersData.UserIdService)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(MockFollowersData.objectToJson(request));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+            .delete("/api/v1/users/{userId}/following/{follower}", MockFollowersData.UserIdService, MockFollowersData.UserIdAdmin)
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON);
 
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
-	}
-
-	@Test
-	@WithMockUser(username = MockFollowersData.UserIdGuest, roles = "USER")
-	void userCannotRemoveFollowerFromOther() throws Exception {
-
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.delete("/api/v1/users/{userId}/following/{follower}", MockFollowersData.UserIdService, MockFollowersData.UserIdAdmin)
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
-
-		mockMvc.perform(requestBuilder)
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().is(HttpStatus.SC_FORBIDDEN));
-	}
+        mockMvc.perform(requestBuilder)
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().is(HttpStatus.SC_FORBIDDEN));
+    }
 }

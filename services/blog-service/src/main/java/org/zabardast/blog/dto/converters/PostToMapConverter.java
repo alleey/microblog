@@ -8,24 +8,26 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.zabardast.blog.controllers.PostsController;
 import org.zabardast.blog.model.Post;
 
-public class PostToMapConverter implements Converter<Post, Map<String, String>> {
+public class PostToMapConverter implements Converter<Post, Map<String, Object>> {
 
     public static final String ATTR_ID = "postId";
     public static final String ATTR_OWNER = "owner";
     public static final String ATTR_REF = "ref";
 
     @Override
-    public Map<String, String> convert(MappingContext<Post, Map<String, String>> context) {
-        Post s = context.getSource();
-        Map<String, String> d = context.getDestination();
+    public Map<String, Object> convert(MappingContext<Post, Map<String, Object>> context) {
 
-        if(d == null)
+        Post s = context.getSource();
+        Map<String, Object> d = context.getDestination();
+
+        if (d == null)
             d = new HashMap<>();
 
         d.putAll(Map.of(
-                ATTR_ID, Long.toString(s.getId()),
-                ATTR_OWNER, s.getOwner(),
-                ATTR_REF, WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PostsController.class).getPostById(s.getId())).toString()
+            ATTR_ID, Long.toString(s.getId()),
+            ATTR_OWNER, s.getOwner(),
+            ATTR_REF, WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PostsController.class).getPostById(s.getId())).toString(),
+            "topics", s.getTopics()
         ));
         return d;
     }

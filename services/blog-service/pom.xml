@@ -247,7 +247,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<repository>alpha/${project.groupId}/${project.artifactId}</repository>
+					<repository>zabardast/${project.groupId}/${project.artifactId}</repository>
 					<tag>${project.version}</tag>
 					<contextDirectory>${project.basedir}</contextDirectory>
 					<dockerfile>Dockerfile</dockerfile>
@@ -258,17 +258,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>2020.0.3-SNAPSHOT</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

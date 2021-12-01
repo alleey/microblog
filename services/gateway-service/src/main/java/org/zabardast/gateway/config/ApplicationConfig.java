@@ -11,6 +11,7 @@ public class ApplicationConfig {
     @Bean
     @LoadBalanced
     RestTemplate restTemplate() {
+
         return new RestTemplate();
     }
 }

@@ -1,11 +1,5 @@
 package org.zabardast.blog;
 
-import org.zabardast.blog.dto.CommentRequestRepresentation;
-import org.zabardast.blog.dto.CommentResponseRepresentation;
-import org.zabardast.blog.dto.PostRequestRepresentation;
-import org.zabardast.blog.dto.PostResponseRepresentation;
-import org.zabardast.blog.dto.TopicRequestRepresentation;
-import org.zabardast.blog.dto.TopicResponseRepresentation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.slugify.Slugify;
@@ -15,6 +9,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.zabardast.blog.dto.CommentRequestRepresentation;
+import org.zabardast.blog.dto.CommentResponseRepresentation;
+import org.zabardast.blog.dto.PostRequestRepresentation;
+import org.zabardast.blog.dto.PostResponseRepresentation;
+import org.zabardast.blog.dto.TopicRequestRepresentation;
+import org.zabardast.blog.dto.TopicResponseRepresentation;
 
 public final class MockBlogData {
 
@@ -42,78 +42,85 @@ public final class MockBlogData {
     public MockBlogData() {
 
         AllTopics = IntStream.range(0, TopicNames.length)
-                .mapToObj(t -> createBlogTopicResponse(t, TopicNames[t]))
-                .collect(Collectors.toList());
+            .mapToObj(t -> createBlogTopicResponse(t, TopicNames[t]))
+            .collect(Collectors.toList());
         TopicGeneral = AllTopics.get(0);
 
         AlLUserPosts = IntStream.range(0, 15)
-                .mapToObj(i -> createBlogPostResponse(i, String.format("Post %s",i), String.format("Text %s",i), UserIdGuest, TopicGeneral))
-                .collect(Collectors.toList());
+            .mapToObj(i -> createBlogPostResponse(i, String.format("Post %s", i), String.format("Text %s", i), UserIdGuest, TopicGeneral))
+            .collect(Collectors.toList());
         AllAdminPosts = IntStream.range(0, 10)
-                .mapToObj(i -> createBlogPostResponse(i+15, String.format("Post %s",i), String.format("Text %s",i), UserIdAdmin, TopicGeneral))
-                .collect(Collectors.toList());
+            .mapToObj(i -> createBlogPostResponse(i + 15, String.format("Post %s", i), String.format("Text %s", i), UserIdAdmin, TopicGeneral))
+            .collect(Collectors.toList());
         AllPosts = Stream.concat(AlLUserPosts.stream(), AllAdminPosts.stream())
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
         AllUserPostComments = IntStream.range(0, 15)
-                .mapToObj(i -> createBlogCommentResponse(i, String.format("Comment %s",i), UserIdGuest, AlLUserPosts.get(0).getId()))
-                .collect(Collectors.toList());
+            .mapToObj(i -> createBlogCommentResponse(i, String.format("Comment %s", i), UserIdGuest, AlLUserPosts.get(0).getId()))
+            .collect(Collectors.toList());
         AllAdminPostComments = IntStream.range(0, 15)
-                .mapToObj(i -> createBlogCommentResponse(i, String.format("Comment %s",i), UserIdAdmin, AllAdminPosts.get(0).getId()))
-                .collect(Collectors.toList());
+            .mapToObj(i -> createBlogCommentResponse(i, String.format("Comment %s", i), UserIdAdmin, AllAdminPosts.get(0).getId()))
+            .collect(Collectors.toList());
     }
 
     public static CommentRequestRepresentation createBlogCommentRequest(String text) {
+
         return CommentRequestRepresentation.builder()
-                .text(text)
-                .build();
+            .text(text)
+            .build();
     }
 
     public static CommentResponseRepresentation createBlogCommentResponse(long id, String text, String userId, Long postId) {
+
         return CommentResponseRepresentation.builder()
-                .id(id)
-                .text(text)
-                .owner(userId)
-                .postId(postId)
-                .build();
+            .id(id)
+            .text(text)
+            .owner(userId)
+            .postId(postId)
+            .build();
     }
 
     public static PostRequestRepresentation createBlogPostRequest(String title, String text) {
+
         Slugify slg = new Slugify();
         return PostRequestRepresentation.builder()
-                .title(title)
-                .slug(slg.slugify(title))
-                .text(text)
-                .build();
+            .title(title)
+            .slug(slg.slugify(title))
+            .text(text)
+            .build();
     }
 
     public static PostResponseRepresentation createBlogPostResponse(long id, String title, String text, String userId, TopicResponseRepresentation topic) {
+
         Slugify slg = new Slugify();
         return PostResponseRepresentation.builder()
-                .id(id)
-                .title(title)
-                .slug(slg.slugify(title))
-                .text(text)
-                .owner(userId)
-                .topics(Collections.singleton(topic))
-                .createdOn(new Date())
-                .build();
+            .id(id)
+            .title(title)
+            .slug(slg.slugify(title))
+            .text(text)
+            .owner(userId)
+            .topics(Collections.singleton(topic))
+            .createdOn(new Date())
+            .build();
     }
 
     public static TopicRequestRepresentation createBlogTopicRequest(String caption) {
+
         return TopicRequestRepresentation.builder()
-                .caption(caption)
-                .build();
+            .caption(caption)
+            .build();
     }
 
     public static TopicResponseRepresentation createBlogTopicResponse(long id, String caption) {
+
         return TopicResponseRepresentation.builder()
-                .id(id)
-                .caption(caption)
-                .build();
+            .id(id)
+            .caption(caption)
+            .build();
     }
 
     public static String objectToJson(Object post) throws JsonProcessingException {
+
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(post);
     }

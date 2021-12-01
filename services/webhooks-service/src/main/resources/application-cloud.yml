@@ -1,0 +1,7 @@
+spring:
+  config:
+    import: "configserver:${CONFIG_URI:http://localhost:8888/config}?fail-fast=true&max-attempts=${CONFIG_RETRY_MAX_ATTEMPTS:15}&max-interval=${CONFIG_RETRY_MAX_INTERVAL:15000}&multiplier=${CONFIG_RETRY_MULTIPLIER:1.2}&initial-interval=${CONFIG_RETRY_INITIAL_INTERVAL:3000}"
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false

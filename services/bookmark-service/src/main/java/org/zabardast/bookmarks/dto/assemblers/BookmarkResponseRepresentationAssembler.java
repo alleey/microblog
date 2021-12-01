@@ -9,9 +9,10 @@ import org.zabardast.bookmarks.dto.BookmarkResponseRepresentation;
 
 @Component
 public class BookmarkResponseRepresentationAssembler implements
-        RepresentationModelAssembler<BookmarkResponseRepresentation, EntityModel<BookmarkResponseRepresentation>> {
+    RepresentationModelAssembler<BookmarkResponseRepresentation, EntityModel<BookmarkResponseRepresentation>> {
     @Override
     public EntityModel<BookmarkResponseRepresentation> toModel(BookmarkResponseRepresentation bookmark) {
+
         return EntityModel.of(
             bookmark,
             WebMvcLinkBuilder.linkTo(BookmarksController.class).slash(bookmark.getId()).withSelfRel()

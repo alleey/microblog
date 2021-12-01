@@ -1,6 +1,5 @@
 package org.zabardast.blog.dto;
 
-import javax.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,9 +1,6 @@
 package org.zabardast.bookmarks.dto;
 
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

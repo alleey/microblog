@@ -20,30 +20,34 @@ public class ApplicationConfig {
 
     @Bean
     OAuth2AuthorizedClientManager authorizedClientManager(ClientRegistrationRepository clients) {
+
         OAuth2AuthorizedClientService service =
-                new InMemoryOAuth2AuthorizedClientService(clients);
+            new InMemoryOAuth2AuthorizedClientService(clients);
         AuthorizedClientServiceOAuth2AuthorizedClientManager manager =
-                new AuthorizedClientServiceOAuth2AuthorizedClientManager(clients, service);
+            new AuthorizedClientServiceOAuth2AuthorizedClientManager(clients, service);
         OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .clientCredentials()
-                        .build();
+            OAuth2AuthorizedClientProviderBuilder.builder()
+                .clientCredentials()
+                .build();
         manager.setAuthorizedClientProvider(authorizedClientProvider);
         return manager;
     }
 
     @Bean
     public ClientCredentialsFeignRequestInterceptor requestInterceptor(OAuth2AuthorizedClientManager authorizedClientManager) {
+
         return new ClientCredentialsFeignRequestInterceptor(authorizedClientManager, "keycloak");
     }
 
     @Bean
     ForwardedHeaderFilter forwardedHeaderFilter() {
+
         return new ForwardedHeaderFilter();
     }
 
     @Bean
     public ModelMapper modelMapper() {
+
         return new ModelMapper();
     }
 }

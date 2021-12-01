@@ -15,6 +15,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+
         http.cors();
         //http.authorizeExchange(e -> e.anyExchange().authenticated());
         //http.oauth2Login(Customizer.withDefaults());

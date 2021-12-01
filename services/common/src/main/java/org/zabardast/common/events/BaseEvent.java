@@ -11,19 +11,29 @@ public abstract class BaseEvent extends ApplicationEvent {
     private String principal;
 
     public BaseEvent(Object source) {
+
         super(source);
         this.data = new HashMap<>();
     }
+
     public BaseEvent(Object source, @NotNull Map<String, Object> data) {
+
         super(source);
         this.data = data;
     }
 
     public final Map<String, Object> attributes() {
+
         return data;
     }
+
     public final String getPrincipal() {
+
         return principal;
     }
-    public final void setPrincipal(String principal) { this.principal = principal; }
+
+    public final void setPrincipal(String principal) {
+
+        this.principal = principal;
+    }
 }

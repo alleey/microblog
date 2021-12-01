@@ -28,8 +28,7 @@ import org.zabardast.stats.services.exceptions.CounterNotFoundException;
 
 @Slf4j
 @Service
-public class CounterService
-{
+public class CounterService {
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
@@ -42,50 +41,52 @@ public class CounterService
 
     @Autowired
     FilterPredicateConverter filterPredicateConverter;
-
+    @Autowired
+    ModelMapper modelMapper;
     @Autowired
     private CounterRepository counterRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
-
     @Transactional
     public CounterStatistics getCounterStatistics(@NotNull String counterId) {
+
         CounterStatistics stats = counterRepository
-                .getCounterStatistics(counterId)
-                .orElseThrow(() -> new CounterNotFoundException(counterId));
+            .getCounterStatistics(counterId)
+            .orElseThrow(() -> new CounterNotFoundException(counterId));
         return stats;
     }
 
     @Transactional
     public CounterResponseRepresentation getCounter(@NotNull String counterId, @NotNull String ownerId) {
+
         Counter counter = counterRepository
-                .findById(new CounterKey(counterId, ownerId))
-                .orElseThrow(() -> new CounterNotFoundException(counterId));
+            .findById(new CounterKey(counterId, ownerId))
+            .orElseThrow(() -> new CounterNotFoundException(counterId));
         return modelMapper.map(counter, CounterResponseRepresentation.class);
     }
 
     @Transactional
     public Page<CounterResponseRepresentation> findAllByCounter(@NotNull String counterId, @NotNull Pageable pageable) {
+
         return counterRepository
-                .findByCounter(counterId, pageable)
-                .map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
+            .findByCounter(counterId, pageable)
+            .map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
     }
 
     @Transactional
     public Page<CounterResponseRepresentation> findAllByOwner(@NotNull String ownerId, @NotNull Pageable pageable) {
+
         return counterRepository
-                .findByOwner(ownerId, pageable)
-                .map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
+            .findByOwner(ownerId, pageable)
+            .map(i -> modelMapper.map(i, CounterResponseRepresentation.class));
     }
 
     @Transactional
     public Page<CounterResponseRepresentation> findAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<Counter> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
-                Counter.class,
-                criteria,
-                pageable.getSort());
+            Counter.class,
+            criteria,
+            pageable.getSort());
         TypedQuery<Counter> query = entityManager.createQuery(criteriaQuery);
 
         int totalRows = query.getResultList().size();
@@ -98,45 +99,47 @@ public class CounterService
 
     @Transactional
     public CounterResponseRepresentation newCounter(@NotNull String counterId, @NotNull String ownerId, double value) {
+
         Counter counter = Counter.builder()
-                .counter((counterId))
-                .owner(ownerId)
-                .value(value)
-                .createdOn(new Date())
-                .build();
+            .counter((counterId))
+            .owner(ownerId)
+            .value(value)
+            .createdOn(new Date())
+            .build();
         Counter saved = counterRepository.save(counter);
         eventPublisher.publishEvent(eventFactory.counterCreated(this, saved));
         return modelMapper.map(saved, CounterResponseRepresentation.class);
     }
 
-    public CounterResponseRepresentation setCounter(@NotNull String counterId, @NotNull String ownerId, double value)
-    {
+    public CounterResponseRepresentation setCounter(@NotNull String counterId, @NotNull String ownerId, double value) {
+
         return this.setInternal(counterId, ownerId, (f) -> value);
     }
 
-    public CounterResponseRepresentation increment(@NotNull String counterId, @NotNull String ownerId, double value)
-    {
+    public CounterResponseRepresentation increment(@NotNull String counterId, @NotNull String ownerId, double value) {
+
         return this.setInternal(counterId, ownerId, (f) -> value + f);
     }
 
-    CounterResponseRepresentation setInternal(@NotNull String counterId, @NotNull String ownerId, Function<Double, Double> valueSetter)
-    {
+    CounterResponseRepresentation setInternal(@NotNull String counterId, @NotNull String ownerId, Function<Double, Double> valueSetter) {
+
         return counterRepository.findById(new CounterKey(counterId, ownerId))
-                .map(found -> {
-                    found.setValue(valueSetter.apply(found.getValue()));
-                    Counter saved = counterRepository.save(found);
-                    eventPublisher.publishEvent(eventFactory.counterUpdated(this, saved));
-                    return modelMapper.map(saved, CounterResponseRepresentation.class);
-                })
-                .orElseGet(() -> {
-                    return newCounter(counterId, ownerId, valueSetter.apply(0d));
-                });
+            .map(found -> {
+                found.setValue(valueSetter.apply(found.getValue()));
+                Counter saved = counterRepository.save(found);
+                eventPublisher.publishEvent(eventFactory.counterUpdated(this, saved));
+                return modelMapper.map(saved, CounterResponseRepresentation.class);
+            })
+            .orElseGet(() -> {
+                return newCounter(counterId, ownerId, valueSetter.apply(0d));
+            });
     }
 
     @Transactional
     public void deleteCounter(@NotNull String counterId, @NotNull String ownerId) {
+
         CounterKey key = new CounterKey(counterId, ownerId);
-        if(counterRepository.existsById(key)) {
+        if (counterRepository.existsById(key)) {
             counterRepository.deleteById(key);
             eventPublisher.publishEvent(eventFactory.counterDeleted(this, key));
         }

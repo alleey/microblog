@@ -23,6 +23,7 @@ public class FlushOutboxTask {
 
     @Scheduled(fixedDelayString = "${service.tasks.flushoutbox.fixedDelay}")
     public void triggerOutboxFlush() {
+
         long now = System.currentTimeMillis() / 1000;
         log.info("Trigger peridic outbox flush - {}", LocalDateTime.now());
         applicationEventPublisher.publishEvent(new OutboxEvent(this, batchSize));

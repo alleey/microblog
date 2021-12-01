@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FollowingOwnership {
     public boolean require(String userId, Authentication authentication) {
+
         return userId.equalsIgnoreCase(authentication.getName());
     }
 }

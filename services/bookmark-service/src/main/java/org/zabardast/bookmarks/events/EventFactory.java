@@ -29,18 +29,22 @@ public class EventFactory {
 
     @PostConstruct
     public void init() {
+
         modelMapper.addConverter(new BookmarkToMapConverter());
     }
 
     public BookmarkCreatedEvent bookmarkCreated(Object source, @NotNull Bookmark bookmark) {
-        return new BookmarkCreatedEvent(source, modelMapper.map(bookmark,  Map.class));
+
+        return new BookmarkCreatedEvent(source, modelMapper.map(bookmark, Map.class));
     }
 
     public BookmarkUpdatedEvent bookmarkUpdated(Object source, @NotNull Bookmark bookmark) {
-        return new BookmarkUpdatedEvent(source, modelMapper.map(bookmark,  Map.class));
+
+        return new BookmarkUpdatedEvent(source, modelMapper.map(bookmark, Map.class));
     }
 
     public BookmarkDeletedEvent bookmarkDeleted(Object source, @NotNull Long bookmarkId) {
+
         return new BookmarkDeletedEvent(source,
             Map.of(BookmarkToMapConverter.ATTR_ID, Long.toString(bookmarkId))
         );
@@ -48,15 +52,15 @@ public class EventFactory {
 
     public Event domainEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
+        if (event.getPrincipal() == null)
             event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
 
         return Event.builder()
-                .instant(new Date())
-                .type(event.getClass().getName())
-                .principal(event.getPrincipal())
-                //.traceId(tracer.currentSpan().context().traceId())
-                .payload(JsonUtils.toJson(event.attributes()))
-                .build();
+            .instant(new Date())
+            .type(event.getClass().getName())
+            .principal(event.getPrincipal())
+            //.traceId(tracer.currentSpan().context().traceId())
+            .payload(JsonUtils.mapToJson(event.attributes()))
+            .build();
     }
 }

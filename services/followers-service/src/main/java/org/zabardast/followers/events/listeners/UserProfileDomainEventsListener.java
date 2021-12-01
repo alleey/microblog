@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.common.domain.DomainConstants;
 import org.zabardast.common.utils.JsonUtils;
 import org.zabardast.followers.dto.FollowResponseRepresentation;
@@ -29,16 +28,17 @@ public class UserProfileDomainEventsListener {
 
     @Bean
     public Consumer<Message<Event>> userProfileEvents() {
+
         return event -> {
-            final String eventName = (String)event.getHeaders().get(DomainConstants.HEADER_EVENT);
+            final String eventName = (String) event.getHeaders().get(DomainConstants.HEADER_EVENT);
             log.info("Received domain event " + eventName);
 
-            if(eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
+            if (eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
 
-                Map attributes = JsonUtils.fromJson(event.getPayload().getPayload());
+                Map attributes = JsonUtils.mapFromJson(event.getPayload().getPayload());
                 String userId = attributes.getOrDefault(ATTR_USER_ID, "").toString();
 
-                if(Strings.isNotBlank(userId)) {
+                if (Strings.isNotBlank(userId)) {
                     handleUserProfileDeletion(userId);
                 }
             }
@@ -49,15 +49,13 @@ public class UserProfileDomainEventsListener {
 
         log.info("handleUserProfileDeletion " + userId);
         Page<FollowResponseRepresentation> followings = followingService.listFollowers(userId, Pageable.unpaged());
-        for (FollowResponseRepresentation following: followings)
-        {
+        for (FollowResponseRepresentation following : followings) {
             followingService.unfollow(following.getFollowerId(), following.getUserId());
             log.info("Deleted orphaned follower " + following.getFollowerId() + " of " + following.getUserId());
         }
 
         followings = followingService.listFollowing(userId, Pageable.unpaged());
-        for (FollowResponseRepresentation following: followings)
-        {
+        for (FollowResponseRepresentation following : followings) {
             followingService.unfollow(following.getFollowerId(), following.getUserId());
             log.info("Deleted orphaned follower " + following.getFollowerId() + " of " + following.getUserId());
         }

@@ -9,9 +9,10 @@ import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
 
 @Component
 public class UserProfileResponseRepresentationAssembler implements
-        RepresentationModelAssembler<UserProfileResponseRepresentation, EntityModel<UserProfileResponseRepresentation>> {
+    RepresentationModelAssembler<UserProfileResponseRepresentation, EntityModel<UserProfileResponseRepresentation>> {
     @Override
     public EntityModel<UserProfileResponseRepresentation> toModel(UserProfileResponseRepresentation userProfile) {
+
         return EntityModel.of(
             userProfile,
             WebMvcLinkBuilder.linkTo(UserProfilesController.class).slash(userProfile.getId()).withSelfRel()

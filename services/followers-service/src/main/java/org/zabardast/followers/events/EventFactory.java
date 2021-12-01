@@ -30,31 +30,34 @@ public class EventFactory {
 
     @PostConstruct
     public void init() {
+
         modelMapper.addConverter(new FollowingToMapConverter());
     }
 
     public FollowingCreatedEvent followingCreated(Object source, @NotNull Following following) {
-        return new FollowingCreatedEvent(source, modelMapper.map(following,  Map.class));
+
+        return new FollowingCreatedEvent(source, modelMapper.map(following, Map.class));
     }
 
     public FollowingDeletedEvent followingDeleted(Object source, @NotNull FollowingKey key) {
+
         return new FollowingDeletedEvent(source,
             Map.of(FollowingToMapConverter.ATTR_ID, key.getUser(),
-                    FollowingToMapConverter.ATTR_FOLLOWER, key.getFollower())
+                FollowingToMapConverter.ATTR_FOLLOWER, key.getFollower())
         );
     }
 
     public Event domainEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
+        if (event.getPrincipal() == null)
             event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
 
         return Event.builder()
-                .instant(new Date())
-                .type(event.getClass().getName())
-                .principal(event.getPrincipal())
-                //.traceId(tracer.currentSpan().context().traceId())
-                .payload(JsonUtils.toJson(event.attributes()))
-                .build();
+            .instant(new Date())
+            .type(event.getClass().getName())
+            .principal(event.getPrincipal())
+            //.traceId(tracer.currentSpan().context().traceId())
+            .payload(JsonUtils.mapToJson(event.attributes()))
+            .build();
     }
 }

@@ -29,16 +29,17 @@ public class UserProfileDomainEventsListener {
 
     @Bean
     public Consumer<Message<Event>> userProfileEvents() {
+
         return event -> {
-            final String eventName = (String)event.getHeaders().get(DomainConstants.HEADER_EVENT);
+            final String eventName = (String) event.getHeaders().get(DomainConstants.HEADER_EVENT);
             log.info("Received domain event " + eventName);
 
-            if(eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
+            if (eventName.compareTo(DOMAIN_EVENT_USERPROFILE_DELETED) == 0) {
 
-                Map attributes = JsonUtils.fromJson(event.getPayload().getPayload());
+                Map attributes = JsonUtils.mapFromJson(event.getPayload().getPayload());
                 String userId = attributes.getOrDefault(ATTR_USER_ID, "").toString();
 
-                if(Strings.isNotBlank(userId)) {
+                if (Strings.isNotBlank(userId)) {
                     handleUserProfileDeletion(userId);
                 }
             }
@@ -49,11 +50,11 @@ public class UserProfileDomainEventsListener {
 
         log.info("handleUserProfileDeletion " + userId);
         Page<ResourceResponseRepresentation> resources = resourceManagerService.findByOwner(userId, Pageable.unpaged());
-        for (ResourceResponseRepresentation res: resources) {
+        for (ResourceResponseRepresentation res : resources) {
             ResourceKey rkey = ResourceKey.builder()
-                    .resource(res.getResource())
-                    .key(res.getKey())
-                    .build();
+                .resource(res.getResource())
+                .key(res.getKey())
+                .build();
             resourceManagerService.deleteResource(res.getKey(), res.getResource());
             log.info("Deleted orphaned res " + rkey);
         }

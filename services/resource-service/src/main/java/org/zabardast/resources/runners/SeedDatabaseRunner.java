@@ -30,7 +30,7 @@ class SeedDatabaseRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        if(!initialImportConfig.isEnabled()) {
+        if (!initialImportConfig.isEnabled()) {
             return;
         }
 
@@ -40,17 +40,16 @@ class SeedDatabaseRunner implements ApplicationRunner {
 
         try {
             for (File dir : storage.toFile().listFiles()) {
-                if(!dir.isDirectory())
+                if (!dir.isDirectory())
                     continue;
 
-                for (File file: dir.listFiles()) {
-                    if(!file.isFile())
+                for (File file : dir.listFiles()) {
+                    if (!file.isFile())
                         continue;
 
                     // Only import resources addressable through Rest/API
-                    if(!pattern.matcher(dir.getName()).matches() ||
-                            !pattern.matcher(file.getName()).matches())
-                    {
+                    if (!pattern.matcher(dir.getName()).matches() ||
+                        !pattern.matcher(file.getName()).matches()) {
                         log.warn("Ignoring import due to invalid names: " + dir.getName() + "/" + file.getName());
                         continue;
                     }
@@ -64,17 +63,17 @@ class SeedDatabaseRunner implements ApplicationRunner {
     }
 
     void importResource(String resource, String key, org.springframework.core.io.Resource contents) {
+
         try {
             ResourceResponseRepresentation resp = manager.newResource(
-                    Resource.AnonymousOwner,
-                    ResourceRequestRepresentation.builder()
-                        .resource(resource)
-                        .key(key)
-                        .build(),
-                    contents);
+                Resource.AnonymousOwner,
+                ResourceRequestRepresentation.builder()
+                    .resource(resource)
+                    .key(key)
+                    .build(),
+                contents);
             log.info(resp.toString());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.warn("Resource import encountered an error: " + e.getMessage());
         }
     }

@@ -5,6 +5,7 @@ import org.zabardast.userprofile.model.UserProfile;
 
 public class UserProfileAlreadyExistsException extends AlreadyExistsException {
     public UserProfileAlreadyExistsException(UserProfile userProfile) {
+
         super(String.format("UserProfile already exists %s", userProfile.getId()));
     }
 }

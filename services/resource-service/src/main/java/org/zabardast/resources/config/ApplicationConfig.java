@@ -10,10 +10,14 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @EnableScheduling
 public class ApplicationConfig {
     @Bean
-    ForwardedHeaderFilter forwardedHeaderFilter() { return new ForwardedHeaderFilter(); }
+    ForwardedHeaderFilter forwardedHeaderFilter() {
+
+        return new ForwardedHeaderFilter();
+    }
 
     @Bean
     public ModelMapper modelMapper() {
+
         return new ModelMapper();
     }
 }

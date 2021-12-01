@@ -24,15 +24,16 @@
 
 	<modules>
 		<module>common</module>
+		<module>config-service</module>
 		<module>eureka-service</module>
 		<module>gateway-service</module>
-		<module>config-service</module>
 		<module>blog-service</module>
 		<module>bookmark-service</module>
-		<module>resource-service</module>
 		<module>followers-service</module>
-		<module>userprofile-service</module>
+		<module>resource-service</module>
 		<module>stats-service</module>
+		<module>userprofile-service</module>
+		<module>webhooks-service</module>
 	</modules>
 
 	<repositories>

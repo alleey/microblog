@@ -31,77 +31,88 @@ public class EventFactory {
     ModelMapper modelMapper;
 
     @Autowired
-    private Tracer tracer;
+    Tracer tracer;
 
     @PostConstruct
     public void init() {
+
         modelMapper.addConverter(new PostToMapConverter());
         modelMapper.addConverter(new CommentToMapConverter());
         modelMapper.addConverter(new TopicToMapConverter());
     }
 
     public PostCreatedEvent postCreated(Object source, @NotNull Post post) {
-        return new PostCreatedEvent(source, modelMapper.map(post,  Map.class));
+
+        return new PostCreatedEvent(source, modelMapper.map(post, Map.class));
     }
 
     public PostUpdatedEvent postUpdated(Object source, @NotNull Post post) {
-        return new PostUpdatedEvent(source, modelMapper.map(post,  Map.class));
+
+        return new PostUpdatedEvent(source, modelMapper.map(post, Map.class));
     }
 
     public PostDeletedEvent postDeleted(Object source, @NotNull Long postId) {
+
         return new PostDeletedEvent(source,
             Map.of(PostToMapConverter.ATTR_ID, Long.toString(postId))
         );
     }
 
     public CommentCreatedEvent commentCreated(Object source, @NotNull Long postId, @NotNull Comment comment) {
+
         Map map = mapCommentCommon(postId, comment);
         return new CommentCreatedEvent(source, map);
     }
 
     public CommentUpdatedEvent commentUpdated(Object source, @NotNull Long postId, @NotNull Comment comment) {
+
         Map map = mapCommentCommon(postId, comment);
         return new CommentUpdatedEvent(source, map);
     }
 
     public CommentDeletedEvent commentDeleted(Object source, @NotNull Long postId, @NotNull Long commentId) {
+
         return new CommentDeletedEvent(source,
-                Map.of(PostToMapConverter.ATTR_ID, Long.toString(postId), CommentToMapConverter.ATTR_ID, Long.toString(commentId)));
+            Map.of(PostToMapConverter.ATTR_ID, Long.toString(postId), CommentToMapConverter.ATTR_ID, Long.toString(commentId)));
     }
 
     public TopicCreatedEvent topicCreated(Object source, @NotNull Topic topic) {
-        return new TopicCreatedEvent(source, modelMapper.map(topic,  Map.class));
+
+        return new TopicCreatedEvent(source, modelMapper.map(topic, Map.class));
     }
 
     public TopicUpdatedEvent topicUpdated(Object source, @NotNull Topic topic) {
-        return new TopicUpdatedEvent(source, modelMapper.map(topic,  Map.class));
+
+        return new TopicUpdatedEvent(source, modelMapper.map(topic, Map.class));
     }
 
     public TopicDeletedEvent topicDeleted(Object source, @NotNull Long topicId) {
+
         return new TopicDeletedEvent(source,
-                Map.of(PostToMapConverter.ATTR_ID, Long.toString(topicId))
+            Map.of(PostToMapConverter.ATTR_ID, Long.toString(topicId))
         );
     }
 
     public Event domainEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
+        if (event.getPrincipal() == null)
             event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
 
         return Event.builder()
-                .instant(new Date())
-                .type(event.getClass().getName())
-                .principal(event.getPrincipal())
-                //.traceId(tracer.currentSpan().context().traceId())
-                .payload(JsonUtils.toJson(event.attributes()))
-                .build();
+            .instant(new Date())
+            .type(event.getClass().getName())
+            .principal(event.getPrincipal())
+            //.traceId(tracer.currentSpan().context().traceId())
+            .payload(JsonUtils.mapToJson(event.attributes()))
+            .build();
     }
 
     private Map mapCommentCommon(@NotNull Long postId, @NotNull Comment comment) {
+
         Map map = modelMapper.map(comment, Map.class);
         map.put(PostToMapConverter.ATTR_ID, postId);
         map.put(CommentToMapConverter.ATTR_REF, WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PostCommentsController.class)
-                .getCommentById(postId, comment.getId())).toString());
+            .getCommentById(postId, comment.getId())).toString());
         return map;
     }
 }

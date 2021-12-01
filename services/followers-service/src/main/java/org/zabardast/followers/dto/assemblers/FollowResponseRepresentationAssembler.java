@@ -11,10 +11,10 @@ import org.zabardast.followers.dto.FollowResponseRepresentation;
 
 @Component
 public class FollowResponseRepresentationAssembler implements
-        RepresentationModelAssembler<FollowResponseRepresentation, EntityModel<FollowResponseRepresentation>>
-{
+    RepresentationModelAssembler<FollowResponseRepresentation, EntityModel<FollowResponseRepresentation>> {
     @Override
     public EntityModel<FollowResponseRepresentation> toModel(FollowResponseRepresentation follows) {
+
         return EntityModel.of(
             follows,
             WebMvcLinkBuilder.linkTo(

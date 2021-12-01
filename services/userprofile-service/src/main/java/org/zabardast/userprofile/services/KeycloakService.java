@@ -13,6 +13,7 @@ import org.zabardast.userprofile.dto.keycloak.KeycloakUserRepresentation;
 
 @FeignClient(name = "keycloak", url = "${service.keycloak.profiles-url}")
 public interface KeycloakService {
+
     @GetMapping("users")
     List<KeycloakUserRepresentation> users(@RequestParam("first") int first, @RequestParam("max") int max);
 

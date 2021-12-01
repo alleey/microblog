@@ -1,4 +1,3 @@
-
 package org.zabardast.blog.controllers;
 
 import java.util.List;
@@ -24,27 +23,30 @@ import org.zabardast.blog.services.PostTopicService;
 @Validated
 public class PostTopicsController {
 
-	@Autowired
-	PostTopicService postTopicService;
+    @Autowired
+    PostTopicService postTopicService;
 
-	@PostMapping()
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> assignPostTopic(@PathVariable("postId") Long postId, @RequestBody Long topicId) {
-		postTopicService.assignTopic(postId, topicId);
-		return ResponseEntity.ok().build();
-	}
+    @PostMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
+    public ResponseEntity<?> assignPostTopic(@PathVariable("postId") Long postId, @RequestBody Long topicId) {
 
-	@PutMapping()
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> setPostTopics(@PathVariable("postId") Long postId, @RequestBody List<Long> topicIds) {
-		postTopicService.resetTopics(postId, topicIds);
-		return ResponseEntity.ok().build();
-	}
+        postTopicService.assignTopic(postId, topicId);
+        return ResponseEntity.ok().build();
+    }
 
-	@DeleteMapping(value = "{topicId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> unassignPostTopic(@PathVariable("postId") Long postId, @PathVariable Long topicId) {
-		postTopicService.unassignTopic(postId, topicId);
-		return ResponseEntity.noContent().build();
-	}
+    @PutMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
+    public ResponseEntity<?> setPostTopics(@PathVariable("postId") Long postId, @RequestBody List<Long> topicIds) {
+
+        postTopicService.resetTopics(postId, topicIds);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "{topicId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
+    public ResponseEntity<?> unassignPostTopic(@PathVariable("postId") Long postId, @PathVariable Long topicId) {
+
+        postTopicService.unassignTopic(postId, topicId);
+        return ResponseEntity.noContent().build();
+    }
 }

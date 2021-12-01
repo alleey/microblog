@@ -1,5 +1,8 @@
 package org.zabardast.blog.services;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
@@ -15,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.blog.dto.TopicRequestRepresentation;
 import org.zabardast.blog.dto.TopicResponseRepresentation;
 import org.zabardast.blog.events.EventFactory;
+import org.zabardast.blog.model.Post;
 import org.zabardast.blog.model.Topic;
 import org.zabardast.blog.repository.TopicRepository;
+import org.zabardast.blog.services.exceptions.PostNotFoundException;
 import org.zabardast.blog.services.exceptions.TopicAlreadyExistsException;
 import org.zabardast.blog.services.exceptions.TopicNotFoundException;
 import org.zabardast.common.events.publishers.EventPublisher;
@@ -24,8 +29,7 @@ import org.zabardast.common.filtering.Filter;
 import org.zabardast.common.filtering.FilterPredicateConverter;
 
 @Service
-public class TopicService
-{
+public class TopicService {
     @Autowired
     @Qualifier("transactionOutboxPublisher")
     EventPublisher eventPublisher;
@@ -39,33 +43,36 @@ public class TopicService
     @Autowired
     FilterPredicateConverter filterPredicateConverter;
 
-    @Autowired TopicRepository topicRepository;
+    @Autowired
+    TopicRepository topicRepository;
 
     @Autowired
     ModelMapper modelMapper;
 
     @Transactional
     public TopicResponseRepresentation findOne(@NotNull Long topicId) {
+
         return topicRepository
-                .findById(topicId)
-                .map(i -> modelMapper.map(i, TopicResponseRepresentation.class))
-                .orElseThrow(() -> new TopicNotFoundException(topicId));
+            .findById(topicId)
+            .map(i -> modelMapper.map(i, TopicResponseRepresentation.class))
+            .orElseThrow(() -> new TopicNotFoundException(topicId));
     }
 
     @Transactional
     public Page<TopicResponseRepresentation> getAllTopics(@NotNull Pageable page) {
+
         return topicRepository
-                .findAll(page)
-                .map(i -> modelMapper.map(i, TopicResponseRepresentation.class));
+            .findAll(page)
+            .map(i -> modelMapper.map(i, TopicResponseRepresentation.class));
     }
 
     @Transactional
     public Page<TopicResponseRepresentation> getAllFiltered(@NotNull Filter criteria, @NotNull Pageable pageable) {
 
         CriteriaQuery<Topic> criteriaQuery = filterPredicateConverter.buildCriteriaQuery(entityManager,
-                Topic.class,
-                criteria,
-                pageable.getSort());
+            Topic.class,
+            criteria,
+            pageable.getSort());
         TypedQuery<Topic> query = entityManager.createQuery(criteriaQuery);
 
         int totalRows = query.getResultList().size();
@@ -78,6 +85,7 @@ public class TopicService
 
     @Transactional
     public TopicResponseRepresentation newTopic(@NotNull TopicRequestRepresentation topicRequestRepresentation) {
+
         topicRepository.findByCaption(topicRequestRepresentation.getCaption())
             .ifPresent(topic -> {
                 throw new TopicAlreadyExistsException(topic);
@@ -91,8 +99,8 @@ public class TopicService
 
     @Transactional
     public TopicResponseRepresentation updateTopic(@NotNull Long topicId,
-                                                   @NotNull TopicRequestRepresentation blogTopic)
-    {
+                                                   @NotNull TopicRequestRepresentation blogTopic) {
+
         return topicRepository.findById(topicId)
             .map(found -> {
                 found.setCaption(blogTopic.getCaption());
@@ -107,7 +115,11 @@ public class TopicService
 
     @Transactional
     public void deleteTopic(@NotNull Long topicId) {
+
         topicRepository.deleteById(topicId);
         eventPublisher.publishEvent(eventFactory.topicDeleted(this, topicId));
     }
+
+
+
 }

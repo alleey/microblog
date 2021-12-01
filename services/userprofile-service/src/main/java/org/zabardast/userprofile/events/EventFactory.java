@@ -29,18 +29,22 @@ public class EventFactory {
 
     @PostConstruct
     public void init() {
+
         modelMapper.addConverter(new UserProfileToMapConverter());
     }
 
     public UserProfileCreatedEvent userProfileCreated(Object source, @NotNull UserProfile userprofile) {
-        return new UserProfileCreatedEvent(source, modelMapper.map(userprofile,  Map.class));
+
+        return new UserProfileCreatedEvent(source, modelMapper.map(userprofile, Map.class));
     }
 
     public UserProfileUpdatedEvent userProfileUpdated(Object source, @NotNull UserProfile userprofile) {
-        return new UserProfileUpdatedEvent(source, modelMapper.map(userprofile,  Map.class));
+
+        return new UserProfileUpdatedEvent(source, modelMapper.map(userprofile, Map.class));
     }
 
     public UserProfileDeletedEvent userProfileDeleted(Object source, @NotNull String userprofileId) {
+
         return new UserProfileDeletedEvent(source,
             Map.of(UserProfileToMapConverter.ATTR_ID, userprofileId)
         );
@@ -48,15 +52,15 @@ public class EventFactory {
 
     public Event domainEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
+        if (event.getPrincipal() == null)
             event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
 
         return Event.builder()
-                .instant(new Date())
-                .type(event.getClass().getName())
-                .principal(event.getPrincipal())
-                //.traceId(tracer.currentSpan().context().traceId())
-                .payload(JsonUtils.toJson(event.attributes()))
-                .build();
+            .instant(new Date())
+            .type(event.getClass().getName())
+            .principal(event.getPrincipal())
+            //.traceId(tracer.currentSpan().context().traceId())
+            .payload(JsonUtils.mapToJson(event.attributes()))
+            .build();
     }
 }

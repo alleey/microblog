@@ -1,4 +1,3 @@
-
 package org.zabardast.blog.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -41,85 +40,84 @@ import org.zabardast.common.filtering.Filter;
 @Validated
 public class PostsController {
 
-	@Autowired
-	PostService postService;
+    @Autowired
+    PostService postService;
 
-	@Autowired
-	PagedResourcesAssembler<PostResponseRepresentation> pagedAssembler;
+    @Autowired
+    PagedResourcesAssembler<PostResponseRepresentation> pagedAssembler;
 
-	@Autowired
-	PostResponseRepresentationAssembler assembler;
+    @Autowired
+    PostResponseRepresentationAssembler assembler;
 
-	@GetMapping()
-	public ResponseEntity<?> getAll (@NotNull final Pageable page) {
+    @GetMapping()
+    public ResponseEntity<?> getAll(@NotNull final Pageable page) {
 
-		PagedModel<?> entities = pagedAssembler.toModel(
-			postService.getAllPosts(page),
-			assembler
-		);
+        PagedModel<?> entities = pagedAssembler.toModel(
+            postService.getAllPosts(page),
+            assembler
+        );
 
-		return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-	}
+        return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+    }
 
-	@GetMapping("search")
-	public ResponseEntity<?> search(@NotBlank @RequestParam("q")  final String criteria, final Pageable page)
-	{
-		try
-		{
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
-			Filter filter = mapper.readValue(criteria, Filter.class);
+    @GetMapping("search")
+    public ResponseEntity<?> search(@NotBlank @RequestParam("q") final String criteria, final Pageable page) {
 
-			PagedModel<?> entities = pagedAssembler.toModel(
-					postService.getAllFiltered(filter, page),
-					assembler
-			);
-			return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
-		}
-		catch (JsonProcessingException e)
-		{
-			log.error(e.toString());
-			return ResponseEntity.badRequest().build();
-		}
-	}
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+            Filter filter = mapper.readValue(criteria, Filter.class);
 
-	@GetMapping(value = "{postId}")
-	public ResponseEntity<?> getPostById(@PathVariable("postId") long postId) {
-		return ResponseEntity
-				.ok()
-				.contentType(MediaTypes.HAL_JSON)
-				.body(assembler.toModel(postService.getPost(postId)));
-	}
+            PagedModel<?> entities = pagedAssembler.toModel(
+                postService.getAllFiltered(filter, page),
+                assembler
+            );
+            return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(entities);
+        } catch (JsonProcessingException e) {
+            log.error(e.toString());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-	@PostMapping()
-	public ResponseEntity<?> newPost(@RequestBody PostRequestRepresentation blogPost,
-									 @NotNull Authentication authentication) {
-		EntityModel<?> entity = assembler.toModel(
-			postService.newPost(authentication.getName(), blogPost)
-		);
-		return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
-	}
+    @GetMapping(value = "{postId}")
+    public ResponseEntity<?> getPostById(@PathVariable("postId") long postId) {
 
-	@PutMapping(value = "{postId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> updatePost(
-			@PathVariable long postId,
-			@RequestBody PostRequestRepresentation blogPost,
-			@NotNull Authentication authentication)
-	{
-		EntityModel<?> entity = assembler.toModel(
-			postService.updatePost(postId, blogPost)
-		);
-		return ResponseEntity.ok().build();
-	}
+        return ResponseEntity
+            .ok()
+            .contentType(MediaTypes.HAL_JSON)
+            .body(assembler.toModel(postService.getPost(postId)));
+    }
 
-	@DeleteMapping(value = "{postId}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
-	public ResponseEntity<?> deletePost(
-			@PathVariable long postId,
-			@NotNull Authentication authentication)
-	{
-		postService.deletePost(postId);
-		return ResponseEntity.noContent().build();
-	}
+    @PostMapping()
+    public ResponseEntity<?> newPost(@RequestBody PostRequestRepresentation blogPost,
+                                     @NotNull Authentication authentication) {
+
+        EntityModel<?> entity = assembler.toModel(
+            postService.newPost(authentication.getName(), blogPost)
+        );
+        return ResponseEntity.created(entity.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entity);
+    }
+
+    @PutMapping(value = "{postId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
+    public ResponseEntity<?> updatePost(
+        @PathVariable long postId,
+        @RequestBody PostRequestRepresentation blogPost,
+        @NotNull Authentication authentication) {
+
+        EntityModel<?> entity = assembler.toModel(
+            postService.updatePost(postId, blogPost)
+        );
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "{postId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SERVICE') or @postOwnership.require(#postId, authentication)")
+    public ResponseEntity<?> deletePost(
+        @PathVariable long postId,
+        @NotNull Authentication authentication) {
+
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
+    }
 }

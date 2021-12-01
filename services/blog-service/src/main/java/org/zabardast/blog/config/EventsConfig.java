@@ -9,6 +9,7 @@ import org.zabardast.common.services.ServiceSecurityContextProvider;
 public class EventsConfig {
     @Bean
     ServiceSecurityContextProvider serviceSecurityContextProvider() {
+
         return new DefaultServiceSecurityContextProvider();
     }
 }

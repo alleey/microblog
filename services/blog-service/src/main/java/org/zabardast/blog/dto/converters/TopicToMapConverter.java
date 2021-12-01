@@ -8,16 +8,16 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.zabardast.blog.controllers.TopicsController;
 import org.zabardast.blog.model.Topic;
 
-public class TopicToMapConverter implements Converter<Topic, Map<String, String>> {
+public class TopicToMapConverter implements Converter<Topic, Map<String, Object>> {
 
     public static final String ATTR_ID = "topicId";
     public static final String ATTR_NAME = "name";
     public static final String ATTR_REF = "ref";
 
     @Override
-    public Map<String, String> convert(MappingContext<Topic, Map<String, String>> context) {
+    public Map<String, Object> convert(MappingContext<Topic, Map<String, Object>> context) {
         Topic s = context.getSource();
-        Map<String, String> d = context.getDestination();
+        Map<String, Object> d = context.getDestination();
 
         if(d == null)
             d = new HashMap<>();

@@ -10,9 +10,10 @@ import org.zabardast.resources.dto.ResourceResponseRepresentation;
 
 @Component
 public class ResourceResponseRepresentationAssembler implements
-        RepresentationModelAssembler<ResourceResponseRepresentation, EntityModel<ResourceResponseRepresentation>> {
+    RepresentationModelAssembler<ResourceResponseRepresentation, EntityModel<ResourceResponseRepresentation>> {
     @Override
     public EntityModel<ResourceResponseRepresentation> toModel(ResourceResponseRepresentation resource) {
+
         return EntityModel.of(
             resource,
             WebMvcLinkBuilder.linkTo(

@@ -8,25 +8,26 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.zabardast.followers.controllers.FollowingController;
 import org.zabardast.followers.model.Following;
 
-public class FollowingToMapConverter implements Converter<Following, Map<String, String>> {
+public class FollowingToMapConverter implements Converter<Following, Map<String, Object>> {
 
     public static final String ATTR_ID = "userId";
     public static final String ATTR_FOLLOWER = "followerId";
     public static final String ATTR_REF = "ref";
 
     @Override
-    public Map<String, String> convert(MappingContext<Following, Map<String, String>> context) {
-        Following s = context.getSource();
-        Map<String, String> d = context.getDestination();
+    public Map<String, Object> convert(MappingContext<Following, Map<String, Object>> context) {
 
-        if(d == null)
+        Following s = context.getSource();
+        Map<String, Object> d = context.getDestination();
+
+        if (d == null)
             d = new HashMap<>();
 
         d.putAll(Map.of(
             ATTR_ID, s.getUser(),
             ATTR_FOLLOWER, s.getFollower(),
             ATTR_REF, WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(FollowingController.class)
-                        .getOne(s.getFollower(), s.getUser())).toString()
+                .getOne(s.getFollower(), s.getUser())).toString()
         ));
         return d;
     }

@@ -18,7 +18,7 @@ import org.springframework.hateoas.server.core.Relation;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Relation(collectionRelation = "resources")
-@JsonIgnoreProperties(value = { "contentLocation", "contents" })
+@JsonIgnoreProperties(value = {"contentLocation", "contents"})
 @ToString
 public class ResourceResponseRepresentation {
     private String owner;

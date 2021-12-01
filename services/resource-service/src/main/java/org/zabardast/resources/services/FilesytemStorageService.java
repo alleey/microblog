@@ -23,21 +23,23 @@ public class FilesytemStorageService implements StorageService {
 
     @Autowired
     public FilesytemStorageService(StorageConfig config) {
+
         storage = Paths.get(config.getStoreLocation()).toAbsolutePath().normalize();
         log.info("Resource storage path set to " + storage.toString());
     }
 
     public String getResolvableMoniker(ResourceKey key) {
+
         return Path.of(key.getResource(), key.getKey()).toString();
     }
 
     public Resource load(String fileName) {
-        try
-        {
+
+        try {
             Path filePath = this.storage.resolve(fileName).normalize();
             log.info("load resource from path " + filePath.toString());
             Resource resource = new UrlResource(filePath.toUri());
-            if(resource.exists()) {
+            if (resource.exists()) {
                 return resource;
             }
             throw new FileNotFoundException("File not found " + filePath.toString());
@@ -48,6 +50,7 @@ public class FilesytemStorageService implements StorageService {
 
 
     public void save(String fileName, Resource resource) {
+
         try {
             Path filePath = this.storage.resolve(fileName).normalize();
             log.info("save resource to path " + filePath.toString());
@@ -59,6 +62,7 @@ public class FilesytemStorageService implements StorageService {
     }
 
     public void delete(String fileName) {
+
         try {
             Path filePath = this.storage.resolve(fileName).normalize();
             log.info("delete resource at path " + filePath.toString());
@@ -70,6 +74,7 @@ public class FilesytemStorageService implements StorageService {
     }
 
     void ensureDirectories(Path directory) {
+
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {

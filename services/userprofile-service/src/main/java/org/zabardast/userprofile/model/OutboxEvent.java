@@ -10,9 +10,12 @@ public class OutboxEvent extends ApplicationEvent {
     private int batchSize = 1;
 
     public OutboxEvent(Object source) {
+
         super(source);
     }
+
     public OutboxEvent(Object source, int batchSize) {
+
         super(source);
         this.batchSize = batchSize;
     }

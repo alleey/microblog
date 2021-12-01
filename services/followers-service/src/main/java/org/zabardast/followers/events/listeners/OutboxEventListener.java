@@ -9,8 +9,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.zabardast.common.events.publishers.EventPublisher;
-import org.zabardast.followers.model.Event;
 import org.zabardast.followers.events.OutboxEvent;
+import org.zabardast.followers.model.Event;
 import org.zabardast.followers.repository.EventRepository;
 
 @Slf4j
@@ -26,21 +26,21 @@ public class OutboxEventListener {
 
     @Async
     @EventListener()
-    void handleOutboxEvent(OutboxEvent event)
-    {
+    void handleOutboxEvent(OutboxEvent event) {
+
         long now = System.currentTimeMillis() / 1000;
         int processed = 0;
-        while(processed < event.getBatchSize())
-        {
+        while (processed < event.getBatchSize()) {
             processOneEvent();
-            processed ++;
+            processed++;
         }
     }
 
     @Transactional
     void processOneEvent() {
+
         Optional<Event> evt = eventRepository.findTopByOrderBySequenceAsc();
-        if(!evt.isPresent()) {
+        if (!evt.isPresent()) {
             return;
         }
         domainEventPublisher.publishEvent(evt.get());

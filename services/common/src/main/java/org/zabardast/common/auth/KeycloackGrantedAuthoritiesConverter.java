@@ -22,6 +22,7 @@ public class KeycloackGrantedAuthoritiesConverter implements Converter<Jwt, Coll
 
     @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
+
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (String authority : getAuthorities(jwt)) {
             grantedAuthorities.add(new SimpleGrantedAuthority(this.authorityPrefix + authority));
@@ -30,13 +31,14 @@ public class KeycloackGrantedAuthoritiesConverter implements Converter<Jwt, Coll
     }
 
     private Collection<String> getAuthorities(Jwt jwt) {
+
         Object authorities = jwt.getClaim("realm_access");
         if (authorities instanceof JSONObject) {
             JSONObject realm_access = (JSONObject) authorities;
             JSONArray roles = (JSONArray) realm_access.get("roles");
             return roles.stream()
-                    .map(m -> m.toString().toUpperCase())
-                    .collect(Collectors.toList());
+                .map(m -> m.toString().toUpperCase())
+                .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

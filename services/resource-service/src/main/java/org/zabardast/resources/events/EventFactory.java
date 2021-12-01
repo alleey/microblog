@@ -30,35 +30,39 @@ public class EventFactory {
 
     @PostConstruct
     public void init() {
+
         modelMapper.addConverter(new ResourceToMapConverter());
     }
 
     public ResourceCreatedEvent resourceCreated(Object source, @NotNull Resource bookmark) {
-        return new ResourceCreatedEvent(source, modelMapper.map(bookmark,  Map.class));
+
+        return new ResourceCreatedEvent(source, modelMapper.map(bookmark, Map.class));
     }
 
     public ResourceUpdatedEvent resourceUpdated(Object source, @NotNull Resource bookmark) {
-        return new ResourceUpdatedEvent(source, modelMapper.map(bookmark,  Map.class));
+
+        return new ResourceUpdatedEvent(source, modelMapper.map(bookmark, Map.class));
     }
 
     public ResourceDeletedEvent resourceDeleted(Object source, @NotNull ResourceKey resourceKey) {
+
         return new ResourceDeletedEvent(source,
             Map.of(ResourceToMapConverter.ATTR_RESOURCE, resourceKey.getResource(),
-                    ResourceToMapConverter.ATTR_KEY, resourceKey.getKey())
+                ResourceToMapConverter.ATTR_KEY, resourceKey.getKey())
         );
     }
 
     public Event domainEvent(BaseEvent event) {
 
-        if(event.getPrincipal() == null)
+        if (event.getPrincipal() == null)
             event.setPrincipal(serviceSecurityContextProvider.getPrincipalName());
 
         return Event.builder()
-                .instant(new Date())
-                .type(event.getClass().getName())
-                .principal(event.getPrincipal())
-                //.traceId(tracer.currentSpan().context().traceId())
-                .payload(JsonUtils.toJson(event.attributes()))
-                .build();
+            .instant(new Date())
+            .type(event.getClass().getName())
+            .principal(event.getPrincipal())
+            //.traceId(tracer.currentSpan().context().traceId())
+            .payload(JsonUtils.mapToJson(event.attributes()))
+            .build();
     }
 }

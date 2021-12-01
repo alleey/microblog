@@ -13,6 +13,7 @@ public class ResourceAlreadyExistsAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(AlreadyExistsException.class)
     String resourceAlreadyExistsHandler(AlreadyExistsException exception) {
+
         return exception.getMessage();
     }
 }

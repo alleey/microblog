@@ -10,7 +10,8 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 @SpringBootApplication(scanBasePackages = {"org.zabardast"})
 public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+
+        SpringApplication.run(Application.class, args);
+    }
 }

@@ -17,17 +17,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Slf4j
 @Configuration
 @EnableWebMvc
-@EnableHypermediaSupport(type= EnableHypermediaSupport.HypermediaType.HAL)
+@EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class CorsConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "server.cors")
     public Map<String, CorsConfiguration> corsConfiguration() {
+
         return new LinkedHashMap<>();
     }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
+
         return new WebMvcConfigurer() {
 
             @Autowired
@@ -35,6 +37,7 @@ public class CorsConfig {
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+
                 for (Map.Entry<String, CorsConfiguration> entry : corsConfiguration.entrySet()) {
                     log.info("CORS configuration " + entry.getKey());
                     CorsRegistration reg = registry.addMapping(entry.getKey());

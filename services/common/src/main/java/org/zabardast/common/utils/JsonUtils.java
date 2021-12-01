@@ -8,26 +8,22 @@ import java.util.Map;
 
 public class JsonUtils {
 
-    public static String toJson(@NotNull Map attributes) {
+    public static String mapToJson(@NotNull Map attributes) {
+
         ObjectMapper objectMapper = new ObjectMapper();
-        try
-        {
+        try {
             return objectMapper.writeValueAsString(attributes);
-        }
-        catch (JsonProcessingException e)
-        {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    public static Map fromJson(@NotNull String json) {
+    public static Map mapFromJson(@NotNull String json) {
+
         ObjectMapper objectMapper = new ObjectMapper();
-        try
-        {
+        try {
             return objectMapper.readValue(json, HashMap.class);
-        }
-        catch (JsonProcessingException e)
-        {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

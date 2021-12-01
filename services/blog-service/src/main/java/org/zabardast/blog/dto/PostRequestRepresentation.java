@@ -1,5 +1,6 @@
 package org.zabardast.blog.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,5 @@ public class PostRequestRepresentation {
     private String slug;
     private String title;
     private String text;
+    private List<Long> topics;
 }

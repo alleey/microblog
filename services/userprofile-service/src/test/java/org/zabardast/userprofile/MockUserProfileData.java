@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.zabardast.userprofile.dto.UserProfileResponseRepresentation;
-import org.zabardast.userprofile.model.UserProfile;
 
 public final class MockUserProfileData {
 
@@ -23,28 +22,30 @@ public final class MockUserProfileData {
     public MockUserProfileData() {
 
         AlLNonAdminProfiles =
-                Stream.concat(
-                    Stream.of(createUserProfileResponse(UserIdGuest, "Guest")),
-                    IntStream.range(0, 20).mapToObj(i -> createUserProfileResponse(String.format("User%d",i), String.format("User%d",i)))
-                ).collect(Collectors.toList());
+            Stream.concat(
+                Stream.of(createUserProfileResponse(UserIdGuest, "Guest")),
+                IntStream.range(0, 20).mapToObj(i -> createUserProfileResponse(String.format("User%d", i), String.format("User%d", i)))
+            ).collect(Collectors.toList());
 
         AllAdminUserProfiles = Stream.of(UserIdAdmin)
-                .map(i -> createUserProfileResponse(i, "Admin"))
-                .collect(Collectors.toList());
+            .map(i -> createUserProfileResponse(i, "Admin"))
+            .collect(Collectors.toList());
 
         AllUserProfiles = Stream.concat(AlLNonAdminProfiles.stream(), AllAdminUserProfiles.stream())
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     public static UserProfileResponseRepresentation createUserProfileResponse(String id, String userName) {
+
         return UserProfileResponseRepresentation.builder()
-                .id(id)
-                .username(userName)
-                .createdOn(new Date())
-                .build();
+            .id(id)
+            .username(userName)
+            .createdOn(new Date())
+            .build();
     }
 
     public static String objectToJson(Object post) throws JsonProcessingException {
+
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(post);
     }

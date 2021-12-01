@@ -19,25 +19,27 @@ public final class MockFollowersData {
     public MockFollowersData() {
 
         AllGuestFollowers =
-                Arrays.asList(UserIdAdmin, UserIdService).stream()
-                        .map(i -> createFollowsResponse(i, UserIdGuest))
-                        .collect(Collectors.toList());
+            Arrays.asList(UserIdAdmin, UserIdService).stream()
+                .map(i -> createFollowsResponse(i, UserIdGuest))
+                .collect(Collectors.toList());
 
         AllGuestFollowing =
-                Arrays.asList(UserIdAdmin).stream()
-                        .map(i -> createFollowsResponse(i, UserIdGuest))
-                        .collect(Collectors.toList());
+            Arrays.asList(UserIdAdmin).stream()
+                .map(i -> createFollowsResponse(i, UserIdGuest))
+                .collect(Collectors.toList());
 
     }
 
     public static FollowResponseRepresentation createFollowsResponse(String id, String follower) {
+
         return FollowResponseRepresentation.builder()
-                .userId(id)
-                .followerId(follower)
-                .build();
+            .userId(id)
+            .followerId(follower)
+            .build();
     }
 
     public static String objectToJson(Object post) throws JsonProcessingException {
+
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(post);
     }
