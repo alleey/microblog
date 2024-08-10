@@ -4,38 +4,28 @@
   "compilerOptions": {
     "paths": {
       "auth-oidc": [
-        "projects/auth-oidc//src/public_api",
-        "dist/auth-oidc/auth-oidc",
-        "dist/auth-oidc"
+        "projects/auth-oidc/src/public_api"
       ],
       "blog": [
-        "dist/blog/blog",
-        "dist/blog"
+        "projects/blog/src/public_api"
       ],
       "bookmarks": [
-        "dist/bookmarks/bookmarks",
-        "dist/bookmarks"
+        "projects/bookmarks/src/public_api"
       ],
       "followers": [
-        "dist/followers/followers",
-        "dist/followers"
+        "projects/followers/src/public_api"
       ],
       "resources": [
-        "dist/resources/resources",
-        "dist/resources"
+        "projects/resources/src/public_api"
       ],
       "stats": [
-        "dist/stats/stats",
-        "dist/stats"
+        "projects/stats/src/public_api"
       ],
       "userprofile": [
-        "dist/userprofile/userprofile",
-        "dist/userprofile"
+        "projects/userprofile/src/public_api"
       ],
       "utils": [
-        "projects/utils//src/public_api",
-        "dist/utils/utils",
-        "dist/utils"
+        "projects/utils/src/public_api"
       ]
     },
     "baseUrl": "./",
